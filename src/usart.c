@@ -86,3 +86,9 @@ void receive_msg_int (void) {
                 }
         }
 }
+
+void receive_msg_clear (void) {
+        rx_msg.active = 0;
+        rx_msg.err = 0;
+        rx_msg.addr = 0;
+}

@@ -30,3 +30,4 @@ extern void send_msg (char *msg);
 extern void send_msg_int (void);
 extern void start_usart_receive (void);
 extern void receive_msg_int (void);
+extern void receive_msg_clear (void);
