@@ -33,6 +33,11 @@ void usart_init (void) {
         rx_msg.addr = 0;
 }
 
+void send_char (char msg) {
+        while (!PIR1bits.TXIF);
+        TXREG = msg;
+}
+
 void send_msg (char *msg) {
         int i;
         tx_msg.msg = msg;
