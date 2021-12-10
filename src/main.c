@@ -51,9 +51,7 @@ void main (void) {
         trch_init();
         usart_init();
         timer2_init();
-        TRISA = 0x3F;
         TRISE = 0x01;
-        int first = 1;
         timer2_ctrl(1);
 
         /*
@@ -66,10 +64,6 @@ void main (void) {
                         cmd_parser();
 
                 if (tmr2.event) {
-                        if (gtimer == 1 && first) {
-                                TRISAbits.TRISA1 = 0;
-                                first = 0;
-                        }
                         gtimer++;
                         tmr2.event = 0;
                 }
