@@ -33,18 +33,24 @@ void usart_init (void) {
 }
 
 void send_msg (char *msg) {
-        TXSTAbits.TXEN = 1;
+        int i;
         tx_msg.msg = msg;
         tx_msg.active = 1;
+
+        // Transfer start
+        TXSTAbits.TXEN = 1;
         while (tx_msg.active) {
                 while (!PIR1bits.TXIF);
-                if (*tx_msg.msg == 0x00) {
-                        TXREG = 0x0d;
+                if (*tx_msg.msg == 0x00)
                         tx_msg.active = 0;
-                } else {
+                else {
                         TXREG = *tx_msg.msg;
                         tx_msg.msg++;
                 }
+        }
+        for (i=0; i<2; i++) {
+                while (!PIR1bits.TXIF);
+                TXREG = newline[i];
         }
         while (!TXSTAbits.TRMT);
         TXSTAbits.TXEN = 0;
