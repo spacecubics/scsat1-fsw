@@ -7,6 +7,11 @@
  */
 
 /*
+ * Hardware Configuration
+ */
+#define _XTAL_FREQ 4000000
+
+/*
  * PORTA Hardware
  *  bit 0: TRCH_CFG_MEM_SEL
  *  bit 1: FPGA_BOOT0
