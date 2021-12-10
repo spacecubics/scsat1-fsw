@@ -9,6 +9,7 @@
 
 #include <pic.h>
 #include <usart.h>
+#include <string.h>
 
 /*
  * USART Initialize
@@ -92,6 +93,7 @@ void receive_msg_int (void) {
 }
 
 void receive_msg_clear (void) {
+        memset(rx_msg.msg, 0, MSG_LEN);
         rx_msg.active = 0;
         rx_msg.err = 0;
         rx_msg.addr = 0;
