@@ -81,6 +81,7 @@ void receive_msg_int (void) {
                         buf = RCREG;
         } else {
                 buf = RCREG;
+                send_char(buf);
                 if (buf == rx_msg_delimiter)
                         rx_msg.active = 1;
                 else {
