@@ -58,7 +58,7 @@ void main (void) {
         /*
          * Space Cubics OBC TRCH-Firmware Main
          */
-        send_msg("SC OBC Firmware v1.0 for board evaluation\n");
+        send_msg("SC OBC Firmware v1.0 for board evaluation");
         start_usart_receive();
         while (1) {
                 if (tmr2.event) {
