@@ -9,6 +9,7 @@
 
 #define MSG_LEN 30
 static char newline[2] = {0x0d, 0x0a};
+static char rx_msg_delimiter = 0x0d;
 
 struct usart_tx_msg {
         char *msg;

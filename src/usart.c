@@ -78,7 +78,7 @@ void receive_msg_int (void) {
                         buf = RCREG;
         } else {
                 buf = RCREG;
-                if (buf == 0x0A)
+                if (buf == rx_msg_delimiter)
                         rx_msg.active = 1;
                 else {
                         rx_msg.msg[rx_msg.addr] = buf;
