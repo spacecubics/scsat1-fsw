@@ -22,6 +22,7 @@ void usart_init (void) {
         TXSTAbits.SYNC = 0;
         TXSTAbits.BRGH = 1;
         TXSTAbits.TX9D = 0;
+        TXSTAbits.TXEN = 1;
         RCSTAbits.SPEN = 1;
         RCSTAbits.RX9 = 0;
         RCSTAbits.ADDEN = 0;
@@ -38,7 +39,6 @@ void send_msg (char *msg) {
         tx_msg.active = 1;
 
         // Transfer start
-        TXSTAbits.TXEN = 1;
         while (tx_msg.active) {
                 while (!PIR1bits.TXIF);
                 if (*tx_msg.msg == 0x00)
@@ -52,8 +52,6 @@ void send_msg (char *msg) {
                 while (!PIR1bits.TXIF);
                 TXREG = newline[i];
         }
-        while (!TXSTAbits.TRMT);
-        TXSTAbits.TXEN = 0;
 }
 
 void start_usart_receive (void) {
