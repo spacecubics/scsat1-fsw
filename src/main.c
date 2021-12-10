@@ -11,6 +11,7 @@
 #include <fpga_ctrl.h>
 #include <usart.h>
 #include <timer.h>
+#include <string.h>
 
 // PIC16LF877A Configuration Bit Settings
 #pragma config FOSC = HS        // Oscillator Selection bits (HS oscillator)
@@ -23,6 +24,8 @@
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
 #define _XTAL_FREQ 4000000
+
+extern void cmd_parser (void);
 
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
@@ -61,6 +64,9 @@ void main (void) {
         send_msg("SC OBC Firmware v1.0 for board evaluation");
         start_usart_receive();
         while (1) {
+                if (rx_msg.active)
+                        cmd_parser();
+
                 if (tmr2.event) {
                         if (gtimer == 1 && first) {
                                 TRISAbits.TRISA1 = 0;
@@ -71,4 +77,16 @@ void main (void) {
                 }
         }
         return;
+}
+
+void cmd_parser (void) {
+        send_msg(rx_msg.msg);
+        if(!strcmp(rx_msg.msg,"ld01")) {
+                if ((PORTE & (_PORTE_RE1_MASK | _PORTE_RE2_MASK)) == 0x02)
+                        PORTE = 0x04;
+                else
+                        PORTE = 0x02;
+        } else
+                send_msg("cmd error");
+        receive_msg_clear();
 }
