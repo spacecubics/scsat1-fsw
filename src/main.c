@@ -65,9 +65,6 @@ void main (void) {
                         cmd_parser();
 
                 if (tmr2.event) {
-                        if (gtimer == 10) {
-                                fpga_config_wait(0);
-                        }
                         gtimer++;
                         tmr2.event = 0;
                 }
@@ -82,6 +79,14 @@ void cmd_parser (void) {
                         PORTE = 0x04;
                 else
                         PORTE = 0x02;
+
+        // FPGA Command
+        } else if (!strcmp(rx_msg.msg,"fc")) {
+                send_msg("fpga configuration");
+                fpga_config_wait(0);
+        } else if (!strcmp(rx_msg.msg,"fr")) {
+                send_msg("fpga re-configuration");
+                fpga_reconfig();
         } else
                 send_msg("cmd error");
         receive_msg_clear();
