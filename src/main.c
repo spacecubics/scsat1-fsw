@@ -11,6 +11,7 @@
 #include <fpga.h>
 #include <usart.h>
 #include <timer.h>
+#include <interrupt.h>
 #include <string.h>
 
 // PIC16LF877A Configuration Bit Settings
@@ -41,8 +42,6 @@ void trch_init (void) {
         TRISC = TRISC_INIT;
         TRISD = TRISD_INIT;
         TRISE = TRISE_INIT;
-        INTCONbits.PEIE = 1;
-        INTCONbits.GIE = 1;
 }
 
 void main (void) {
@@ -54,6 +53,7 @@ void main (void) {
         timer2_init();
         TRISE = 0x01;
         timer2_ctrl(1);
+        interrupt_init();
 
         /*
          * Space Cubics OBC TRCH-Firmware Main
