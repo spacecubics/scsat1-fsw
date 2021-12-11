@@ -83,10 +83,12 @@ void cmd_parser (void) {
         // FPGA Command
         } else if (!strcmp(rx_msg.msg,"fc")) {
                 send_msg("fpga configuration");
-                fpga_config_wait(0);
-        } else if (!strcmp(rx_msg.msg,"fr")) {
-                send_msg("fpga re-configuration");
-                fpga_reconfig();
+                if (switch_fpga_state(ST_FPGA_CONFIG))
+                        send_msg(" Configuration Error");
+        } else if (!strcmp(rx_msg.msg,"fu")) {
+                send_msg("fpga unconfiguration");
+                if (switch_fpga_state(ST_FPGA_READY))
+                        send_msg(" Unconfiguration Error");
         } else
                 send_msg("cmd error");
         receive_msg_clear();
