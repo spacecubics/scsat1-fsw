@@ -8,7 +8,7 @@
 #include <xc.h>
 #include <pic.h>
 #include <trch.h>
-#include <fpga_ctrl.h>
+#include <fpga.h>
 #include <usart.h>
 #include <timer.h>
 #include <string.h>
@@ -49,6 +49,7 @@ void main (void) {
         // Initialize trch-firmware
         unsigned long gtimer = 0;
         trch_init();
+        fpga_init();
         usart_init();
         timer2_init();
         TRISE = 0x01;
@@ -64,6 +65,9 @@ void main (void) {
                         cmd_parser();
 
                 if (tmr2.event) {
+                        if (gtimer == 10) {
+                                fpga_config_wait(0);
+                        }
                         gtimer++;
                         tmr2.event = 0;
                 }

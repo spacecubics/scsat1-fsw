@@ -20,10 +20,12 @@
  *  bit 4: FPGA_INIT_B
  *  bit 5: FPGA_CDRST_B
  */
-#define TRISA_INIT       0x3E
-#define TRISA_FPGA_READY 0x00
-#define FPGA_PROGRAM_B   PORTAbits.RA3
-#define FPGA_INIT_B      PORTAbits.RA4
+#define TRISA_INIT         0x3F
+#define TRISA_FPGA_READY   0x00
+#define FPGA_PROGRAM_B     PORTAbits.RA0
+#define FPGA_PROGRAM_B_DIR TRISAbits.TRISA0
+#define FPGA_INIT_B        PORTAbits.RA1
+#define FPGA_INIT_B_DIR    TRISAbits.TRISA1
 
 /*
  * PORTB Hardware
@@ -71,4 +73,4 @@
  *  bit 2: FPGA_INIT_B_IN
  */
 #define TRISE_INIT 0x06
-#define VDD_3V3 PORTEbits.RE2
+#define VDD_3V3 PORTBbits.RB3
