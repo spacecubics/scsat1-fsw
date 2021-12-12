@@ -9,6 +9,7 @@
 #include <pic.h>
 #include <trch.h>
 #include <fpga.h>
+#include <i2c-gpio.h>
 #include <usart.h>
 #include <timer.h>
 #include <interrupt.h>
@@ -24,7 +25,9 @@
 #pragma config WRT = OFF        // Flash Program Memory Write Enable bits (Write protection off; all program memory may be written to by EECON control)
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
+#define BUF_LEN 20
 extern void cmd_parser (void);
+extern void conv_message (char *data, int count);
 
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
@@ -73,6 +76,8 @@ void main (void) {
 }
 
 void cmd_parser (void) {
+        char buf[BUF_LEN] = { };
+
         send_msg(rx_msg.msg);
         if(!strcmp(rx_msg.msg,"ld01")) {
                 if ((PORTE & (_PORTE_RE1_MASK | _PORTE_RE2_MASK)) == 0x02)
@@ -89,7 +94,39 @@ void cmd_parser (void) {
                 send_msg("fpga unconfiguration");
                 if (switch_fpga_state(ST_FPGA_READY))
                         send_msg(" Unconfiguration Error");
+
+        // I2C-GPIO Command
+        } else if (!strcmp(rx_msg.msg,"i2cr")) {
+                if (!get_i2c()) {
+                        interrupt_lock(1);
+                        PORTE = 0x04;
+                        send_start(0);
+                        i2c_send_data(0, 0x90);
+                        i2c_send_data(0, 0x03);
+                        send_start(0);
+                        i2c_send_data(0, 0x91);
+                        buf[0] = i2c_receive_data(0);
+                        buf[1] = i2c_receive_data(0);
+                        send_stop(0);
+                        interrupt_lock(0);
+                        conv_message(buf, 2);
+                } else
+                        send_msg("i2c bus error");
+
         } else
                 send_msg("cmd error");
         receive_msg_clear();
+}
+
+void conv_message (char *data, int count) {
+        int i, j=0;
+        char text[] = "0123456789ABCDEF";
+        char message[BUF_LEN] = { };
+        for (i=0; i<count; i++) {
+                message[j]   = text[(*data & 0xF0) >> 4];
+                message[j+1] = text[*data & 0x0F];
+                j=j+2;
+                data++;
+        }
+        send_msg(message);
 }
