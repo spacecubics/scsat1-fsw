@@ -64,6 +64,9 @@ void main (void) {
         send_msg("SC OBC Firmware v1.0 for board evaluation");
         start_usart_receive();
         while (1) {
+                if (fmd.state == ST_FPGA_ACTIVE)
+                        TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
+
                 if (rx_msg.active)
                         cmd_parser();
 
@@ -94,6 +97,21 @@ void cmd_parser (void) {
                 send_msg("fpga unconfiguration");
                 if (switch_fpga_state(ST_FPGA_READY))
                         send_msg(" Unconfiguration Error");
+
+        // Configuration Memory Select
+        } else if (!strncmp(rx_msg.msg,"bc",2)) {
+                if (fmd.state != ST_FPGA_ACTIVE) {
+                        send_msg("buffer select control");
+                        buf[0] = *(rx_msg.msg+2) - 0x30;
+                        if (buf[0] == 0x00) {
+                                TRCH_CFG_MEM_SEL = 0;
+                                send_msg("  level 0");
+                        } else if (buf[0] == 0x01) {
+                                TRCH_CFG_MEM_SEL = 1;
+                                send_msg("  level 1");
+                        }
+                } else
+                        send_msg("fpga state error");
 
         // I2C-GPIO Command
         } else if (!strcmp(rx_msg.msg,"i2cr")) {

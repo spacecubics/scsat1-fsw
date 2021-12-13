@@ -20,8 +20,9 @@
  *  bit 4: FPGA_INIT_B
  *  bit 5: FPGA_CDRST_B
  */
-#define TRISA_INIT         0x3F
+#define TRISA_INIT         0x3E
 #define TRISA_FPGA_READY   0x00
+#define TRCH_CFG_MEM_SEL   PORTAbits.RA0
 #define FPGA_PROGRAM_B     PORTAbits.RA0
 #define FPGA_PROGRAM_B_DIR TRISAbits.TRISA0
 #define FPGA_INIT_B        PORTAbits.RA1
@@ -39,6 +40,7 @@
  *  bit 7: No Function (for Debug: ICSP_PGD)
  */
 #define TRISB_INIT 0xFF
+#define FPGA_CFG_MEM_SEL   PORTBbits.RB5
 
 /*
  * PORTC Hardware
