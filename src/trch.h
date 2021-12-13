@@ -86,5 +86,5 @@
  *  bit 1: FPGA_PROGRAM_B_IN
  *  bit 2: FPGA_INIT_B_IN
  */
-#define TRISE_INIT 0x06
-#define VDD_3V3 PORTBbits.RB3
+#define TRISE_INIT        0x06
+#define VDD_3V3           PORTEbits.RE1

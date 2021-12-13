@@ -67,7 +67,9 @@ void main (void) {
         send_msg("SC OBC Firmware v1.0 for board evaluation");
         start_usart_receive();
         while (1) {
-                if (fmd.state == ST_FPGA_ACTIVE)
+                if (fmd.state == ST_POWER_OFF) {
+                        check_fpga_power();
+                } else if (fmd.state == ST_FPGA_ACTIVE)
                         TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
 
                 if (rx_msg.active)

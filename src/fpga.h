@@ -18,6 +18,5 @@ struct fpga_management_data {
 struct fpga_management_data fmd;
 
 extern void fpga_init (void);
-extern void fpga_config_wait (int sw);
-extern void fpga_reconfig (void);
+extern void check_fpga_power (void);
 extern int switch_fpga_state (fpga_st next_st);
