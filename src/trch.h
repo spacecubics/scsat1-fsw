@@ -70,15 +70,15 @@
  *  bit 6: UIO3_02
  *  bit 7: FPGA_RESERVE
  */
-#define TRISD_INIT  0xFF
-#define INT_SCL_DIR TRISDbits.TRISD5
-#define INT_SCL_DAT PORTDbits.RD5
-#define INT_SDA_DIR TRISDbits.TRISD6
-#define INT_SDA_DAT PORTDbits.RD6
-#define EXT_SCL_DIR TRISDbits.TRISD3
-#define EXT_SCL_DAT PORTDbits.RD3
-#define EXT_SDA_DIR TRISDbits.TRISD4
-#define EXT_SDA_DAT PORTDbits.RD4
+#define TRISD_INIT         0xFF
+#define INT_SCL_DIR        TRISDbits.TRISD0
+#define INT_SCL_DAT        PORTDbits.RD0
+#define INT_SDA_DIR        TRISDbits.TRISD1
+#define INT_SDA_DAT        PORTDbits.RD1
+#define EXT_SCL_DIR        TRISDbits.TRISD2
+#define EXT_SCL_DAT        PORTDbits.RD2
+#define EXT_SDA_DIR        TRISDbits.TRISD3
+#define EXT_SDA_DAT        PORTDbits.RD3
 
 /*
  * PORTE Hardware
