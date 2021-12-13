@@ -53,7 +53,11 @@
  *  bit 6: TRCH_UART_TX
  *  bit 7: TRCH_UART_RX
  */
-#define TRISC_INIT 0xFF
+#define TRISC_INIT         0xFF
+#define SPICAN_CS_B_DIR    TRISCbits.TRISC1
+#define SPICAN_CS_B        PORTCbits.RC1
+#define SPICAN_SCK_DIR     TRISCbits.TRISC3
+#define SPICAN_MOSI_DIR    TRISCbits.TRISC5
 
 /*
  * PORTD Hardware

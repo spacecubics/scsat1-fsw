@@ -9,6 +9,7 @@
 #include <pic.h>
 #include <trch.h>
 #include <fpga.h>
+#include <spi.h>
 #include <i2c-gpio.h>
 #include <usart.h>
 #include <timer.h>
@@ -28,6 +29,7 @@
 #define BUF_LEN 20
 extern void cmd_parser (void);
 extern void conv_message (char *data, int count);
+extern char conv_asc2hex (char data);
 
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
@@ -52,6 +54,7 @@ void main (void) {
         unsigned long gtimer = 0;
         trch_init();
         fpga_init();
+        spi_init();
         usart_init();
         timer2_init();
         TRISE = 0x01;
@@ -80,6 +83,7 @@ void main (void) {
 
 void cmd_parser (void) {
         char buf[BUF_LEN] = { };
+        char data;
 
         send_msg(rx_msg.msg);
         if(!strcmp(rx_msg.msg,"ld01")) {
@@ -112,6 +116,21 @@ void cmd_parser (void) {
                         }
                 } else
                         send_msg("fpga state error");
+
+        // SPI Command
+        } else if (!strcmp(rx_msg.msg,"spistart")) {
+                send_msg("spi start (cs=0)");
+                get_spi();
+
+        } else if (!strcmp(rx_msg.msg,"spistop")) {
+                send_msg("spi stop (cs=1)");
+                release_spi();
+
+        } else if (!strncmp(rx_msg.msg,"spi",3)) {
+                data = conv_asc2hex(*(rx_msg.msg+3));
+                data = (char)(data << 4) | conv_asc2hex(*(rx_msg.msg+4));
+                buf[0] = spi_trans(data);
+                conv_message(buf, 1);
 
         // I2C-GPIO Command
         } else if (!strcmp(rx_msg.msg,"i2cr")) {
@@ -147,4 +166,15 @@ void conv_message (char *data, int count) {
                 data++;
         }
         send_msg(message);
+}
+
+char conv_asc2hex (char data) {
+        if (data >= 0x30 && data <= 39)
+                return (data - 0x30);
+        else if (data >= 0x41 && data <= 0x46)
+                return (data - 0x37);
+        else if (data >= 0x61 && data <= 0x66)
+                return (data - 0x57);
+        else
+                return 0x00;
 }
