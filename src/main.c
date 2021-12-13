@@ -57,7 +57,6 @@ void main (void) {
         spi_init();
         usart_init();
         timer2_init();
-        TRISE = 0x01;
         timer2_ctrl(1);
         interrupt_init();
 
@@ -88,14 +87,8 @@ void cmd_parser (void) {
         char data;
 
         send_msg(rx_msg.msg);
-        if(!strcmp(rx_msg.msg,"ld01")) {
-                if ((PORTE & (_PORTE_RE1_MASK | _PORTE_RE2_MASK)) == 0x02)
-                        PORTE = 0x04;
-                else
-                        PORTE = 0x02;
-
         // FPGA Command
-        } else if (!strcmp(rx_msg.msg,"fc")) {
+        if (!strcmp(rx_msg.msg,"fc")) {
                 send_msg("fpga configuration");
                 if (switch_fpga_state(ST_FPGA_CONFIG))
                         send_msg(" Configuration Error");
@@ -138,7 +131,6 @@ void cmd_parser (void) {
         } else if (!strcmp(rx_msg.msg,"i2cr")) {
                 if (!get_i2c()) {
                         interrupt_lock(1);
-                        PORTE = 0x04;
                         send_start(0);
                         i2c_send_data(0, 0x90);
                         i2c_send_data(0, 0x03);
