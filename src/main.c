@@ -43,10 +43,15 @@ void __interrupt() isr(void) {
 void trch_init (void) {
         ADCON1 = 0x07;
         TRISA = TRISA_INIT;
+        PORTA = PORTA_INIT;
         TRISB = TRISB_INIT;
+        PORTB = PORTB_INIT;
         TRISC = TRISC_INIT;
+        PORTC = PORTC_INIT;
         TRISD = TRISD_INIT;
+        PORTD = PORTD_INIT;
         TRISE = TRISE_INIT;
+        PORTE = PORTE_INIT;
 }
 
 void main (void) {
