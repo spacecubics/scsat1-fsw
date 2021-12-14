@@ -103,16 +103,16 @@ void cmd_parser (void) {
                         send_msg(" Unconfiguration Error");
 
         // Configuration Memory Select
-        } else if (!strncmp(rx_msg.msg,"bc",2)) {
+        } else if (!strncmp(rx_msg.msg,"ms",2)) {
                 if (fmd.state != ST_FPGA_ACTIVE) {
-                        send_msg("buffer select control");
+                        send_msg("Memory select control");
                         buf[0] = *(rx_msg.msg+2) - 0x30;
                         if (buf[0] == 0x00) {
                                 TRCH_CFG_MEM_SEL = 0;
-                                send_msg("  level 0");
+                                send_msg("  memory 0");
                         } else if (buf[0] == 0x01) {
                                 TRCH_CFG_MEM_SEL = 1;
-                                send_msg("  level 1");
+                                send_msg("  memory 1");
                         }
                 } else
                         send_msg("fpga state error");
