@@ -1,7 +1,7 @@
 
 # Design Parameter
 MODULE := trch-firmware
-DEVICE := 16LF877A
+DEVICE := 16LF877
 TARGET := PPK4
 
 # Command variables
