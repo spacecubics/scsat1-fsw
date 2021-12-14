@@ -68,7 +68,7 @@ void main (void) {
         /*
          * Space Cubics OBC TRCH-Firmware Main
          */
-        send_msg("SC OBC Firmware v1.0 for board evaluation");
+        send_msg("SC OBC TRCH-FW v0.1");
         start_usart_receive();
         while (1) {
                 if (fmd.state == ST_POWER_OFF) {
@@ -180,6 +180,49 @@ void cmd_parser (void) {
                         conv_message(buf, 2);
                 } else
                         send_msg("i2c bus error");
+
+        // Register Check
+        } else if (!strcmp(rx_msg.msg,"chkreg")) {
+                send_msg("TRISA");
+                buf[0] = TRISA;
+                conv_message(buf, 1);
+                send_msg("PORTA");
+                buf[0] = PORTA;
+                conv_message(buf, 1);
+
+                send_msg("TRISB");
+                buf[0] = TRISB;
+                conv_message(buf, 1);
+                send_msg("PORTB");
+                buf[0] = PORTB;
+                conv_message(buf, 1);
+
+                send_msg("TRISC");
+                buf[0] = TRISC;
+                conv_message(buf, 1);
+                send_msg("PORTC");
+                buf[0] = PORTC;
+                conv_message(buf, 1);
+
+                send_msg("TRISD");
+                buf[0] = TRISD;
+                conv_message(buf, 1);
+                send_msg("PORTD");
+                buf[0] = PORTD;
+                conv_message(buf, 1);
+
+                send_msg("TRISE");
+                buf[0] = TRISE;
+                conv_message(buf, 1);
+                send_msg("PORTE");
+                buf[0] = PORTE;
+                conv_message(buf, 1);
+
+                send_msg("FPGA State");
+                buf[0] = fmd.state;
+                conv_message(buf, 1);
+                buf[0] = (char)fmd.count;
+                conv_message(buf, 1);
 
         } else
                 send_msg("cmd error");
