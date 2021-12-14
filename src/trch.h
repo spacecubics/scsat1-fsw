@@ -91,6 +91,9 @@
 #define EXT_SCL_DAT        PORTDbits.RD2
 #define EXT_SDA_DIR        TRISDbits.TRISD3
 #define EXT_SDA_DAT        PORTDbits.RD3
+#define UIO3_00            PORTDbits.RD4
+#define UIO3_01            PORTDbits.RD5
+#define UIO3_02            PORTDbits.RD6
 
 /*
  * PORTE Hardware

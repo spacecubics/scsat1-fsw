@@ -117,6 +117,38 @@ void cmd_parser (void) {
                 } else
                         send_msg("fpga state error");
 
+        // User IO
+        } else if (!strncmp(rx_msg.msg,"uio0",4)) {
+                send_msg("UIO3 00");
+                buf[0] = *(rx_msg.msg+4) - 0x30;
+                if (buf[0] == 0x00) {
+                        UIO3_00 = 0;
+                        send_msg("  level 0");
+                } else if (buf[0] == 0x01) {
+                        UIO3_00 = 1;
+                        send_msg("  level 1");
+                }
+        } else if (!strncmp(rx_msg.msg,"uio1",4)) {
+                send_msg("UIO3 01");
+                buf[0] = *(rx_msg.msg+4) - 0x30;
+                if (buf[0] == 0x00) {
+                        UIO3_01 = 0;
+                        send_msg("  level 0");
+                } else if (buf[0] == 0x01) {
+                        UIO3_01 = 1;
+                        send_msg("  level 1");
+                }
+        } else if (!strncmp(rx_msg.msg,"uio2",4)) {
+                send_msg("UIO3 01");
+                buf[0] = *(rx_msg.msg+4) - 0x30;
+                if (buf[0] == 0x00) {
+                        UIO3_02 = 0;
+                        send_msg("  level 0");
+                } else if (buf[0] == 0x01) {
+                        UIO3_02 = 1;
+                        send_msg("  level 1");
+                }
+
         // SPI Command
         } else if (!strcmp(rx_msg.msg,"spistart")) {
                 send_msg("spi start (cs=0)");
