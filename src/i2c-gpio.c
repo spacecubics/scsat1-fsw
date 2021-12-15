@@ -16,8 +16,6 @@ int get_i2c (void) {
         if (fmd.state == ST_FPGA_CONFIG |
             fmd.state == ST_FPGA_ACTIVE)
                 return 1;
-        INT_SCL_DAT = 0;
-        INT_SDA_DAT = 0;
         INT_SCL_DIR = 1;
         INT_SDA_DIR = 1;
         return 0;
