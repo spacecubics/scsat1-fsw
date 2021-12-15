@@ -7,7 +7,7 @@
  *
  */
 
-int get_i2c (void);
+int get_i2c (int m);
 void send_start (int m);
 void send_stop (int m);
 void send_bit (int m, char l);
