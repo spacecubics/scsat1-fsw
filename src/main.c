@@ -76,9 +76,14 @@ void main (void) {
         while (1) {
                 if (fmd.state == ST_POWER_OFF) {
                         check_fpga_power();
-                } else if (fmd.state == ST_FPGA_ACTIVE)
-                        TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
-
+                } else if (fmd.state == ST_FPGA_CONFIG && CFG_DONE) {
+                        switch_fpga_state(ST_FPGA_ACTIVE);
+                } else if (fmd.state == ST_FPGA_ACTIVE) {
+                        if (CFG_DONE)
+                                TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
+                        else
+                                switch_fpga_state(ST_FPGA_CONFIG);
+                }
                 if (rx_msg.active)
                         cmd_parser();
 

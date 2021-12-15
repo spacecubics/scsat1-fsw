@@ -45,6 +45,18 @@ int switch_fpga_state (fpga_st next_st) {
                         FPGA_PROGRAM_B = 0;
                         fmd.state = ST_FPGA_READY;
                         return 0;
+                } else if (next_st == ST_FPGA_ACTIVE) {
+                        fmd.state = ST_FPGA_ACTIVE;
+                        return 0;
+                }
+        } else if (fmd.state == ST_FPGA_ACTIVE) {
+                if (next_st == ST_FPGA_READY) {
+                        FPGA_PROGRAM_B = 0;
+                        fmd.state = ST_FPGA_READY;
+                        return 0;
+                } else if (next_st == ST_FPGA_CONFIG) {
+                        fmd.state = ST_FPGA_CONFIG;
+                        return 0;
                 }
         }
         return 1;
