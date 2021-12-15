@@ -11,10 +11,12 @@
 #include <fpga.h>
 #include <spi.h>
 #include <i2c-gpio.h>
+#include <tmp175.h>
 #include <usart.h>
 #include <timer.h>
 #include <interrupt.h>
 #include <string.h>
+#include <stdio.h>
 
 // PIC16LF877A Configuration Bit Settings
 #pragma config FOSC = HS        // Oscillator Selection bits (HS oscillator)
@@ -90,6 +92,7 @@ void main (void) {
 void cmd_parser (void) {
         char buf[BUF_LEN] = { };
         char data;
+        tmp175_data temp;
 
         send_msg(rx_msg.msg);
         // FPGA Command
@@ -164,22 +167,25 @@ void cmd_parser (void) {
                 buf[0] = spi_trans(data);
                 conv_message(buf, 1);
 
-        // I2C-GPIO Command
-        } else if (!strcmp(rx_msg.msg,"i2cr")) {
-                if (!get_i2c()) {
-                        interrupt_lock(1);
-                        send_start(0);
-                        i2c_send_data(0, 0x90);
-                        i2c_send_data(0, 0x03);
-                        send_start(0);
-                        i2c_send_data(0, 0x91);
-                        buf[0] = i2c_receive_data(0);
-                        buf[1] = i2c_receive_data(0);
-                        send_stop(0);
-                        interrupt_lock(0);
-                        conv_message(buf, 2);
-                } else
-                        send_msg("i2c bus error");
+        // Temperature sensor read Command
+        } else if (!strncmp(rx_msg.msg,"ts",2)) {
+                send_msg("Read Temperature sensor");
+                buf[0] = *(rx_msg.msg+2) - 0x30;
+                temp.master = 0;
+                if (buf[0] == 0x00)
+                        temp.addr = 0x4c;
+                else if (buf[0] == 0x01)
+                        temp.addr = 0x4d;
+                else if (buf[0] == 0x02)
+                        temp.addr = 0x4e;
+                else
+                        send_msg("Sensor number error");
+
+                if (temp.addr != 0) {
+                        if (tmp175_data_read(&temp) | temp.error)
+                                send_msg("i2c bus error");
+                        conv_message(temp.data,2);
+                }
 
         // Register Check
         } else if (!strcmp(rx_msg.msg,"chkreg")) {
