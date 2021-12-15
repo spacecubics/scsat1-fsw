@@ -12,6 +12,7 @@
 #include <spi.h>
 #include <i2c-gpio.h>
 #include <tmp175.h>
+#include <ina3221.h>
 #include <usart.h>
 #include <timer.h>
 #include <interrupt.h>
@@ -93,6 +94,7 @@ void cmd_parser (void) {
         char buf[BUF_LEN] = { };
         char data;
         tmp175_data temp;
+        ina3221_data voltage;
 
         send_msg(rx_msg.msg);
         // FPGA Command
@@ -186,6 +188,32 @@ void cmd_parser (void) {
                                 send_msg("i2c bus error");
                         conv_message(temp.data,2);
                 }
+
+        // Voltage sensor read Command
+        } else if  (!strncmp(rx_msg.msg,"vs",2)) {
+                int type = 0;
+                send_msg("Read Voltage sensor");
+                buf[0] = *(rx_msg.msg+2) - 0x30;
+                buf[1] = *(rx_msg.msg+3) - 0x30;
+                buf[2] = *(rx_msg.msg+4) - 0x30;
+                voltage.master = 0;
+                if (buf[0] == 0x00)
+                        voltage.addr = 0x40;
+                else if (buf[0] == 0x01)
+                        voltage.addr = 0x41;
+                else
+                        send_msg("Sensor number error");
+                voltage.channel = buf[1];
+                if (buf[2] == 0x00 | buf[2] == 0x01) {
+                        type = (int)buf[2];
+                        if (ina3221_data_read(&voltage, type))
+                                send_msg("i2c bus error");
+                        if (type)
+                                conv_message(voltage.bus,2);
+                        else
+                                conv_message(voltage.shunt,2);
+                } else
+                        send_msg("type error");
 
         // Register Check
         } else if (!strcmp(rx_msg.msg,"chkreg")) {
