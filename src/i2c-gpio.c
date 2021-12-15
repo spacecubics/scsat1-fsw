@@ -111,6 +111,6 @@ char i2c_receive_data (int master) {
         data = ((char)(data << 1) | receive_bit(master));
         data = ((char)(data << 1) | receive_bit(master));
         data = ((char)(data << 1) | receive_bit(master));
-        send_bit(master, 1);
+        send_bit(master, 0);
         return data;
 }
