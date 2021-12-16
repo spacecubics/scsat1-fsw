@@ -71,7 +71,7 @@ void main (void) {
         /*
          * Space Cubics OBC TRCH-Firmware Main
          */
-        send_msg("SC OBC TRCH-FW v0.1");
+        send_msg("SC OBC TRCH-FW v0.2");
         start_usart_receive();
         while (1) {
                 if (fmd.state == ST_POWER_OFF) {
