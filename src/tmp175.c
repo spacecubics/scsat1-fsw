@@ -12,10 +12,10 @@
 #include <i2c-gpio.h>
 #include <tmp175.h>
 
-int tmp175_data_read (tmp175_data *td) {
+int tmp175_data_read (tmp175_data *td, int fpga_state) {
         char addr = (char)((*td).addr << 1);
         int err = 0;
-        if (get_i2c((*td).master))
+        if (get_i2c((*td).master, fpga_state))
                 return 1;
 
         interrupt_lock(1);        

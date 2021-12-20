@@ -19,4 +19,4 @@ typedef struct s_tmp175_data {
         int  error;
 } tmp175_data;
 
-extern int tmp175_data_read (tmp175_data *td);
+extern int tmp175_data_read (tmp175_data *td, int fpga_state);

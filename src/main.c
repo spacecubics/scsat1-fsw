@@ -30,7 +30,6 @@
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
 #define BUF_LEN 20
-extern void cmd_parser (void);
 extern void conv_message (char *data, int count);
 extern char conv_asc2hex (char data);
 
@@ -53,8 +52,9 @@ typedef struct s_trch_bstatus {
 
 extern void get_vm (ina3221_data *id, int type);
 extern void get_vm_all (trch_bstatus *tbs);
-extern void get_tmp (tmp175_data *td);
-extern void get_tmp_all (trch_bstatus *tbs);
+extern void get_tmp (tmp175_data *td, int fpga_state);
+extern void get_tmp_all (trch_state *tst, trch_bstatus *tbs);
+extern void cmd_parser (trch_state *tst);
 
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
@@ -84,7 +84,7 @@ void main (void) {
         trch_bstatus tbs;
         // Initialize trch-firmware
         trch_init();
-        fpga_init();
+        fpga_init(&(tst.fmd));
         spi_init();
         usart_init();
         tst.gtimer = 0;
@@ -150,22 +150,15 @@ void main (void) {
         tbs.vm3v3i.channel = 3;
 
         get_vm_all(&tbs);
-        get_tmp_all(&tbs);
+        get_tmp_all(&tst, &tbs);
 
         start_usart_receive();
         while (1) {
-                if (fmd.state == ST_POWER_OFF) {
-                        check_fpga_power();
-                } else if (fmd.state == ST_FPGA_CONFIG && CFG_DONE) {
-                        switch_fpga_state(ST_FPGA_ACTIVE);
-                } else if (fmd.state == ST_FPGA_ACTIVE) {
-                        if (CFG_DONE)
-                                TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
-                        else
-                                switch_fpga_state(ST_FPGA_CONFIG);
-                }
+                // FPGA State Control
+                fpgafunc[tst.fmd.state](&tst.fmd);
+
                 if (rx_msg.active)
-                        cmd_parser();
+                        cmd_parser(&tst);
 
                 if (tmr2.event) {
                         tst.gtimer++;
@@ -186,10 +179,10 @@ void get_vm (ina3221_data *id, int type) {
         }
 }
 
-void get_tmp (tmp175_data *td) {
+void get_tmp (tmp175_data *td, int fpga_state) {
         int retry = 3;
         while (retry) {
-                tmp175_data_read(td);
+                tmp175_data_read(td, fpga_state);
                 if ((*td).error)
                         retry--;
                 else
@@ -212,13 +205,13 @@ void get_vm_all (trch_bstatus *tbs) {
         get_vm(&tbs->vm3v3i, 1);
 }
 
-void get_tmp_all (trch_bstatus *tbs) {
-        get_tmp(&tbs->ts1);
-        get_tmp(&tbs->ts2);
-        get_tmp(&tbs->ts3);
+void get_tmp_all (trch_state *tst, trch_bstatus *tbs) {
+        get_tmp(&tbs->ts1, (*tst).fmd.state);
+        get_tmp(&tbs->ts2, (*tst).fmd.state);
+        get_tmp(&tbs->ts3, (*tst).fmd.state);
 }
 
-void cmd_parser (void) {
+void cmd_parser (trch_state *tst) {
         char buf[BUF_LEN] = { };
         char data;
         tmp175_data temp;
@@ -228,16 +221,21 @@ void cmd_parser (void) {
         // FPGA Command
         if (!strcmp(rx_msg.msg,"fc")) {
                 send_msg("fpga configuration");
-                if (switch_fpga_state(ST_FPGA_CONFIG))
+                if ((*tst).fmd.state != ST_FPGA_READY)
                         send_msg(" Configuration Error");
+                else
+                        (*tst).fmd.config_ok = 1;
         } else if (!strcmp(rx_msg.msg,"fu")) {
                 send_msg("fpga unconfiguration");
-                if (switch_fpga_state(ST_FPGA_READY))
+                if ((*tst).fmd.state != ST_FPGA_CONFIG &
+                    (*tst).fmd.state != ST_FPGA_ACTIVE)
                         send_msg(" Unconfiguration Error");
+                else
+                        (*tst).fmd.config_ok = 0;
 
         // Configuration Memory Select
         } else if (!strncmp(rx_msg.msg,"ms",2)) {
-                if (fmd.state != ST_FPGA_ACTIVE) {
+                if ((*tst).fmd.state != ST_FPGA_ACTIVE) {
                         send_msg("Memory select control");
                         buf[0] = *(rx_msg.msg+2) - 0x30;
                         if (buf[0] == 0x00) {
@@ -312,7 +310,7 @@ void cmd_parser (void) {
                         send_msg("Sensor number error");
 
                 if (temp.addr != 0) {
-                        if (tmp175_data_read(&temp) | temp.error)
+                        if (tmp175_data_read(&temp, (*tst).fmd.state) | temp.error)
                                 send_msg("i2c bus error");
                         conv_message(temp.data,2);
                 }
@@ -381,9 +379,9 @@ void cmd_parser (void) {
                 conv_message(buf, 1);
 
                 send_msg("FPGA State");
-                buf[0] = fmd.state;
+                buf[0] = (*tst).fmd.state;
                 conv_message(buf, 1);
-                buf[0] = (char)fmd.count;
+                buf[0] = (char)((*tst).fmd.count);
                 conv_message(buf, 1);
 
         } else

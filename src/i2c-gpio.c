@@ -12,9 +12,9 @@
 #include <i2c-gpio.h>
 #include <fpga.h>
 
-int get_i2c (int m) {
-        if (fmd.state == ST_FPGA_CONFIG |
-            fmd.state == ST_FPGA_ACTIVE)
+int get_i2c (int m, int fpga_state) {
+        if (fpga_state == ST_FPGA_CONFIG |
+            fpga_state == ST_FPGA_ACTIVE)
                 return 1;
         if (!m) {
                 INT_SCL_DIR = 1;

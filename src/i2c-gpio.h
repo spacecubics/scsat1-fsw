@@ -7,7 +7,7 @@
  *
  */
 
-int get_i2c (int m);
+int get_i2c (int m, int fpga_state);
 void send_start (int m);
 void send_stop (int m);
 void send_bit (int m, char l);
