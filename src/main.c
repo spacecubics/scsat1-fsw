@@ -5,6 +5,8 @@
  *
  */
 
+#define AUTO_CONFIG 1
+
 #include <xc.h>
 #include <pic.h>
 #include <trch.h>
@@ -85,6 +87,9 @@ void main (void) {
         // Initialize trch-firmware
         trch_init();
         fpga_init(&(tst.fmd));
+#if AUTO_CONFIG
+        tst.fmd.config_ok = 1;
+#endif
         spi_init();
         usart_init();
         tst.gtimer = 0;
