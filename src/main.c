@@ -78,11 +78,11 @@ void main (void) {
         trch_state tst;
         trch_bstatus tbs;
         // Initialize trch-firmware
-        unsigned long gtimer = 0;
         trch_init();
         fpga_init();
         spi_init();
         usart_init();
+        tst.gtimer = 0;
         timer2_init();
         tmr2.etiming = 250;
         timer2_ctrl(1);
@@ -108,7 +108,7 @@ void main (void) {
                         cmd_parser();
 
                 if (tmr2.event) {
-                        gtimer++;
+                        tst.gtimer++;
                         tmr2.event = 0;
                 }
         }
