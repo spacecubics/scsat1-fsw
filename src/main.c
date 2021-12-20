@@ -34,6 +34,11 @@ extern void cmd_parser (void);
 extern void conv_message (char *data, int count);
 extern char conv_asc2hex (char data);
 
+typedef struct s_trch_state {
+        unsigned long gtimer;
+        fpga_management_data fmd;
+} trch_state;
+
 typedef struct s_trch_bstatus {
         tmp175_data ts1;
         tmp175_data ts2;
@@ -70,6 +75,7 @@ void trch_init (void) {
 }
 
 void main (void) {
+        trch_state tst;
         trch_bstatus tbs;
         // Initialize trch-firmware
         unsigned long gtimer = 0;
