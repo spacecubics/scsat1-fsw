@@ -34,6 +34,18 @@ extern void cmd_parser (void);
 extern void conv_message (char *data, int count);
 extern char conv_asc2hex (char data);
 
+typedef struct s_trch_bstatus {
+        tmp175_data ts1;
+        tmp175_data ts2;
+        tmp175_data ts3;
+        ina3221_data vm1v0;
+        ina3221_data vm1v8;
+        ina3221_data vm3v3;
+        ina3221_data vm3v3a;
+        ina3221_data vm3v3b;
+        ina3221_data vm3v3i;
+} trch_bstatus;
+
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
                 timer2_int();
@@ -58,6 +70,7 @@ void trch_init (void) {
 }
 
 void main (void) {
+        trch_bstatus tbs;
         // Initialize trch-firmware
         unsigned long gtimer = 0;
         trch_init();
