@@ -9,13 +9,13 @@
 
 typedef enum { ST_POWER_OFF, ST_FPGA_READY, ST_FPGA_CONFIG, ST_FPGA_ACTIVE } fpga_st;
 
-struct fpga_management_data {
+typedef struct s_fpga_management_data {
         fpga_st state;
         int count;
         int time;
-};
+} fpga_management_data;
 
-struct fpga_management_data fmd;
+fpga_management_data fmd;
 
 extern void fpga_init (void);
 extern void check_fpga_power (void);
