@@ -12,11 +12,11 @@
 
 /*
  * Initialize Timer 2
- *  Timer Interval 100 us
+ *  Timer Interval 4 ms
  */
 void timer2_init (void) {
-        T2CONbits.T2CKPS = 0b00;
-        PR2 = 0x63;
+        T2CONbits.T2CKPS = 0b10;
+        PR2 = 0xFA;
 }
 
 void timer2_ctrl (char control) {
@@ -26,13 +26,10 @@ void timer2_ctrl (char control) {
 
 void timer2_int (void) {
         PIR1bits.TMR2IF = 0;
-        if (tmr2.us == 9) {
-                tmr2.us = 0;
-                if (tmr2.ms == 999) {
-                        tmr2.ms = 0;
-                        tmr2.event = 1;
-                } else
-                        tmr2.ms++;
-        } else
-                tmr2.us++;
+        if ((tmr2.ms4 +1) % tmr2.etiming == 0)
+                tmr2.event = 1;
+        if (tmr2.ms4 == 249)
+                tmr2.ms4 = 0;
+        else
+                tmr2.ms4++;
 }

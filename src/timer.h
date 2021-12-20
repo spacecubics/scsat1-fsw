@@ -12,8 +12,8 @@ extern void timer2_ctrl (char control);
 extern void timer2_int (void);
 
 struct interval_timer {
-        int us;
-        int ms;
+        int ms4;
+        int etiming;
         unsigned event: 1;
 };
 struct interval_timer tmr2;

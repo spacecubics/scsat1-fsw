@@ -65,6 +65,7 @@ void main (void) {
         spi_init();
         usart_init();
         timer2_init();
+        tmr2.etiming = 250;
         timer2_ctrl(1);
         interrupt_init();
 
