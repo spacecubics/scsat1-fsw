@@ -51,6 +51,11 @@ typedef struct s_trch_bstatus {
         ina3221_data vm3v3i;
 } trch_bstatus;
 
+extern void get_vm (ina3221_data *id, int type);
+extern void get_vm_all (trch_bstatus *tbs);
+extern void get_tmp (tmp175_data *td);
+extern void get_tmp_all (trch_bstatus *tbs);
+
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
                 timer2_int();
@@ -92,6 +97,61 @@ void main (void) {
          * Space Cubics OBC TRCH-Firmware Main
          */
         send_msg("SC OBC TRCH-FW v0.2");
+
+        /*
+         *  Get Board Status
+         *  ---------------------------------------------------
+         *  Temperature Sensor 1 (IC16 beside TRCH)
+         *   I2C Master   : 0
+         *   Slave Address: 0x4C
+         *  Temperature Sensor 2 (IC17 beside FPGA)
+         *   I2C Master   : 0
+         *   Slave Address: 0x4D
+         *  Temperature Sensor 3 (IC20 beside FPGA and Power)
+         *   I2C Master   : 0
+         *   Slave Address: 0x4E
+         *  Current/Voltage Monitor 1 (IC22)
+         *   I2C Master   : 0
+         *   Slave Address: 0x40
+         *   - Channel 1 (VDD 1V0)
+         *   - Channel 2 (VDD 1V8)
+         *   - Channel 3 (VDD 3V3)
+         *  Current/Voltage Monitor 2 (IC21)
+         *   I2C Master   : 0
+         *   Slave Address: 0x41
+         *   - Channel 1 (VDD 3V3A)
+         *   - Channel 2 (VDD 3V3B)
+         *   - Channel 3 (VDD 3V3IO)
+         */
+        tbs.ts1.master     = 0;
+        tbs.ts1.addr       = 0x4C;
+        tbs.ts2.master     = 0;
+        tbs.ts2.addr       = 0x4D;
+        tbs.ts3.master     = 0;
+        tbs.ts3.addr       = 0x4E;
+
+        tbs.vm1v0.master   = 0;
+        tbs.vm1v0.addr     = 0x40;
+        tbs.vm1v0.channel  = 1;
+        tbs.vm1v8.master   = 0;
+        tbs.vm1v8.addr     = 0x40;
+        tbs.vm1v8.channel  = 2;
+        tbs.vm3v3.master   = 0;
+        tbs.vm3v3.addr     = 0x40;
+        tbs.vm3v3.channel  = 3;
+        tbs.vm3v3a.master  = 0;
+        tbs.vm3v3a.addr    = 0x41;
+        tbs.vm3v3a.channel = 1;
+        tbs.vm3v3b.master  = 0;
+        tbs.vm3v3b.addr    = 0x41;
+        tbs.vm3v3b.channel = 2;
+        tbs.vm3v3i.master  = 0;
+        tbs.vm3v3i.addr    = 0x41;
+        tbs.vm3v3i.channel = 3;
+
+        get_vm_all(&tbs);
+        get_tmp_all(&tbs);
+
         start_usart_receive();
         while (1) {
                 if (fmd.state == ST_POWER_OFF) {
@@ -113,6 +173,49 @@ void main (void) {
                 }
         }
         return;
+}
+
+void get_vm (ina3221_data *id, int type) {
+        int retry = 3;
+        while (retry) {
+                ina3221_data_read(id, type);
+                if ((*id).error)
+                        retry--;
+                else
+                        return;
+        }
+}
+
+void get_tmp (tmp175_data *td) {
+        int retry = 3;
+        while (retry) {
+                tmp175_data_read(td);
+                if ((*td).error)
+                        retry--;
+                else
+                        return;
+        }
+}
+
+void get_vm_all (trch_bstatus *tbs) {
+        get_vm(&tbs->vm3v3a, 1);
+        get_vm(&tbs->vm3v3b, 1);
+        get_vm(&tbs->vm1v0, 1);
+        get_vm(&tbs->vm1v8, 1);
+        get_vm(&tbs->vm3v3, 1);
+        get_vm(&tbs->vm3v3i, 1);
+        get_vm(&tbs->vm3v3a, 0);
+        get_vm(&tbs->vm3v3b, 0);
+        get_vm(&tbs->vm1v0, 0);
+        get_vm(&tbs->vm1v8, 0);
+        get_vm(&tbs->vm3v3, 0);
+        get_vm(&tbs->vm3v3i, 1);
+}
+
+void get_tmp_all (trch_bstatus *tbs) {
+        get_tmp(&tbs->ts1);
+        get_tmp(&tbs->ts2);
+        get_tmp(&tbs->ts3);
 }
 
 void cmd_parser (void) {
