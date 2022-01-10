@@ -12,10 +12,12 @@
 #include <i2c-gpio.h>
 #include <ina3221.h>
 
-int ina3221_data_read (ina3221_data *id, int type) {
+int ina3221_data_read (ina3221_data *id, int fpga_state, int type) {
         char addr = (char)((*id).addr << 1);
         char reg_addr = (char)(((*id).channel -1) * 2 + type + REG_VOLTAGE_BASE);
         int err = 0;
+        if (get_i2c((*id).master, fpga_state))
+                return 1;
 
         interrupt_lock(1);
         send_start((*id).master);

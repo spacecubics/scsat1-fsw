@@ -18,4 +18,4 @@ typedef struct s_ina3221_data {
         int  error;
 } ina3221_data;
 
-extern int ina3221_data_read (ina3221_data *id, int type);
+extern int ina3221_data_read (ina3221_data *id, int fpga_state, int type);

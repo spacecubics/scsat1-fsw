@@ -52,8 +52,8 @@ typedef struct s_trch_bstatus {
         ina3221_data vm3v3i;
 } trch_bstatus;
 
-extern void get_vm (ina3221_data *id, int type);
-extern void get_vm_all (trch_bstatus *tbs);
+extern void get_vm (ina3221_data *id, int fpga_state, int type);
+extern void get_vm_all (trch_state *tst, trch_bstatus *tbs);
 extern void get_tmp (tmp175_data *td, int fpga_state);
 extern void get_tmp_all (trch_state *tst, trch_bstatus *tbs);
 extern void cmd_parser (trch_state *tst);
@@ -154,7 +154,7 @@ void main (void) {
         tbs.vm3v3i.addr    = 0x41;
         tbs.vm3v3i.channel = 3;
 
-        get_vm_all(&tbs);
+        get_vm_all(&tst,  &tbs);
         get_tmp_all(&tst, &tbs);
 
         start_usart_receive();
@@ -173,10 +173,10 @@ void main (void) {
         return;
 }
 
-void get_vm (ina3221_data *id, int type) {
+void get_vm (ina3221_data *id, int fpga_state, int type) {
         int retry = 3;
         while (retry) {
-                ina3221_data_read(id, type);
+                ina3221_data_read(id, fpga_state, type);
                 if ((*id).error)
                         retry--;
                 else
@@ -195,19 +195,19 @@ void get_tmp (tmp175_data *td, int fpga_state) {
         }
 }
 
-void get_vm_all (trch_bstatus *tbs) {
-        get_vm(&tbs->vm3v3a, 1);
-        get_vm(&tbs->vm3v3b, 1);
-        get_vm(&tbs->vm1v0, 1);
-        get_vm(&tbs->vm1v8, 1);
-        get_vm(&tbs->vm3v3, 1);
-        get_vm(&tbs->vm3v3i, 1);
-        get_vm(&tbs->vm3v3a, 0);
-        get_vm(&tbs->vm3v3b, 0);
-        get_vm(&tbs->vm1v0, 0);
-        get_vm(&tbs->vm1v8, 0);
-        get_vm(&tbs->vm3v3, 0);
-        get_vm(&tbs->vm3v3i, 1);
+void get_vm_all (trch_state *tst, trch_bstatus *tbs) {
+        get_vm(&tbs->vm3v3a, (*tst).fmd.state, 1);
+        get_vm(&tbs->vm3v3b, (*tst).fmd.state, 1);
+        get_vm(&tbs->vm1v0, (*tst).fmd.state, 1);
+        get_vm(&tbs->vm1v8, (*tst).fmd.state, 1);
+        get_vm(&tbs->vm3v3, (*tst).fmd.state, 1);
+        get_vm(&tbs->vm3v3i, (*tst).fmd.state, 1);
+        get_vm(&tbs->vm3v3a, (*tst).fmd.state, 0);
+        get_vm(&tbs->vm3v3b, (*tst).fmd.state, 0);
+        get_vm(&tbs->vm1v0, (*tst).fmd.state, 0);
+        get_vm(&tbs->vm1v8, (*tst).fmd.state, 0);
+        get_vm(&tbs->vm3v3, (*tst).fmd.state, 0);
+        get_vm(&tbs->vm3v3i, (*tst).fmd.state, 1);
 }
 
 void get_tmp_all (trch_state *tst, trch_bstatus *tbs) {
@@ -337,7 +337,7 @@ void cmd_parser (trch_state *tst) {
                 voltage.channel = buf[1];
                 if (buf[2] == 0x00 | buf[2] == 0x01) {
                         type = (int)buf[2];
-                        if (ina3221_data_read(&voltage, type))
+                        if (ina3221_data_read(&voltage, (*tst).fmd.state, type))
                                 send_msg("i2c bus error");
                         if (type)
                                 conv_message(voltage.bus,2);
