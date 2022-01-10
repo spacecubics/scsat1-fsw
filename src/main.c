@@ -346,6 +346,51 @@ void cmd_parser (trch_state *tst) {
                 } else
                         send_msg("type error");
 
+        // Port Control
+        } else if (!strncmp(rx_msg.msg,"pt",2)) {
+                char port;
+                port = conv_asc2hex(*(rx_msg.msg+2));
+                buf[0] = (char)(conv_asc2hex(*(rx_msg.msg+3)) << 4) | conv_asc2hex(*(rx_msg.msg+4));
+                if (port == 0x0A) {
+                        send_msg("Set TRISA");
+                        TRISA = buf[0];
+                } else if (port == 0x0B) {
+                        send_msg("Set TRISB");
+                        TRISB = buf[0];
+                } else if (port == 0x0C) {
+                        send_msg("Set TRISC");
+                        TRISC = buf[0];
+                } else if (port == 0x0D) {
+                        send_msg("Set TRISD");
+                        TRISD = buf[0];
+                } else if (port == 0x0E) {
+                        send_msg("Set TRISE");
+                        TRISD = buf[0];
+                } else
+                        send_msg("TRIS Port Select Error");
+
+        } else if (!strncmp(rx_msg.msg,"po",2)) {
+                char port;
+                port = conv_asc2hex(*(rx_msg.msg+2));
+                buf[0] = (char)(conv_asc2hex(*(rx_msg.msg+3)) << 4) | conv_asc2hex(*(rx_msg.msg+4));
+                if (port == 0x0A) {
+                        send_msg("Set PORTA");
+                        PORTA = buf[0];
+                } else if (port == 0x0B) {
+                        send_msg("Set PORTB");
+                        PORTB = buf[0];
+                } else if (port == 0x0C) {
+                        send_msg("Set PORTC");
+                        PORTC = buf[0];
+                } else if (port == 0x0D) {
+                        send_msg("Set PORTD");
+                        PORTD = buf[0];
+                } else if (port == 0x0E) {
+                        send_msg("Set PORTE");
+                        PORTD = buf[0];
+                } else
+                        send_msg("Port Select Error");
+
         // Register Check
         } else if (!strcmp(rx_msg.msg,"chkreg")) {
                 send_msg("TRISA");
@@ -408,7 +453,7 @@ void conv_message (char *data, int count) {
 }
 
 char conv_asc2hex (char data) {
-        if (data >= 0x30 && data <= 39)
+        if (data >= 0x30 && data <= 0x39)
                 return (data - 0x30);
         else if (data >= 0x41 && data <= 0x46)
                 return (data - 0x37);
