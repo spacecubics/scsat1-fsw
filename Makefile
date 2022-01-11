@@ -24,7 +24,7 @@ CF      = $(HEXDIR) src/*.p1 src/*.d MPLABXLog.* log.*
 vpath %.c   $(src)
 
 .PHONY: all
-all: program
+all: build
 
 .PHONY: build
 build: $(PRGDAT).hex
