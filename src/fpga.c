@@ -18,7 +18,7 @@ void fpga_init (fpga_management_data *fmd) {
         (*fmd).time = 0;
 }
 
-void f_power_off (fpga_management_data *fmd) {
+static void f_power_off (fpga_management_data *fmd) {
         if (VDD_3V3) {
                 (*fmd).state = ST_FPGA_READY;
                 FPGA_INIT_B_DIR = 0;
@@ -27,7 +27,7 @@ void f_power_off (fpga_management_data *fmd) {
         }
 }
 
-void f_fpga_ready (fpga_management_data *fmd) {
+static void f_fpga_ready (fpga_management_data *fmd) {
         if ((*fmd).config_ok) {
                 if ((*fmd).count == 0)
                         FPGA_INIT_B_DIR = 1;
@@ -38,7 +38,7 @@ void f_fpga_ready (fpga_management_data *fmd) {
         }
 }
 
-void f_fpga_config (fpga_management_data *fmd) {
+static void f_fpga_config (fpga_management_data *fmd) {
         if (!(*fmd).config_ok) {
                 FPGA_PROGRAM_B = 0;
                 (*fmd).state = ST_FPGA_READY;
@@ -46,7 +46,7 @@ void f_fpga_config (fpga_management_data *fmd) {
                 (*fmd).state = ST_FPGA_ACTIVE;
 }
 
-void f_fpga_active (fpga_management_data *fmd) {
+static void f_fpga_active (fpga_management_data *fmd) {
         if (!(*fmd).config_ok) {
                 FPGA_PROGRAM_B = 0;
                 (*fmd).state = ST_FPGA_READY;
@@ -55,3 +55,9 @@ void f_fpga_active (fpga_management_data *fmd) {
         else
                 (*fmd).state = ST_FPGA_CONFIG;
 }
+
+STATEFUNC fpgafunc[] = {
+	f_power_off,
+	f_fpga_ready,
+	f_fpga_config,
+	f_fpga_active };
