@@ -16,9 +16,10 @@ PRGDAT := $(HEXDIR)/$(MODULE)
 
 # Source and object files
 SRCS := $(wildcard src/*.c)
+OBJS := $(SRCS:.c=.p1)
 
 # Clean File
-CF      = $(HEXDIR) MPLABXLog.* log.*
+CF      = $(HEXDIR) src/*.p1 src/*.d MPLABXLog.* log.*
 
 vpath %.c   $(src)
 
@@ -28,9 +29,12 @@ all: program
 .PHONY: build
 build: $(PRGDAT).hex
 
-$(PRGDAT).hex: $(SRCS)
+$(PRGDAT).hex: $(OBJS)
 	mkdir -p $(HEXDIR)
 	$(CC) -mcpu=$(DEVICE) -I $(INCDIR) -o $(HEXDIR)/$(MODULE) $^
+
+%.p1: %.c
+	$(CC) -mcpu=$(DEVICE) -I $(INCDIR) -c -o $@ $<
 
 .PHONY: program
 program: $(PRGDAT).hex
