@@ -8,8 +8,8 @@
  */
 
 #include <pic.h>
-#include <usart.h>
 #include <string.h>
+#include "usart.h"
 
 /*
  * USART Initialize

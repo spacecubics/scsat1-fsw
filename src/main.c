@@ -9,17 +9,17 @@
 
 #include <xc.h>
 #include <pic.h>
-#include <trch.h>
-#include <fpga.h>
-#include <spi.h>
-#include <i2c-gpio.h>
-#include <tmp175.h>
-#include <ina3221.h>
-#include <usart.h>
-#include <timer.h>
-#include <interrupt.h>
 #include <string.h>
 #include <stdio.h>
+#include "trch.h"
+#include "fpga.h"
+#include "spi.h"
+#include "i2c-gpio.h"
+#include "tmp175.h"
+#include "ina3221.h"
+#include "usart.h"
+#include "timer.h"
+#include "interrupt.h"
 
 // PIC16LF877A Configuration Bit Settings
 #pragma config FOSC = HS        // Oscillator Selection bits (HS oscillator)

@@ -10,7 +10,6 @@ IPECMD := ipecmd.sh
 RM     := rm -rf
 
 # File Path variables
-INCDIR := src
 HEXDIR := hex
 PRGDAT := $(HEXDIR)/$(MODULE)
 
@@ -30,10 +29,10 @@ build: $(PRGDAT).hex
 $(PRGDAT).hex: $(OBJS)
 	mkdir -p $(HEXDIR)
 	echo '*' > $(HEXDIR)/.gitignore
-	$(CC) -mcpu=$(DEVICE) -I $(INCDIR) -o $(HEXDIR)/$(MODULE) $^
+	$(CC) -mcpu=$(DEVICE) -o $(HEXDIR)/$(MODULE) $^
 
 %.p1: %.c
-	$(CC) -mcpu=$(DEVICE) -I $(INCDIR) -c -o $@ $<
+	$(CC) -mcpu=$(DEVICE) -c -o $@ $<
 
 .PHONY: program
 program: $(PRGDAT).hex

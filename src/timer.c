@@ -8,7 +8,7 @@
  */
 
 #include <pic.h>
-#include <timer.h>
+#include "timer.h"
 
 /*
  * Initialize Timer 2

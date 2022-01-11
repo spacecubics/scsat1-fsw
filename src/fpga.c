@@ -8,8 +8,8 @@
  */
 
 #include <pic.h>
-#include <trch.h>
-#include <fpga.h>
+#include "trch.h"
+#include "fpga.h"
 
 void fpga_init (fpga_management_data *fmd) {
         (*fmd).state = ST_POWER_OFF;
@@ -55,4 +55,3 @@ void f_fpga_active (fpga_management_data *fmd) {
         else
                 (*fmd).state = ST_FPGA_CONFIG;
 }
-

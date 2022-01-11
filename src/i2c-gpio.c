@@ -8,9 +8,9 @@
  */
 
 #include <pic.h>
-#include <trch.h>
-#include <i2c-gpio.h>
-#include <fpga.h>
+#include "trch.h"
+#include "i2c-gpio.h"
+#include "fpga.h"
 
 int get_i2c (int m, int fpga_state) {
         if (fpga_state == ST_FPGA_CONFIG |

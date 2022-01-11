@@ -8,9 +8,9 @@
  */
 
 #include <pic.h>
-#include <interrupt.h>
-#include <i2c-gpio.h>
-#include <tmp175.h>
+#include "interrupt.h"
+#include "i2c-gpio.h"
+#include "tmp175.h"
 
 int tmp175_data_read (tmp175_data *td, int fpga_state) {
         char addr = (char)((*td).addr << 1);

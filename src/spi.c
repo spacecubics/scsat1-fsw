@@ -8,8 +8,8 @@
  */
 
 #include <pic.h>
-#include <trch.h>
-#include <spi.h>
+#include "trch.h"
+#include "spi.h"
 
 /*
  * SSPSTAT.SMP      : Sample bit        : 0b0
