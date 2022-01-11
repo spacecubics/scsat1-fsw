@@ -1,4 +1,5 @@
 *~
 *.p1
+*.d
 log.*
 MPLABXLog.xml
