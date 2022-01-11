@@ -21,8 +21,6 @@ OBJS := $(SRCS:.c=.p1)
 # Clean File
 CF      = $(HEXDIR) src/*.p1 src/*.d MPLABXLog.* log.*
 
-vpath %.c   $(src)
-
 .PHONY: all
 all: build
 
