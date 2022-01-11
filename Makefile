@@ -14,6 +14,9 @@ INCDIR := src
 HEXDIR := hex
 PRGDAT := $(HEXDIR)/$(MODULE)
 
+# Source and object files
+SRCS := $(wildcard src/*.c)
+
 # Clean File
 CF      = $(wildcard $(HEXDIR) MPLABXLog.* log.*)
 
@@ -25,7 +28,7 @@ all: program
 .PHONY: build
 build: $(PRGDAT).hex
 
-$(PRGDAT).hex: $(INCDIR)/*.c
+$(PRGDAT).hex: $(SRCS)
 	mkdir -p $(HEXDIR)
 	$(CC) -mcpu=$(DEVICE) -I $(INCDIR) -o $(HEXDIR)/$(MODULE) $^
 
