@@ -26,9 +26,7 @@ all: program
 build: $(PRGDAT).hex
 
 $(PRGDAT).hex: $(INCDIR)/*.c
-	@if [ ! -e $(HEXDIR) ]; then \
-		mkdir $(HEXDIR); \
-	fi
+	mkdir -p $(HEXDIR)
 	$(CC) -mcpu=$(DEVICE) -I $(INCDIR) -o $(HEXDIR)/$(MODULE) $^
 
 .PHONY: program
