@@ -35,8 +35,8 @@ $(PRGDAT).hex: $(INCDIR)/*.c
 program: $(PRGDAT).hex
 	$(IPECMD) -P$(DEVICE) -T$(TARGET) -F$< -M
 
-.PHONY: elace
-elace:
+.PHONY: erase
+erase:
 	$(IPECMD) -P$(DEVICE) -T$(TARGET) -E
 
 .PHONY: clean
