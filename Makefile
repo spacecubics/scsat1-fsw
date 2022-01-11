@@ -18,7 +18,7 @@ PRGDAT := $(HEXDIR)/$(MODULE)
 SRCS := $(wildcard src/*.c)
 
 # Clean File
-CF      = $(wildcard $(HEXDIR) MPLABXLog.* log.*)
+CF      = $(HEXDIR) MPLABXLog.* log.*
 
 vpath %.c   $(src)
 
