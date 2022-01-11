@@ -31,6 +31,7 @@ build: $(PRGDAT).hex
 
 $(PRGDAT).hex: $(OBJS)
 	mkdir -p $(HEXDIR)
+	echo '*' > $(HEXDIR)/.gitignore
 	$(CC) -mcpu=$(DEVICE) -I $(INCDIR) -o $(HEXDIR)/$(MODULE) $^
 
 %.p1: %.c
