@@ -157,7 +157,7 @@ void main (void) {
         get_vm_all(&tst,  &tbs);
         get_tmp_all(&tst, &tbs);
 
-        start_usart_receive();
+        usart_start_receive();
         while (1) {
                 // FPGA State Control
                 fpgafunc[tst.fmd.state](&tst.fmd);

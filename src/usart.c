@@ -65,7 +65,7 @@ void usart_send_msg (char *msg) {
         }
 }
 
-void start_usart_receive (void) {
+void usart_start_receive (void) {
         char buf;
         RCSTAbits.CREN = 1;
         if (RCSTAbits.FERR | PIR1bits.RCIF)
