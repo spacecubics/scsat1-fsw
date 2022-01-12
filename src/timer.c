@@ -10,6 +10,8 @@
 #include <pic.h>
 #include "timer.h"
 
+struct interval_timer tmr2;
+
 /*
  * Initialize Timer 2
  *  Timer Interval 4 ms

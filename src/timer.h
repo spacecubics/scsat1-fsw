@@ -16,4 +16,4 @@ struct interval_timer {
         int etiming;
         unsigned event: 1;
 };
-struct interval_timer tmr2;
+extern struct interval_timer tmr2;
