@@ -60,7 +60,7 @@ extern void cmd_parser (trch_state *tst);
 
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
-                timer2_int();
+                timer2_isr();
         }
         if (PIR1bits.RCIF) {
                 receive_msg_int();

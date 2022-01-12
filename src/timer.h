@@ -9,7 +9,7 @@
 
 extern void timer2_init (void);
 extern void timer2_ctrl (char control);
-extern void timer2_int (void);
+extern void timer2_isr (void);
 
 struct interval_timer {
         int ms4;

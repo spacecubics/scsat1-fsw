@@ -24,7 +24,7 @@ void timer2_ctrl (char control) {
         PIE1bits.TMR2IE = 1;
 }
 
-void timer2_int (void) {
+void timer2_isr (void) {
         PIR1bits.TMR2IF = 0;
         if ((tmr2.ms4 +1) % tmr2.etiming == 0)
                 tmr2.event = 1;
