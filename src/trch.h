@@ -6,6 +6,8 @@
  *
  */
 
+#include <pic.h>
+
 /*
  * Hardware Configuration
  */
