@@ -12,7 +12,7 @@
 #include "i2c.h"
 #include "tmp175.h"
 
-int tmp175_data_read (tmp175_data *td, int fpga_state) {
+int tmp175_data_read (struct tmp175_data *td, int fpga_state) {
         char addr = (char)(td->addr << 1);
         int err = 0;
         if (i2c_get(td->master, fpga_state))

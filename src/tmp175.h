@@ -12,11 +12,11 @@
 #define REG_TLOW   0x02
 #define REG_THIGH  0x03
 
-typedef struct s_tmp175_data {
+struct tmp175_data {
         int  master;
         char addr;
         char data[2];
         int  error;
-} tmp175_data;
+};
 
-extern int tmp175_data_read (tmp175_data *td, int fpga_state);
+extern int tmp175_data_read (struct tmp175_data *td, int fpga_state);
