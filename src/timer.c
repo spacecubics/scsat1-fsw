@@ -8,6 +8,7 @@
  */
 
 #include <pic.h>
+#include <stdint.h>
 #include "timer.h"
 
 struct interval_timer tmr2;
@@ -21,7 +22,7 @@ void timer2_init (void) {
         PR2 = 0xFA;
 }
 
-void timer2_ctrl (char control) {
+void timer2_ctrl (uint8_t control) {
         T2CONbits.TMR2ON = control;
         PIE1bits.TMR2IE = 1;
 }
