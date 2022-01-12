@@ -11,6 +11,7 @@
 #include <pic.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "trch.h"
 #include "fpga.h"
 #include "spi.h"
@@ -32,7 +33,7 @@
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
 #define BUF_LEN 20
-extern void conv_message (char *data, int count);
+extern void conv_message (uint8_t *data, int count);
 extern char conv_asc2hex (char data);
 
 struct trch_state {
@@ -217,7 +218,7 @@ void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs) {
 }
 
 void cmd_parser (struct trch_state *tst) {
-        char buf[BUF_LEN] = { };
+        uint8_t buf[BUF_LEN] = { };
         char data;
         struct tmp175_data temp;
         struct ina3221_data voltage;
@@ -439,7 +440,7 @@ void cmd_parser (struct trch_state *tst) {
         usart_receive_msg_clear();
 }
 
-void conv_message (char *data, int count) {
+void conv_message (uint8_t *data, int count) {
         int i, j=0;
         char text[] = "0123456789ABCDEF";
         char message[BUF_LEN] = { };

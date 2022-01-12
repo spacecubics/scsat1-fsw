@@ -7,6 +7,8 @@
  *
  */
 
+#include <stdint.h>
+
 #define REG_TEMP   0x00
 #define REG_CONFIG 0x01
 #define REG_TLOW   0x02
@@ -14,8 +16,8 @@
 
 struct tmp175_data {
         int  master;
-        char addr;
-        char data[2];
+        uint8_t addr;
+        uint8_t data[2];
         int  error;
 };
 

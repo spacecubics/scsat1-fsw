@@ -8,6 +8,7 @@
  */
 
 #include <pic.h>
+#include <stdint.h>
 #include "trch.h"
 #include "i2c.h"
 #include "fpga.h"
@@ -50,7 +51,7 @@ void i2c_send_stop (int m) {
         }
 }
 
-static void send_bit (int m, char l) {
+static void send_bit (int m, uint8_t l) {
         if (!m) {
                 INT_SDA_DIR = l;
                 INT_SCL_DIR = 1;
@@ -62,7 +63,7 @@ static void send_bit (int m, char l) {
         }
 }
 
-static void send_bit_befor_resp (int m, char l) {
+static void send_bit_befor_resp (int m, uint8_t l) {
         if (!m) {
                 INT_SDA_DIR = l;
                 INT_SCL_DIR = 1;
@@ -76,8 +77,8 @@ static void send_bit_befor_resp (int m, char l) {
         }
 }
 
-static char receive_bit (int m) {
-        char r = 0x00;
+static uint8_t receive_bit (int m) {
+        uint8_t r = 0x00;
         if (!m) {
                 INT_SDA_DIR = 1;
                 INT_SCL_DIR = 1;
@@ -92,7 +93,7 @@ static char receive_bit (int m) {
         return r;
 }
 
-int i2c_send_data (int master, char data) {
+int i2c_send_data (int master, uint8_t data) {
         send_bit(master, (data >> 7));
         send_bit(master, (data >> 6));
         send_bit(master, (data >> 5));
@@ -104,16 +105,16 @@ int i2c_send_data (int master, char data) {
         return receive_bit(master);
 }
 
-char i2c_receive_data (int master) {
-        char data = 0x00;
-        data = ((char)(data << 1) | receive_bit(master));
-        data = ((char)(data << 1) | receive_bit(master));
-        data = ((char)(data << 1) | receive_bit(master));
-        data = ((char)(data << 1) | receive_bit(master));
-        data = ((char)(data << 1) | receive_bit(master));
-        data = ((char)(data << 1) | receive_bit(master));
-        data = ((char)(data << 1) | receive_bit(master));
-        data = ((char)(data << 1) | receive_bit(master));
+uint8_t i2c_receive_data (int master) {
+        uint8_t data = 0x00;
+        data = ((uint8_t)(data << 1) | receive_bit(master));
+        data = ((uint8_t)(data << 1) | receive_bit(master));
+        data = ((uint8_t)(data << 1) | receive_bit(master));
+        data = ((uint8_t)(data << 1) | receive_bit(master));
+        data = ((uint8_t)(data << 1) | receive_bit(master));
+        data = ((uint8_t)(data << 1) | receive_bit(master));
+        data = ((uint8_t)(data << 1) | receive_bit(master));
+        data = ((uint8_t)(data << 1) | receive_bit(master));
         send_bit(master, 0);
         return data;
 }
