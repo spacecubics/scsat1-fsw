@@ -48,12 +48,50 @@ struct trch_bstatus {
         struct ina3221_data vm3v3i;
 };
 
-extern void get_vm (struct ina3221_data *id, int fpga_state, int type);
-extern void get_vm_all (struct trch_state *tst, struct trch_bstatus *tbs);
-extern void get_tmp (struct tmp175_data *td, int fpga_state);
-extern void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs);
+static void get_vm (struct ina3221_data *id, int fpga_state, int type) {
+        int retry = 3;
+        while (retry) {
+                ina3221_data_read(id, fpga_state, type);
+                if (id->error)
+                        retry--;
+                else
+                        return;
+        }
+}
 
-void __interrupt() isr(void) {
+static void get_tmp (struct tmp175_data *td, int fpga_state) {
+        int retry = 3;
+        while (retry) {
+                tmp175_data_read(td, fpga_state);
+                if (td->error)
+                        retry--;
+                else
+                        return;
+        }
+}
+
+static void get_vm_all (struct trch_state *tst, struct trch_bstatus *tbs) {
+        get_vm(&tbs->vm3v3a, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3b, tst->fmd.state, 1);
+        get_vm(&tbs->vm1v0, tst->fmd.state, 1);
+        get_vm(&tbs->vm1v8, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3a, tst->fmd.state, 0);
+        get_vm(&tbs->vm3v3b, tst->fmd.state, 0);
+        get_vm(&tbs->vm1v0, tst->fmd.state, 0);
+        get_vm(&tbs->vm1v8, tst->fmd.state, 0);
+        get_vm(&tbs->vm3v3, tst->fmd.state, 0);
+        get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
+}
+
+static void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs) {
+        get_tmp(&tbs->ts1, tst->fmd.state);
+        get_tmp(&tbs->ts2, tst->fmd.state);
+        get_tmp(&tbs->ts3, tst->fmd.state);
+}
+
+static void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
                 timer2_isr();
         }
@@ -62,7 +100,7 @@ void __interrupt() isr(void) {
         }
 }
 
-void trch_init (void) {
+static void trch_init (void) {
         ADCON1 = 0x07;
         TRISA = TRISA_INIT;
         PORTA = PORTA_INIT;
@@ -166,47 +204,4 @@ void main (void) {
                 }
         }
         return;
-}
-
-void get_vm (struct ina3221_data *id, int fpga_state, int type) {
-        int retry = 3;
-        while (retry) {
-                ina3221_data_read(id, fpga_state, type);
-                if (id->error)
-                        retry--;
-                else
-                        return;
-        }
-}
-
-void get_tmp (struct tmp175_data *td, int fpga_state) {
-        int retry = 3;
-        while (retry) {
-                tmp175_data_read(td, fpga_state);
-                if (td->error)
-                        retry--;
-                else
-                        return;
-        }
-}
-
-void get_vm_all (struct trch_state *tst, struct trch_bstatus *tbs) {
-        get_vm(&tbs->vm3v3a, tst->fmd.state, 1);
-        get_vm(&tbs->vm3v3b, tst->fmd.state, 1);
-        get_vm(&tbs->vm1v0, tst->fmd.state, 1);
-        get_vm(&tbs->vm1v8, tst->fmd.state, 1);
-        get_vm(&tbs->vm3v3, tst->fmd.state, 1);
-        get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
-        get_vm(&tbs->vm3v3a, tst->fmd.state, 0);
-        get_vm(&tbs->vm3v3b, tst->fmd.state, 0);
-        get_vm(&tbs->vm1v0, tst->fmd.state, 0);
-        get_vm(&tbs->vm1v8, tst->fmd.state, 0);
-        get_vm(&tbs->vm3v3, tst->fmd.state, 0);
-        get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
-}
-
-void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs) {
-        get_tmp(&tbs->ts1, tst->fmd.state);
-        get_tmp(&tbs->ts2, tst->fmd.state);
-        get_tmp(&tbs->ts3, tst->fmd.state);
 }
