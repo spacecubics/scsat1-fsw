@@ -13,8 +13,8 @@
 #include "fpga.h"
 
 int get_i2c (int m, int fpga_state) {
-        if (fpga_state == ST_FPGA_CONFIG |
-            fpga_state == ST_FPGA_ACTIVE)
+        if (fpga_state == FPGA_STATE_CONFIG |
+            fpga_state == FPGA_STATE_ACTIVE)
                 return 1;
         if (!m) {
                 INT_SCL_DIR = 1;

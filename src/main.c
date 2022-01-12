@@ -226,21 +226,21 @@ void cmd_parser (trch_state *tst) {
         // FPGA Command
         if (!strcmp(rx_msg.msg,"fc")) {
                 send_msg("fpga configuration");
-                if ((*tst).fmd.state != ST_FPGA_READY)
+                if ((*tst).fmd.state != FPGA_STATE_READY)
                         send_msg(" Configuration Error");
                 else
                         (*tst).fmd.config_ok = 1;
         } else if (!strcmp(rx_msg.msg,"fu")) {
                 send_msg("fpga unconfiguration");
-                if ((*tst).fmd.state != ST_FPGA_CONFIG &
-                    (*tst).fmd.state != ST_FPGA_ACTIVE)
+                if ((*tst).fmd.state != FPGA_STATE_CONFIG &
+                    (*tst).fmd.state != FPGA_STATE_ACTIVE)
                         send_msg(" Unconfiguration Error");
                 else
                         (*tst).fmd.config_ok = 0;
 
         // Configuration Memory Select
         } else if (!strncmp(rx_msg.msg,"ms",2)) {
-                if ((*tst).fmd.state != ST_FPGA_ACTIVE) {
+                if ((*tst).fmd.state != FPGA_STATE_ACTIVE) {
                         send_msg("Memory select control");
                         buf[0] = *(rx_msg.msg+2) - 0x30;
                         if (buf[0] == 0x00) {
