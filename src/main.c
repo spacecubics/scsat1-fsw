@@ -35,10 +35,10 @@
 extern void conv_message (char *data, int count);
 extern char conv_asc2hex (char data);
 
-typedef struct s_trch_state {
+struct trch_state {
         unsigned long gtimer;
         struct fpga_management_data fmd;
-} trch_state;
+};
 
 typedef struct s_trch_bstatus {
         struct tmp175_data ts1;
@@ -53,10 +53,10 @@ typedef struct s_trch_bstatus {
 } trch_bstatus;
 
 extern void get_vm (ina3221_data *id, int fpga_state, int type);
-extern void get_vm_all (trch_state *tst, trch_bstatus *tbs);
+extern void get_vm_all (struct trch_state *tst, trch_bstatus *tbs);
 extern void get_tmp (struct tmp175_data *td, int fpga_state);
-extern void get_tmp_all (trch_state *tst, trch_bstatus *tbs);
-extern void cmd_parser (trch_state *tst);
+extern void get_tmp_all (struct trch_state *tst, trch_bstatus *tbs);
+extern void cmd_parser (struct trch_state *tst);
 
 void __interrupt() isr(void) {
         if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
@@ -82,7 +82,7 @@ void trch_init (void) {
 }
 
 void main (void) {
-        trch_state tst;
+        struct trch_state tst;
         trch_bstatus tbs;
         // Initialize trch-firmware
         trch_init();
@@ -195,7 +195,7 @@ void get_tmp (struct tmp175_data *td, int fpga_state) {
         }
 }
 
-void get_vm_all (trch_state *tst, trch_bstatus *tbs) {
+void get_vm_all (struct trch_state *tst, trch_bstatus *tbs) {
         get_vm(&tbs->vm3v3a, tst->fmd.state, 1);
         get_vm(&tbs->vm3v3b, tst->fmd.state, 1);
         get_vm(&tbs->vm1v0, tst->fmd.state, 1);
@@ -210,13 +210,13 @@ void get_vm_all (trch_state *tst, trch_bstatus *tbs) {
         get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
 }
 
-void get_tmp_all (trch_state *tst, trch_bstatus *tbs) {
+void get_tmp_all (struct trch_state *tst, trch_bstatus *tbs) {
         get_tmp(&tbs->ts1, tst->fmd.state);
         get_tmp(&tbs->ts2, tst->fmd.state);
         get_tmp(&tbs->ts3, tst->fmd.state);
 }
 
-void cmd_parser (trch_state *tst) {
+void cmd_parser (struct trch_state *tst) {
         char buf[BUF_LEN] = { };
         char data;
         struct tmp175_data temp;
