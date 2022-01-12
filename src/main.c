@@ -63,7 +63,7 @@ void __interrupt() isr(void) {
                 timer2_isr();
         }
         if (PIR1bits.RCIF) {
-                receive_msg_isr();
+                usart_receive_msg_isr();
         }
 }
 
@@ -436,7 +436,7 @@ void cmd_parser (trch_state *tst) {
 
         } else
                 usart_send_msg("cmd error");
-        receive_msg_clear();
+        usart_receive_msg_clear();
 }
 
 void conv_message (char *data, int count) {

@@ -78,7 +78,7 @@ void usart_start_receive (void) {
 
 #define RX_MSG_DELIMITER (0x0d)
 
-void receive_msg_isr (void) {
+void usart_receive_msg_isr (void) {
         char buf;
 
         if (RCSTAbits.OERR | RCSTAbits.FERR) {
@@ -100,7 +100,7 @@ void receive_msg_isr (void) {
         }
 }
 
-void receive_msg_clear (void) {
+void usart_receive_msg_clear (void) {
         memset(rx_msg.msg, 0, MSG_LEN);
         rx_msg.active = 0;
         rx_msg.err = 0;
