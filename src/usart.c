@@ -43,7 +43,7 @@ void send_char (char msg) {
         TXREG = msg;
 }
 
-void send_msg (char *msg) {
+void usart_send_msg (char *msg) {
         int i;
         tx_msg.msg = msg;
         tx_msg.active = 1;
