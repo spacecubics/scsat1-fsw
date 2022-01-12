@@ -26,7 +26,6 @@ extern struct usart_rx_msg rx_msg;
 extern void usart_init (void);
 extern void send_char (char msg);
 extern void send_msg (char *msg);
-extern void send_msg_int (void);
 extern void start_usart_receive (void);
 extern void receive_msg_int (void);
 extern void receive_msg_clear (void);
