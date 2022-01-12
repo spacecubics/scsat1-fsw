@@ -50,7 +50,7 @@ void send_stop (int m) {
         }
 }
 
-void send_bit (int m, char l) {
+static void send_bit (int m, char l) {
         if (!m) {
                 INT_SDA_DIR = l;
                 INT_SCL_DIR = 1;
@@ -62,7 +62,7 @@ void send_bit (int m, char l) {
         }
 }
 
-void send_bit_befor_resp (int m, char l) {
+static void send_bit_befor_resp (int m, char l) {
         if (!m) {
                 INT_SDA_DIR = l;
                 INT_SCL_DIR = 1;
@@ -76,7 +76,7 @@ void send_bit_befor_resp (int m, char l) {
         }
 }
 
-char receive_bit (int m) {
+static char receive_bit (int m) {
         char r = 0x00;
         if (!m) {
                 INT_SDA_DIR = 1;
