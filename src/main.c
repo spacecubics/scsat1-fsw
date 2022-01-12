@@ -40,7 +40,7 @@ struct trch_state {
         struct fpga_management_data fmd;
 };
 
-typedef struct s_trch_bstatus {
+struct trch_bstatus {
         struct tmp175_data ts1;
         struct tmp175_data ts2;
         struct tmp175_data ts3;
@@ -50,12 +50,12 @@ typedef struct s_trch_bstatus {
         struct ina3221_data vm3v3a;
         struct ina3221_data vm3v3b;
         struct ina3221_data vm3v3i;
-} trch_bstatus;
+};
 
 extern void get_vm (struct ina3221_data *id, int fpga_state, int type);
-extern void get_vm_all (struct trch_state *tst, trch_bstatus *tbs);
+extern void get_vm_all (struct trch_state *tst, struct trch_bstatus *tbs);
 extern void get_tmp (struct tmp175_data *td, int fpga_state);
-extern void get_tmp_all (struct trch_state *tst, trch_bstatus *tbs);
+extern void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs);
 extern void cmd_parser (struct trch_state *tst);
 
 void __interrupt() isr(void) {
@@ -83,7 +83,7 @@ void trch_init (void) {
 
 void main (void) {
         struct trch_state tst;
-        trch_bstatus tbs;
+        struct trch_bstatus tbs;
         // Initialize trch-firmware
         trch_init();
         fpga_init(&(tst.fmd));
@@ -195,7 +195,7 @@ void get_tmp (struct tmp175_data *td, int fpga_state) {
         }
 }
 
-void get_vm_all (struct trch_state *tst, trch_bstatus *tbs) {
+void get_vm_all (struct trch_state *tst, struct trch_bstatus *tbs) {
         get_vm(&tbs->vm3v3a, tst->fmd.state, 1);
         get_vm(&tbs->vm3v3b, tst->fmd.state, 1);
         get_vm(&tbs->vm1v0, tst->fmd.state, 1);
@@ -210,7 +210,7 @@ void get_vm_all (struct trch_state *tst, trch_bstatus *tbs) {
         get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
 }
 
-void get_tmp_all (struct trch_state *tst, trch_bstatus *tbs) {
+void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs) {
         get_tmp(&tbs->ts1, tst->fmd.state);
         get_tmp(&tbs->ts2, tst->fmd.state);
         get_tmp(&tbs->ts3, tst->fmd.state);
