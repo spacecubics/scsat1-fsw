@@ -44,15 +44,15 @@ typedef struct s_trch_bstatus {
         struct tmp175_data ts1;
         struct tmp175_data ts2;
         struct tmp175_data ts3;
-        ina3221_data vm1v0;
-        ina3221_data vm1v8;
-        ina3221_data vm3v3;
-        ina3221_data vm3v3a;
-        ina3221_data vm3v3b;
-        ina3221_data vm3v3i;
+        struct ina3221_data vm1v0;
+        struct ina3221_data vm1v8;
+        struct ina3221_data vm3v3;
+        struct ina3221_data vm3v3a;
+        struct ina3221_data vm3v3b;
+        struct ina3221_data vm3v3i;
 } trch_bstatus;
 
-extern void get_vm (ina3221_data *id, int fpga_state, int type);
+extern void get_vm (struct ina3221_data *id, int fpga_state, int type);
 extern void get_vm_all (struct trch_state *tst, trch_bstatus *tbs);
 extern void get_tmp (struct tmp175_data *td, int fpga_state);
 extern void get_tmp_all (struct trch_state *tst, trch_bstatus *tbs);
@@ -173,7 +173,7 @@ void main (void) {
         return;
 }
 
-void get_vm (ina3221_data *id, int fpga_state, int type) {
+void get_vm (struct ina3221_data *id, int fpga_state, int type) {
         int retry = 3;
         while (retry) {
                 ina3221_data_read(id, fpga_state, type);
@@ -220,7 +220,7 @@ void cmd_parser (struct trch_state *tst) {
         char buf[BUF_LEN] = { };
         char data;
         struct tmp175_data temp;
-        ina3221_data voltage;
+        struct ina3221_data voltage;
 
         usart_send_msg(rx_msg.msg);
         // FPGA Command
