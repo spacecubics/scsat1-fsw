@@ -15,12 +15,12 @@ void interrupt_init (void) {
         INTCONbits.GIE = 1;
 }
 
-void interrupt_lock (int lock) {
-        if (!lock) {
-                INTCONbits.PEIE = 1;
-                INTCONbits.GIE = 1;
-        } else {
-                INTCONbits.PEIE = 0;
-                INTCONbits.GIE = 0;
-        }
+void interrupt_lock () {
+	INTCONbits.PEIE = 0;
+	INTCONbits.GIE = 0;
+}
+
+void interrupt_unlock () {
+	INTCONbits.PEIE = 1;
+	INTCONbits.GIE = 1;
 }
