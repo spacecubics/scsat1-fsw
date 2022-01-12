@@ -11,6 +11,10 @@
 #include <string.h>
 #include "usart.h"
 
+/* Variables shared with main */
+struct usart_tx_msg tx_msg;
+struct usart_rx_msg rx_msg;
+
 /*
  * USART Initialize
  *  - Asynchronouse mode
@@ -43,6 +47,7 @@ void send_msg (char *msg) {
         int i;
         tx_msg.msg = msg;
         tx_msg.active = 1;
+	char newline[2] = {0x0d, 0x0a};
 
         // Transfer start
         while (tx_msg.active) {
@@ -71,8 +76,11 @@ void start_usart_receive (void) {
         PIE1bits.RCIE = 1;
 }
 
+#define RX_MSG_DELIMITER (0x0d)
+
 void receive_msg_int (void) {
         char buf;
+
         if (RCSTAbits.OERR | RCSTAbits.FERR) {
                 rx_msg.active = 1;
                 rx_msg.err = 1;
@@ -83,7 +91,7 @@ void receive_msg_int (void) {
         } else {
                 buf = RCREG;
                 send_char(buf);
-                if (buf == rx_msg_delimiter)
+                if (buf == RX_MSG_DELIMITER)
                         rx_msg.active = 1;
                 else {
                         rx_msg.msg[rx_msg.addr] = buf;

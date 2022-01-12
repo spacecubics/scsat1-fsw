@@ -8,14 +8,12 @@
  */
 
 #define MSG_LEN 30
-static char newline[2] = {0x0d, 0x0a};
-static char rx_msg_delimiter = 0x0d;
 
 struct usart_tx_msg {
         char *msg;
         unsigned active :1;
 };
-struct usart_tx_msg tx_msg;
+extern struct usart_tx_msg tx_msg;
 
 struct usart_rx_msg {
         char msg[MSG_LEN];
@@ -23,7 +21,7 @@ struct usart_rx_msg {
         unsigned active :1;
         unsigned err :1;
 };
-struct usart_rx_msg rx_msg;
+extern struct usart_rx_msg rx_msg;
 
 extern void usart_init (void);
 extern void send_char (char msg);
