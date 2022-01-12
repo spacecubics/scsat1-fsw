@@ -23,7 +23,6 @@ typedef struct s_fpga_management_data {
 } fpga_management_data;
 
 typedef void (*STATEFUNC)(fpga_management_data *fmd);
+extern STATEFUNC fpgafunc[FPGA_STATE_LAST];
 
 extern void fpga_init (fpga_management_data *fmd);
-
-extern STATEFUNC fpgafunc[FPGA_STATE_LAST];
