@@ -63,7 +63,7 @@ void __interrupt() isr(void) {
                 timer2_isr();
         }
         if (PIR1bits.RCIF) {
-                receive_msg_int();
+                receive_msg_isr();
         }
 }
 

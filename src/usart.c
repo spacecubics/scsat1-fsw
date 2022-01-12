@@ -78,7 +78,7 @@ void start_usart_receive (void) {
 
 #define RX_MSG_DELIMITER (0x0d)
 
-void receive_msg_int (void) {
+void receive_msg_isr (void) {
         char buf;
 
         if (RCSTAbits.OERR | RCSTAbits.FERR) {
