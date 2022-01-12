@@ -9,7 +9,7 @@
 
 #include <pic.h>
 #include "interrupt.h"
-#include "i2c-gpio.h"
+#include "i2c.h"
 #include "tmp175.h"
 
 int tmp175_data_read (tmp175_data *td, int fpga_state) {

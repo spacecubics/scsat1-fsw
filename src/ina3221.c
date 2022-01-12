@@ -9,7 +9,7 @@
 
 #include <pic.h>
 #include "interrupt.h"
-#include "i2c-gpio.h"
+#include "i2c.h"
 #include "ina3221.h"
 
 int ina3221_data_read (ina3221_data *id, int fpga_state, int type) {

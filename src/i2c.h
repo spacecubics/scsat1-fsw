@@ -1,6 +1,6 @@
 /*
  * Space Cubics OBC TRCH Software
- *  Definitions for i2c-gpio
+ *  Definitions for i2c
  *
  * (C) Copyright 2021
  *         Space Cubics, LLC

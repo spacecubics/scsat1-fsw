@@ -9,7 +9,7 @@
 
 #include <pic.h>
 #include "trch.h"
-#include "i2c-gpio.h"
+#include "i2c.h"
 #include "fpga.h"
 
 int i2c_get (int m, int fpga_state) {

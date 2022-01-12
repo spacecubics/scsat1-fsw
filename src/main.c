@@ -14,7 +14,7 @@
 #include "trch.h"
 #include "fpga.h"
 #include "spi.h"
-#include "i2c-gpio.h"
+#include "i2c.h"
 #include "tmp175.h"
 #include "ina3221.h"
 #include "usart.h"
