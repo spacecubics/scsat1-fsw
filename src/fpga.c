@@ -11,14 +11,14 @@
 #include "trch.h"
 #include "fpga.h"
 
-void fpga_init (fpga_management_data *fmd) {
+void fpga_init (struct fpga_management_data *fmd) {
         fmd->state = FPGA_STATE_POWER_OFF;
         fmd->config_ok = 0;
         fmd->count = 0;
         fmd->time = 0;
 }
 
-static void f_power_off (fpga_management_data *fmd) {
+static void f_power_off (struct fpga_management_data *fmd) {
         if (VDD_3V3) {
                 fmd->state = FPGA_STATE_READY;
                 FPGA_INIT_B_DIR = 0;
@@ -27,7 +27,7 @@ static void f_power_off (fpga_management_data *fmd) {
         }
 }
 
-static void f_fpga_ready (fpga_management_data *fmd) {
+static void f_fpga_ready (struct fpga_management_data *fmd) {
         if (fmd->config_ok) {
                 if (fmd->count == 0)
                         FPGA_INIT_B_DIR = 1;
@@ -38,7 +38,7 @@ static void f_fpga_ready (fpga_management_data *fmd) {
         }
 }
 
-static void f_fpga_config (fpga_management_data *fmd) {
+static void f_fpga_config (struct fpga_management_data *fmd) {
         if (!fmd->config_ok) {
                 FPGA_PROGRAM_B = 0;
                 fmd->state = FPGA_STATE_READY;
@@ -46,7 +46,7 @@ static void f_fpga_config (fpga_management_data *fmd) {
                 fmd->state = FPGA_STATE_ACTIVE;
 }
 
-static void f_fpga_active (fpga_management_data *fmd) {
+static void f_fpga_active (struct fpga_management_data *fmd) {
         if (!fmd->config_ok) {
                 FPGA_PROGRAM_B = 0;
                 fmd->state = FPGA_STATE_READY;

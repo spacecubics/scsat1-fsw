@@ -37,7 +37,7 @@ extern char conv_asc2hex (char data);
 
 typedef struct s_trch_state {
         unsigned long gtimer;
-        fpga_management_data fmd;
+        struct fpga_management_data fmd;
 } trch_state;
 
 typedef struct s_trch_bstatus {

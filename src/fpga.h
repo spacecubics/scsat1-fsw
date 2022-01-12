@@ -15,14 +15,14 @@ enum FpgaState{
 	FPGA_STATE_LAST,
 };
 
-typedef struct s_fpga_management_data {
+struct fpga_management_data {
         enum FpgaState state;
         unsigned config_ok: 1;
         int count;
         int time;
-} fpga_management_data;
+};
 
-typedef void (*STATEFUNC)(fpga_management_data *fmd);
+typedef void (*STATEFUNC)(struct fpga_management_data *fmd);
 extern STATEFUNC fpgafunc[FPGA_STATE_LAST];
 
-extern void fpga_init (fpga_management_data *fmd);
+extern void fpga_init (struct fpga_management_data *fmd);
