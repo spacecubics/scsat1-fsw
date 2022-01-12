@@ -12,7 +12,7 @@
 #include "i2c-gpio.h"
 #include "fpga.h"
 
-int get_i2c (int m, int fpga_state) {
+int i2c_get (int m, int fpga_state) {
         if (fpga_state == FPGA_STATE_CONFIG |
             fpga_state == FPGA_STATE_ACTIVE)
                 return 1;
@@ -26,7 +26,7 @@ int get_i2c (int m, int fpga_state) {
         return 0;
 }
 
-void send_start (int m) {
+void i2c_send_start (int m) {
         if (!m) {
                 INT_SCL_DIR = 1;
                 INT_SDA_DIR = 0;
@@ -38,7 +38,7 @@ void send_start (int m) {
         }
 }
 
-void send_stop (int m) {
+void i2c_send_stop (int m) {
         if (!m) {
                 INT_SDA_DIR = 0;
                 INT_SCL_DIR = 1;

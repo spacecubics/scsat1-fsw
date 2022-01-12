@@ -16,18 +16,18 @@ int ina3221_data_read (ina3221_data *id, int fpga_state, int type) {
         char addr = (char)((*id).addr << 1);
         char reg_addr = (char)(((*id).channel -1) * 2 + type + REG_VOLTAGE_BASE);
         int err = 0;
-        if (get_i2c((*id).master, fpga_state))
+        if (i2c_get((*id).master, fpga_state))
                 return 1;
 
         interrupt_lock(1);
-        send_start((*id).master);
+        i2c_send_start((*id).master);
         err |= i2c_send_data((*id).master, addr);
         err |= i2c_send_data((*id).master, reg_addr);
-        send_stop((*id).master);
+        i2c_send_stop((*id).master);
         interrupt_lock(0);
 
         interrupt_lock(1);
-        send_start((*id).master);
+        i2c_send_start((*id).master);
         err |= i2c_send_data((*id).master, addr | 0x01);
         if (type) {
                 (*id).bus[0] = i2c_receive_data((*id).master);
@@ -36,7 +36,7 @@ int ina3221_data_read (ina3221_data *id, int fpga_state, int type) {
                 (*id).shunt[0] = i2c_receive_data((*id).master);
                 (*id).shunt[1] = i2c_receive_data((*id).master);
         }
-        send_stop((*id).master);
+        i2c_send_stop((*id).master);
         interrupt_lock(0);
 
         (*id).error = err;
