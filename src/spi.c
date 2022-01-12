@@ -29,11 +29,11 @@ void spi_init (void) {
         SSPCON = 0x60;
 }
 
-void get_spi (void) {
+void spi_get (void) {
         SPICAN_CS_B = 0;
 }
 
-void release_spi (void) {
+void spi_release (void) {
         SPICAN_CS_B = 1;
 }
 

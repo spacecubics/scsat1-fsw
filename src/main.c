@@ -288,11 +288,11 @@ void cmd_parser (trch_state *tst) {
         // SPI Command
         } else if (!strcmp(rx_msg.msg,"spistart")) {
                 send_msg("spi start (cs=0)");
-                get_spi();
+                spi_get();
 
         } else if (!strcmp(rx_msg.msg,"spistop")) {
                 send_msg("spi stop (cs=1)");
-                release_spi();
+                spi_release();
 
         } else if (!strncmp(rx_msg.msg,"spi",3)) {
                 data = conv_asc2hex(*(rx_msg.msg+3));

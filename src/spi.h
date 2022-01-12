@@ -8,6 +8,6 @@
  */
 
 void spi_init (void);
-void get_spi (void);
-void release_spi (void);
+void spi_get (void);
+void spi_release (void);
 char spi_trans (char buf);
