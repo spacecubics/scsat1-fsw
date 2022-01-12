@@ -1,7 +1,7 @@
 /*
  * Space Cubics OBC TRCH Software
  *
- * (C) Copyright Space Cubics, LLC
+ * (C) Copyright 2021-2022 Space Cubics, LLC
  *
  */
 

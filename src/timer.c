@@ -2,7 +2,7 @@
  * Space Cubics OBC TRCH Software
  *  Timer Driver
  *
- * (C) Copyright 2021
+ * (C) Copyright 2021-2022
  *         Space Cubics, LLC
  *
  */
