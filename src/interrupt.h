@@ -7,5 +7,7 @@
  *
  */
 
+#pragma once
+
 extern void interrupt_lock (void);
 extern void interrupt_unlock (void);

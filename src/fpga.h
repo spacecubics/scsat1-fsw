@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 enum FpgaState{
 	FPGA_STATE_POWER_OFF,
 	FPGA_STATE_READY,

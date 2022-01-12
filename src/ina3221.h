@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 #define REG_VOLTAGE_BASE 0x01
 
 struct ina3221_data {

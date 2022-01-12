@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 #define MSG_LEN 30
 
 struct usart_tx_msg {

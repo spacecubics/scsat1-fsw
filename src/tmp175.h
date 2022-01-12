@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 #include <stdint.h>
 
 #define REG_TEMP   0x00

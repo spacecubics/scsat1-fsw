@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 void spi_init (void);
 void spi_get (void);
 void spi_release (void);

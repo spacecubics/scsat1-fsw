@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 #include <stdint.h>
 
 int i2c_get (int m, int fpga_state);
