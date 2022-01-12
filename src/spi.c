@@ -8,6 +8,7 @@
  */
 
 #include <pic.h>
+#include <stdint.h>
 #include "trch.h"
 #include "spi.h"
 
@@ -37,8 +38,8 @@ void spi_release (void) {
         SPICAN_CS_B = 1;
 }
 
-char spi_trans (char buf) {
-        char rdata;
+uint8_t spi_trans (uint8_t buf) {
+        uint8_t rdata;
         SSPBUF = buf;
         while(!SSPSTATbits.BF);
         rdata = SSPBUF;

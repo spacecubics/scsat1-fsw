@@ -219,7 +219,7 @@ void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs) {
 
 void cmd_parser (struct trch_state *tst) {
         uint8_t buf[BUF_LEN] = { };
-        char data;
+        uint8_t data;
         struct tmp175_data temp;
         struct ina3221_data voltage;
 
@@ -297,7 +297,7 @@ void cmd_parser (struct trch_state *tst) {
 
         } else if (!strncmp(rx_msg.msg,"spi",3)) {
                 data = conv_asc2hex(*(rx_msg.msg+3));
-                data = (char)(data << 4) | conv_asc2hex(*(rx_msg.msg+4));
+                data = (uint8_t)(data << 4) | conv_asc2hex(*(rx_msg.msg+4));
                 buf[0] = spi_trans(data);
                 conv_message(buf, 1);
 
