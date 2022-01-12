@@ -177,7 +177,7 @@ void get_vm (ina3221_data *id, int fpga_state, int type) {
         int retry = 3;
         while (retry) {
                 ina3221_data_read(id, fpga_state, type);
-                if ((*id).error)
+                if (id->error)
                         retry--;
                 else
                         return;
@@ -188,7 +188,7 @@ void get_tmp (tmp175_data *td, int fpga_state) {
         int retry = 3;
         while (retry) {
                 tmp175_data_read(td, fpga_state);
-                if ((*td).error)
+                if (td->error)
                         retry--;
                 else
                         return;
@@ -196,24 +196,24 @@ void get_tmp (tmp175_data *td, int fpga_state) {
 }
 
 void get_vm_all (trch_state *tst, trch_bstatus *tbs) {
-        get_vm(&tbs->vm3v3a, (*tst).fmd.state, 1);
-        get_vm(&tbs->vm3v3b, (*tst).fmd.state, 1);
-        get_vm(&tbs->vm1v0, (*tst).fmd.state, 1);
-        get_vm(&tbs->vm1v8, (*tst).fmd.state, 1);
-        get_vm(&tbs->vm3v3, (*tst).fmd.state, 1);
-        get_vm(&tbs->vm3v3i, (*tst).fmd.state, 1);
-        get_vm(&tbs->vm3v3a, (*tst).fmd.state, 0);
-        get_vm(&tbs->vm3v3b, (*tst).fmd.state, 0);
-        get_vm(&tbs->vm1v0, (*tst).fmd.state, 0);
-        get_vm(&tbs->vm1v8, (*tst).fmd.state, 0);
-        get_vm(&tbs->vm3v3, (*tst).fmd.state, 0);
-        get_vm(&tbs->vm3v3i, (*tst).fmd.state, 1);
+        get_vm(&tbs->vm3v3a, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3b, tst->fmd.state, 1);
+        get_vm(&tbs->vm1v0, tst->fmd.state, 1);
+        get_vm(&tbs->vm1v8, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
+        get_vm(&tbs->vm3v3a, tst->fmd.state, 0);
+        get_vm(&tbs->vm3v3b, tst->fmd.state, 0);
+        get_vm(&tbs->vm1v0, tst->fmd.state, 0);
+        get_vm(&tbs->vm1v8, tst->fmd.state, 0);
+        get_vm(&tbs->vm3v3, tst->fmd.state, 0);
+        get_vm(&tbs->vm3v3i, tst->fmd.state, 1);
 }
 
 void get_tmp_all (trch_state *tst, trch_bstatus *tbs) {
-        get_tmp(&tbs->ts1, (*tst).fmd.state);
-        get_tmp(&tbs->ts2, (*tst).fmd.state);
-        get_tmp(&tbs->ts3, (*tst).fmd.state);
+        get_tmp(&tbs->ts1, tst->fmd.state);
+        get_tmp(&tbs->ts2, tst->fmd.state);
+        get_tmp(&tbs->ts3, tst->fmd.state);
 }
 
 void cmd_parser (trch_state *tst) {
@@ -226,21 +226,21 @@ void cmd_parser (trch_state *tst) {
         // FPGA Command
         if (!strcmp(rx_msg.msg,"fc")) {
                 usart_send_msg("fpga configuration");
-                if ((*tst).fmd.state != FPGA_STATE_READY)
+                if (tst->fmd.state != FPGA_STATE_READY)
                         usart_send_msg(" Configuration Error");
                 else
-                        (*tst).fmd.config_ok = 1;
+                        tst->fmd.config_ok = 1;
         } else if (!strcmp(rx_msg.msg,"fu")) {
                 usart_send_msg("fpga unconfiguration");
-                if ((*tst).fmd.state != FPGA_STATE_CONFIG &
-                    (*tst).fmd.state != FPGA_STATE_ACTIVE)
+                if (tst->fmd.state != FPGA_STATE_CONFIG &
+                    tst->fmd.state != FPGA_STATE_ACTIVE)
                         usart_send_msg(" Unconfiguration Error");
                 else
-                        (*tst).fmd.config_ok = 0;
+                        tst->fmd.config_ok = 0;
 
         // Configuration Memory Select
         } else if (!strncmp(rx_msg.msg,"ms",2)) {
-                if ((*tst).fmd.state != FPGA_STATE_ACTIVE) {
+                if (tst->fmd.state != FPGA_STATE_ACTIVE) {
                         usart_send_msg("Memory select control");
                         buf[0] = *(rx_msg.msg+2) - 0x30;
                         if (buf[0] == 0x00) {
@@ -315,7 +315,7 @@ void cmd_parser (trch_state *tst) {
                         usart_send_msg("Sensor number error");
 
                 if (temp.addr != 0) {
-                        if (tmp175_data_read(&temp, (*tst).fmd.state) | temp.error)
+                        if (tmp175_data_read(&temp, tst->fmd.state) | temp.error)
                                 usart_send_msg("i2c bus error");
                         conv_message(temp.data,2);
                 }
@@ -337,7 +337,7 @@ void cmd_parser (trch_state *tst) {
                 voltage.channel = buf[1];
                 if (buf[2] == 0x00 | buf[2] == 0x01) {
                         type = (int)buf[2];
-                        if (ina3221_data_read(&voltage, (*tst).fmd.state, type))
+                        if (ina3221_data_read(&voltage, tst->fmd.state, type))
                                 usart_send_msg("i2c bus error");
                         if (type)
                                 conv_message(voltage.bus,2);
@@ -429,9 +429,9 @@ void cmd_parser (trch_state *tst) {
                 conv_message(buf, 1);
 
                 usart_send_msg("FPGA State");
-                buf[0] = (*tst).fmd.state;
+                buf[0] = tst->fmd.state;
                 conv_message(buf, 1);
-                buf[0] = (char)((*tst).fmd.count);
+                buf[0] = (char)(tst->fmd.count);
                 conv_message(buf, 1);
 
         } else
