@@ -7,9 +7,10 @@
  *
  */
 
+#include "timer.h"
+
 #include <pic.h>
 #include <stdint.h>
-#include "timer.h"
 
 struct interval_timer tmr2;
 

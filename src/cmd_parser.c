@@ -7,6 +7,8 @@
  *
  */
 
+#include "cmd_parser.h"
+
 #include <stdint.h>
 #include <string.h>
 #include "trch.h"

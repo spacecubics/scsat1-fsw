@@ -7,11 +7,12 @@
  *
  */
 
+#include "tmp175.h"
+
 #include <pic.h>
 #include <stdint.h>
 #include "interrupt.h"
 #include "i2c.h"
-#include "tmp175.h"
 #include "fpga.h"
 
 int tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state) {

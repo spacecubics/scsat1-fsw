@@ -7,11 +7,12 @@
  *
  */
 
+#include "ina3221.h"
+
 #include <pic.h>
 #include <stdint.h>
 #include "interrupt.h"
 #include "i2c.h"
-#include "ina3221.h"
 #include "fpga.h"
 
 int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, int type) {

@@ -7,10 +7,11 @@
  *
  */
 
+#include "spi.h"
+
 #include <pic.h>
 #include <stdint.h>
 #include "trch.h"
-#include "spi.h"
 
 /*
  * SSPSTAT.SMP      : Sample bit        : 0b0

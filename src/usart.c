@@ -7,9 +7,10 @@
  *
  */
 
+#include "usart.h"
+
 #include <pic.h>
 #include <string.h>
-#include "usart.h"
 
 /* Variables shared with main */
 struct usart_tx_msg tx_msg;

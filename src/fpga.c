@@ -7,9 +7,10 @@
  *
  */
 
+#include "fpga.h"
+
 #include <pic.h>
 #include "trch.h"
-#include "fpga.h"
 
 void fpga_init (struct fpga_management_data *fmd) {
         fmd->state = FPGA_STATE_POWER_OFF;

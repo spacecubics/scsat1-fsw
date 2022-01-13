@@ -9,4 +9,6 @@
 
 #pragma once
 
+#include "fpga.h"
+
 extern void cmd_parser (struct fpga_management_data *fmd);

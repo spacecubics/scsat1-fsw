@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "fpga.h"
 
 #define REG_VOLTAGE_BASE 0x01

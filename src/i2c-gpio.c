@@ -7,10 +7,11 @@
  *
  */
 
+#include "i2c.h"
+
 #include <pic.h>
 #include <stdint.h>
 #include "trch.h"
-#include "i2c.h"
 #include "fpga.h"
 
 int i2c_get (int m, enum FpgaState fpga_state) {

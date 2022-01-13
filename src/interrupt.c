@@ -7,8 +7,9 @@
  *
  */
 
-#include <pic.h>
 #include "interrupt.h"
+
+#include <pic.h>
 
 void interrupt_lock () {
 	INTCONbits.PEIE = 0;
