@@ -92,7 +92,7 @@ static void get_tmp_all (struct trch_state *tst, struct board_status *bs) {
 }
 
 static void __interrupt() isr(void) {
-        if (PIE1bits.TMR2IE && PIR1bits.TMR2IF) {
+        if (PIR1bits.TMR2IF) {
                 timer2_isr();
         }
         if (PIR1bits.RCIF) {
