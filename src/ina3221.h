@@ -13,7 +13,10 @@
 
 #include "fpga.h"
 
-#define REG_VOLTAGE_BASE 0x01
+enum Ina3221VoltageType {
+	INA3221_VOLTAGE_SHUNT,
+	INA3221_VOLTAGE_BUS,
+};
 
 struct ina3221_data {
         int  master;
@@ -24,4 +27,4 @@ struct ina3221_data {
         int  error;
 };
 
-extern int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, int type);
+extern int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type);

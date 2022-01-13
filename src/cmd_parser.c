@@ -150,7 +150,7 @@ void cmd_parser (struct fpga_management_data *fmd) {
 
         // Voltage sensor read Command
         } else if  (!strncmp(rx_msg.msg,"vs",2)) {
-                int type = 0;
+                enum Ina3221VoltageType type;
                 usart_send_msg("Read Voltage sensor");
                 buf[0] = *(rx_msg.msg+2) - 0x30;
                 buf[1] = *(rx_msg.msg+3) - 0x30;
@@ -164,10 +164,10 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         usart_send_msg("Sensor number error");
                 voltage.channel = buf[1];
                 if (buf[2] == 0x00 || buf[2] == 0x01) {
-                        type = (int)buf[2];
+                        type = buf[2] == 0x0 ? INA3221_VOLTAGE_SHUNT : INA3221_VOLTAGE_BUS;
                         if (ina3221_data_read(&voltage, fmd->state, type))
                                 usart_send_msg("i2c bus error");
-                        if (type)
+                        if (type == INA3221_VOLTAGE_BUS)
                                 conv_message(voltage.bus,2);
                         else
                                 conv_message(voltage.shunt,2);

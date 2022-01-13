@@ -48,7 +48,7 @@ struct board_status {
         struct ina3221_data vm3v3i;
 };
 
-static void get_voltage_monitor (struct ina3221_data *id, enum FpgaState fpga_state, int type) {
+static void get_voltage_monitor (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type) {
         int retry = 3;
         while (retry) {
                 ina3221_data_read(id, fpga_state, type);
@@ -71,18 +71,18 @@ static void get_tmp (struct tmp175_data *td, enum FpgaState fpga_state) {
 }
 
 static void get_voltage_monitor_all (struct trch_state *tst, struct board_status *bs) {
-        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, 1);
-        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, 1);
-        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, 1);
-        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, 1);
-        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, 1);
-        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, 1);
-        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, 0);
-        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, 0);
-        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, 0);
-        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, 0);
-        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, 0);
-        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, 1);
+        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, INA3221_VOLTAGE_BUS);
 }
 
 static void get_tmp_all (struct trch_state *tst, struct board_status *bs) {
