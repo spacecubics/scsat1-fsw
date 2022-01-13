@@ -15,8 +15,7 @@
 #include "fpga.h"
 
 int i2c_get (int m, enum FpgaState fpga_state) {
-        if (fpga_state == FPGA_STATE_CONFIG ||
-            fpga_state == FPGA_STATE_ACTIVE)
+        if (fpga_is_i2c_accessible(fpga_state))
                 return 1;
         if (!m) {
                 INT_SCL_DIR = 1;

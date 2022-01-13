@@ -10,6 +10,7 @@
 #include "fpga.h"
 
 #include <pic.h>
+#include <stdbool.h>
 #include "trch.h"
 
 void fpga_init (struct fpga_management_data *fmd) {
@@ -17,6 +18,10 @@ void fpga_init (struct fpga_management_data *fmd) {
         fmd->config_ok = 0;
         fmd->count = 0;
         fmd->time = 0;
+}
+
+bool fpga_is_i2c_accessible (enum FpgaState state) {
+        return state == FPGA_STATE_POWER_OFF || state == FPGA_STATE_READY;
 }
 
 static void f_power_off (struct fpga_management_data *fmd) {
