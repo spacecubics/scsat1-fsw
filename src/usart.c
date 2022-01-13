@@ -111,3 +111,9 @@ void usart_receive_msg_clear (void) {
         rx_msg.addr = 0;
 	interrupt_enable();
 }
+
+void usart_copy_received_msg(char *msg) {
+	interrupt_disable();
+	memcpy(msg, rx_msg.msg, MSG_LEN);
+	interrupt_enable();
+}

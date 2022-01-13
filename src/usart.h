@@ -30,3 +30,4 @@ extern void usart_send_msg (char *msg);
 extern void usart_start_receive (void);
 extern void usart_receive_msg_isr (void);
 extern void usart_receive_msg_clear (void);
+extern void usart_copy_received_msg (char *msg);

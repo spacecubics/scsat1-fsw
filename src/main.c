@@ -192,8 +192,11 @@ void main (void) {
                 // FPGA State Control
                 fpgafunc[tst.fmd.state](&tst.fmd);
 
-                if (rx_msg.active)
-                        cmd_parser(&tst.fmd);
+                if (rx_msg.active) {
+			char msg[MSG_LEN];
+			usart_copy_received_msg(msg);
+                        cmd_parser(&tst.fmd, msg);
+		}
         }
         return;
 }

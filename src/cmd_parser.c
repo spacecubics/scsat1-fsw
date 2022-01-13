@@ -50,21 +50,21 @@ static char conv_asc2hex (char data) {
 				 (((x) & 0x00ff0000) >>  8) |	\
 				 (((x) & 0xff000000) >> 24)) )
 
-void cmd_parser (struct fpga_management_data *fmd) {
+void cmd_parser (struct fpga_management_data *fmd, char *msg) {
         uint8_t buf[BUF_LEN] = { };
         uint8_t data;
         struct tmp175_data temp;
         struct ina3221_data voltage;
 
-        usart_send_msg(rx_msg.msg);
+        usart_send_msg(msg);
         // FPGA Command
-        if (!strcmp(rx_msg.msg,"fc")) {
+        if (!strcmp(msg,"fc")) {
                 usart_send_msg("fpga configuration");
                 if (fmd->state != FPGA_STATE_READY)
                         usart_send_msg(" Configuration Error");
                 else
                         fmd->config_ok = 1;
-        } else if (!strcmp(rx_msg.msg,"fu")) {
+        } else if (!strcmp(msg,"fu")) {
                 usart_send_msg("fpga unconfiguration");
                 if (fmd->state != FPGA_STATE_CONFIG &
                     fmd->state != FPGA_STATE_ACTIVE)
@@ -73,17 +73,17 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         fmd->config_ok = 0;
 
         // Timer
-	} else if (!strncmp(rx_msg.msg, "gtimer", 6)) {
+	} else if (!strncmp(msg, "gtimer", 6)) {
 		uint32_t ticks = timer_get_ticks();
 		ticks = bswap32(ticks);
 		usart_send_msg("Global Timer");
 		conv_message((uint8_t *)&ticks, sizeof(ticks));
 
         // Configuration Memory Select
-        } else if (!strncmp(rx_msg.msg,"ms",2)) {
+        } else if (!strncmp(msg,"ms",2)) {
                 if (fmd->state != FPGA_STATE_ACTIVE) {
                         usart_send_msg("Memory select control");
-                        buf[0] = *(rx_msg.msg+2) - 0x30;
+                        buf[0] = *(msg+2) - 0x30;
                         if (buf[0] == 0x00) {
                                 TRCH_CFG_MEM_SEL = 0;
                                 usart_send_msg("  memory 0");
@@ -95,9 +95,9 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         usart_send_msg("fpga state error");
 
         // User IO
-        } else if (!strncmp(rx_msg.msg,"uio0",4)) {
+        } else if (!strncmp(msg,"uio0",4)) {
                 usart_send_msg("UIO3 00");
-                buf[0] = *(rx_msg.msg+4) - 0x30;
+                buf[0] = *(msg+4) - 0x30;
                 if (buf[0] == 0x00) {
                         UIO3_00 = 0;
                         usart_send_msg("  level 0");
@@ -105,9 +105,9 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         UIO3_00 = 1;
                         usart_send_msg("  level 1");
                 }
-        } else if (!strncmp(rx_msg.msg,"uio1",4)) {
+        } else if (!strncmp(msg,"uio1",4)) {
                 usart_send_msg("UIO3 01");
-                buf[0] = *(rx_msg.msg+4) - 0x30;
+                buf[0] = *(msg+4) - 0x30;
                 if (buf[0] == 0x00) {
                         UIO3_01 = 0;
                         usart_send_msg("  level 0");
@@ -115,9 +115,9 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         UIO3_01 = 1;
                         usart_send_msg("  level 1");
                 }
-        } else if (!strncmp(rx_msg.msg,"uio2",4)) {
+        } else if (!strncmp(msg,"uio2",4)) {
                 usart_send_msg("UIO3 01");
-                buf[0] = *(rx_msg.msg+4) - 0x30;
+                buf[0] = *(msg+4) - 0x30;
                 if (buf[0] == 0x00) {
                         UIO3_02 = 0;
                         usart_send_msg("  level 0");
@@ -127,24 +127,24 @@ void cmd_parser (struct fpga_management_data *fmd) {
                 }
 
         // SPI Command
-        } else if (!strcmp(rx_msg.msg,"spistart")) {
+        } else if (!strcmp(msg,"spistart")) {
                 usart_send_msg("spi start (cs=0)");
                 spi_get();
 
-        } else if (!strcmp(rx_msg.msg,"spistop")) {
+        } else if (!strcmp(msg,"spistop")) {
                 usart_send_msg("spi stop (cs=1)");
                 spi_release();
 
-        } else if (!strncmp(rx_msg.msg,"spi",3)) {
-                data = conv_asc2hex(*(rx_msg.msg+3));
-                data = (uint8_t)(data << 4) | conv_asc2hex(*(rx_msg.msg+4));
+        } else if (!strncmp(msg,"spi",3)) {
+                data = conv_asc2hex(*(msg+3));
+                data = (uint8_t)(data << 4) | conv_asc2hex(*(msg+4));
                 buf[0] = spi_trans(data);
                 conv_message(buf, 1);
 
         // Temperature sensor read Command
-        } else if (!strncmp(rx_msg.msg,"ts",2)) {
+        } else if (!strncmp(msg,"ts",2)) {
                 usart_send_msg("Read Temperature sensor");
-                buf[0] = *(rx_msg.msg+2) - 0x30;
+                buf[0] = *(msg+2) - 0x30;
                 temp.master = 0;
                 if (buf[0] == 0x00)
                         temp.addr = 0x4c;
@@ -162,12 +162,12 @@ void cmd_parser (struct fpga_management_data *fmd) {
                 }
 
         // Voltage sensor read Command
-        } else if  (!strncmp(rx_msg.msg,"vs",2)) {
+        } else if  (!strncmp(msg,"vs",2)) {
                 enum Ina3221VoltageType type;
                 usart_send_msg("Read Voltage sensor");
-                buf[0] = *(rx_msg.msg+2) - 0x30;
-                buf[1] = *(rx_msg.msg+3) - 0x30;
-                buf[2] = *(rx_msg.msg+4) - 0x30;
+                buf[0] = *(msg+2) - 0x30;
+                buf[1] = *(msg+3) - 0x30;
+                buf[2] = *(msg+4) - 0x30;
                 voltage.master = 0;
                 if (buf[0] == 0x00)
                         voltage.addr = 0x40;
@@ -188,10 +188,10 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         usart_send_msg("type error");
 
         // Port Control
-        } else if (!strncmp(rx_msg.msg,"pt",2)) {
+        } else if (!strncmp(msg,"pt",2)) {
                 char port;
-                port = conv_asc2hex(*(rx_msg.msg+2));
-                buf[0] = (char)(conv_asc2hex(*(rx_msg.msg+3)) << 4) | conv_asc2hex(*(rx_msg.msg+4));
+                port = conv_asc2hex(*(msg+2));
+                buf[0] = (char)(conv_asc2hex(*(msg+3)) << 4) | conv_asc2hex(*(msg+4));
                 if (port == 0x0A) {
                         usart_send_msg("Set TRISA");
                         TRISA = buf[0];
@@ -210,10 +210,10 @@ void cmd_parser (struct fpga_management_data *fmd) {
                 } else
                         usart_send_msg("TRIS Port Select Error");
 
-        } else if (!strncmp(rx_msg.msg,"po",2)) {
+        } else if (!strncmp(msg,"po",2)) {
                 char port;
-                port = conv_asc2hex(*(rx_msg.msg+2));
-                buf[0] = (char)(conv_asc2hex(*(rx_msg.msg+3)) << 4) | conv_asc2hex(*(rx_msg.msg+4));
+                port = conv_asc2hex(*(msg+2));
+                buf[0] = (char)(conv_asc2hex(*(msg+3)) << 4) | conv_asc2hex(*(msg+4));
                 if (port == 0x0A) {
                         usart_send_msg("Set PORTA");
                         PORTA = buf[0];
@@ -233,7 +233,7 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         usart_send_msg("Port Select Error");
 
         // Register Check
-        } else if (!strcmp(rx_msg.msg,"chkreg")) {
+        } else if (!strcmp(msg,"chkreg")) {
                 usart_send_msg("TRISA");
                 buf[0] = TRISA;
                 conv_message(buf, 1);
