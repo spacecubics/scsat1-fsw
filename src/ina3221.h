@@ -18,7 +18,7 @@
 struct ina3221_data {
         int  master;
         uint8_t addr;
-        int  channel;
+        uint8_t channel;
         uint8_t shunt[2];
         uint8_t bus[2];
         int  error;
