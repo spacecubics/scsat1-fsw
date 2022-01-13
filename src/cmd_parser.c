@@ -143,7 +143,7 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         usart_send_msg("Sensor number error");
 
                 if (temp.addr != 0) {
-                        if (tmp175_data_read(&temp, fmd->state) | temp.error)
+                        if (tmp175_data_read(&temp, fmd->state) || temp.error)
                                 usart_send_msg("i2c bus error");
                         conv_message(temp.data,2);
                 }
@@ -163,7 +163,7 @@ void cmd_parser (struct fpga_management_data *fmd) {
                 else
                         usart_send_msg("Sensor number error");
                 voltage.channel = buf[1];
-                if (buf[2] == 0x00 | buf[2] == 0x01) {
+                if (buf[2] == 0x00 || buf[2] == 0x01) {
                         type = (int)buf[2];
                         if (ina3221_data_read(&voltage, fmd->state, type))
                                 usart_send_msg("i2c bus error");
