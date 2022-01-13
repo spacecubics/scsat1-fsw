@@ -10,9 +10,8 @@
 #pragma once
 
 #include <stdint.h>
-#include "fpga.h"
 
-int i2c_get (int m, enum FpgaState fpga_state);
+void i2c_get (int m);
 void i2c_send_start (int m);
 void i2c_send_stop (int m);
 int i2c_send_data (int master, uint8_t data);

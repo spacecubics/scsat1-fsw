@@ -12,11 +12,8 @@
 #include <pic.h>
 #include <stdint.h>
 #include "trch.h"
-#include "fpga.h"
 
-int i2c_get (int m, enum FpgaState fpga_state) {
-        if (fpga_is_i2c_accessible(fpga_state))
-                return 1;
+void i2c_get (int m) {
         if (!m) {
                 INT_SCL_DIR = 1;
                 INT_SDA_DIR = 1;
@@ -24,7 +21,6 @@ int i2c_get (int m, enum FpgaState fpga_state) {
                 EXT_SCL_DIR = 1;
                 EXT_SDA_DIR = 1;
         }
-        return 0;
 }
 
 void i2c_send_start (int m) {

@@ -19,8 +19,11 @@ int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, int t
         uint8_t addr = (uint8_t)(id->addr << 1);
         uint8_t reg_addr = (uint8_t)((id->channel -1) * 2 + type + REG_VOLTAGE_BASE);
         int err = 0;
-        if (i2c_get(id->master, fpga_state))
-                return 1;
+
+	if (!fpga_is_i2c_accessible(fpga_state))
+		return 1;
+
+        i2c_get(id->master);
 
         interrupt_lock();
         i2c_send_start(id->master);
