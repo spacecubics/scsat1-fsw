@@ -18,7 +18,7 @@
 #define REG_THIGH  0x03
 
 struct tmp175_data {
-        int  master;
+        uint8_t master;
         uint8_t addr;
         uint8_t data[2];
         uint8_t error;
