@@ -15,5 +15,4 @@ extern void timer2_init (void);
 extern void timer2_ctrl (uint8_t control);
 extern void timer2_isr (void);
 
-extern uint32_t gtimer;
-extern uint32_t timer_get_gtimer(void);
+extern uint32_t timer_get_ticks(void);

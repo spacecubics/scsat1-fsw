@@ -18,12 +18,12 @@
 #define MSEC(x) (x)
 #define TIMER_INTERVAL (MSEC(4))
 
-uint32_t gtimer;
+static uint32_t current_ticks;
 
-uint32_t timer_get_gtimer(void)
+uint32_t timer_get_ticks(void)
 {
 	interrupt_disable();
-	uint32_t ret = gtimer;
+	uint32_t ret = current_ticks;
 	interrupt_enable();
 
 	return ret;
@@ -37,7 +37,7 @@ void timer2_init (void) {
         T2CONbits.T2CKPS = 0b10;
         PR2 = 0xFA;
 
-	gtimer = 0;
+	current_ticks = 0;
 }
 
 void timer2_ctrl (uint8_t control) {
@@ -54,6 +54,6 @@ void timer2_isr (void) {
 	count %= SEC_IN_MSEC(1) / TIMER_INTERVAL;
 
 	if (count == 0) {
-		gtimer++;
+		current_ticks++;
 	}
 }

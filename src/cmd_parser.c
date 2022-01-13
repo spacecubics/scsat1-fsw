@@ -74,7 +74,7 @@ void cmd_parser (struct fpga_management_data *fmd) {
 
         // Timer
 	} else if (!strncmp(rx_msg.msg, "gtimer", 6)) {
-		uint32_t ticks = timer_get_gtimer();
+		uint32_t ticks = timer_get_ticks();
 		ticks = bswap32(ticks);
 		usart_send_msg("Global Timer");
 		conv_message((uint8_t *)&ticks, sizeof(ticks));
