@@ -12,6 +12,8 @@
 #include <pic.h>
 #include <string.h>
 
+#include "interrupt.h"
+
 /* Variables shared with main */
 struct usart_tx_msg tx_msg;
 struct usart_rx_msg rx_msg;
@@ -102,8 +104,10 @@ void usart_receive_msg_isr (void) {
 }
 
 void usart_receive_msg_clear (void) {
+	interrupt_disable();
         memset(rx_msg.msg, 0, MSG_LEN);
         rx_msg.active = 0;
         rx_msg.err = 0;
         rx_msg.addr = 0;
+	interrupt_enable();
 }
