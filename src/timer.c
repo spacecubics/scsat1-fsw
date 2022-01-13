@@ -12,7 +12,22 @@
 #include <pic.h>
 #include <stdint.h>
 
-struct interval_timer tmr2;
+#include "interrupt.h"
+
+#define SEC_IN_MSEC(x) (1000 * (x))
+#define MSEC(x) (x)
+#define TIMER_INTERVAL (MSEC(4))
+
+uint32_t gtimer;
+
+uint32_t timer_get_gtimer(void)
+{
+	interrupt_disable();
+	uint32_t ret = gtimer;
+	interrupt_enable();
+
+	return ret;
+}
 
 /*
  * Initialize Timer 2
@@ -21,6 +36,8 @@ struct interval_timer tmr2;
 void timer2_init (void) {
         T2CONbits.T2CKPS = 0b10;
         PR2 = 0xFA;
+
+	gtimer = 0;
 }
 
 void timer2_ctrl (uint8_t control) {
@@ -29,11 +46,14 @@ void timer2_ctrl (uint8_t control) {
 }
 
 void timer2_isr (void) {
-        PIR1bits.TMR2IF = 0;
-        if ((tmr2.ms4 +1) % tmr2.etiming == 0)
-                tmr2.event = 1;
-        if (tmr2.ms4 == 249)
-                tmr2.ms4 = 0;
-        else
-                tmr2.ms4++;
+	static uint8_t count = 0;
+
+	PIR1bits.TMR2IF = 0;
+
+	count++;
+	count %= SEC_IN_MSEC(1) / TIMER_INTERVAL;
+
+	if (count == 0) {
+		gtimer++;
+	}
 }

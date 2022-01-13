@@ -32,7 +32,6 @@
 #define FPGA_AUTO_CONFIG 1
 
 struct trch_state {
-        unsigned long gtimer;
         struct fpga_management_data fmd;
 };
 
@@ -125,9 +124,7 @@ void main (void) {
 
         spi_init();
         usart_init();
-        tst.gtimer = 0;
         timer2_init();
-        tmr2.etiming = 250;
         timer2_ctrl(1);
         interrupt_enable();
 
@@ -197,11 +194,6 @@ void main (void) {
 
                 if (rx_msg.active)
                         cmd_parser(&tst.fmd);
-
-                if (tmr2.event) {
-                        tst.gtimer++;
-                        tmr2.event = 0;
-                }
         }
         return;
 }
