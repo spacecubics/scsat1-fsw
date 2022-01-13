@@ -17,7 +17,7 @@
 
 int tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state) {
         uint8_t addr = (uint8_t)(td->addr << 1);
-        int err = 0;
+        uint8_t err = 0;
 
 	if (fpga_is_i2c_accessible(fpga_state))
 		return 1;

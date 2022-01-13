@@ -21,7 +21,7 @@ struct tmp175_data {
         int  master;
         uint8_t addr;
         uint8_t data[2];
-        int  error;
+        uint8_t error;
 };
 
 extern int tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state);
