@@ -36,7 +36,7 @@ struct trch_state {
         struct fpga_management_data fmd;
 };
 
-struct trch_bstatus {
+struct board_status {
         struct tmp175_data ts1;
         struct tmp175_data ts2;
         struct tmp175_data ts3;
@@ -70,25 +70,25 @@ static void get_tmp (struct tmp175_data *td, int fpga_state) {
         }
 }
 
-static void get_voltage_monitor_all (struct trch_state *tst, struct trch_bstatus *tbs) {
-        get_voltage_monitor(&tbs->vm3v3a, tst->fmd.state, 1);
-        get_voltage_monitor(&tbs->vm3v3b, tst->fmd.state, 1);
-        get_voltage_monitor(&tbs->vm1v0, tst->fmd.state, 1);
-        get_voltage_monitor(&tbs->vm1v8, tst->fmd.state, 1);
-        get_voltage_monitor(&tbs->vm3v3, tst->fmd.state, 1);
-        get_voltage_monitor(&tbs->vm3v3i, tst->fmd.state, 1);
-        get_voltage_monitor(&tbs->vm3v3a, tst->fmd.state, 0);
-        get_voltage_monitor(&tbs->vm3v3b, tst->fmd.state, 0);
-        get_voltage_monitor(&tbs->vm1v0, tst->fmd.state, 0);
-        get_voltage_monitor(&tbs->vm1v8, tst->fmd.state, 0);
-        get_voltage_monitor(&tbs->vm3v3, tst->fmd.state, 0);
-        get_voltage_monitor(&tbs->vm3v3i, tst->fmd.state, 1);
+static void get_voltage_monitor_all (struct trch_state *tst, struct board_status *bs) {
+        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, 1);
+        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, 1);
+        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, 1);
+        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, 1);
+        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, 1);
+        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, 1);
+        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, 0);
+        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, 0);
+        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, 0);
+        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, 0);
+        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, 0);
+        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, 1);
 }
 
-static void get_tmp_all (struct trch_state *tst, struct trch_bstatus *tbs) {
-        get_tmp(&tbs->ts1, tst->fmd.state);
-        get_tmp(&tbs->ts2, tst->fmd.state);
-        get_tmp(&tbs->ts3, tst->fmd.state);
+static void get_tmp_all (struct trch_state *tst, struct board_status *bs) {
+        get_tmp(&bs->ts1, tst->fmd.state);
+        get_tmp(&bs->ts2, tst->fmd.state);
+        get_tmp(&bs->ts3, tst->fmd.state);
 }
 
 static void __interrupt() isr(void) {
@@ -116,7 +116,7 @@ static void trch_init (void) {
 
 void main (void) {
         struct trch_state tst;
-        struct trch_bstatus tbs;
+        struct board_status bs;
         // Initialize trch-firmware
         trch_init();
         fpga_init(&(tst.fmd));
@@ -161,34 +161,34 @@ void main (void) {
          *   - Channel 2 (VDD 3V3B)
          *   - Channel 3 (VDD 3V3IO)
          */
-        tbs.ts1.master     = 0;
-        tbs.ts1.addr       = 0x4C;
-        tbs.ts2.master     = 0;
-        tbs.ts2.addr       = 0x4D;
-        tbs.ts3.master     = 0;
-        tbs.ts3.addr       = 0x4E;
+        bs.ts1.master     = 0;
+        bs.ts1.addr       = 0x4C;
+        bs.ts2.master     = 0;
+        bs.ts2.addr       = 0x4D;
+        bs.ts3.master     = 0;
+        bs.ts3.addr       = 0x4E;
 
-        tbs.vm1v0.master   = 0;
-        tbs.vm1v0.addr     = 0x40;
-        tbs.vm1v0.channel  = 1;
-        tbs.vm1v8.master   = 0;
-        tbs.vm1v8.addr     = 0x40;
-        tbs.vm1v8.channel  = 2;
-        tbs.vm3v3.master   = 0;
-        tbs.vm3v3.addr     = 0x40;
-        tbs.vm3v3.channel  = 3;
-        tbs.vm3v3a.master  = 0;
-        tbs.vm3v3a.addr    = 0x41;
-        tbs.vm3v3a.channel = 1;
-        tbs.vm3v3b.master  = 0;
-        tbs.vm3v3b.addr    = 0x41;
-        tbs.vm3v3b.channel = 2;
-        tbs.vm3v3i.master  = 0;
-        tbs.vm3v3i.addr    = 0x41;
-        tbs.vm3v3i.channel = 3;
+        bs.vm1v0.master   = 0;
+        bs.vm1v0.addr     = 0x40;
+        bs.vm1v0.channel  = 1;
+        bs.vm1v8.master   = 0;
+        bs.vm1v8.addr     = 0x40;
+        bs.vm1v8.channel  = 2;
+        bs.vm3v3.master   = 0;
+        bs.vm3v3.addr     = 0x40;
+        bs.vm3v3.channel  = 3;
+        bs.vm3v3a.master  = 0;
+        bs.vm3v3a.addr    = 0x41;
+        bs.vm3v3a.channel = 1;
+        bs.vm3v3b.master  = 0;
+        bs.vm3v3b.addr    = 0x41;
+        bs.vm3v3b.channel = 2;
+        bs.vm3v3i.master  = 0;
+        bs.vm3v3i.addr    = 0x41;
+        bs.vm3v3i.channel = 3;
 
-        get_voltage_monitor_all(&tst,  &tbs);
-        get_tmp_all(&tst, &tbs);
+        get_voltage_monitor_all(&tst,  &bs);
+        get_tmp_all(&tst, &bs);
 
         usart_start_receive();
         while (1) {
