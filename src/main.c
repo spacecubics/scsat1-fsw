@@ -82,7 +82,7 @@ static void get_voltage_monitor_all (struct trch_state *tst, struct board_status
         get_voltage_monitor(&bs->vm1v0, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
         get_voltage_monitor(&bs->vm1v8, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
         get_voltage_monitor(&bs->vm3v3, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
 }
 
 static void get_tmp_all (struct trch_state *tst, struct board_status *bs) {
