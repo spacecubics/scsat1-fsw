@@ -48,7 +48,7 @@ struct board_status {
         struct ina3221_data vm3v3i;
 };
 
-static void get_voltage_monitor (struct ina3221_data *id, int fpga_state, int type) {
+static void get_voltage_monitor (struct ina3221_data *id, enum FpgaState fpga_state, int type) {
         int retry = 3;
         while (retry) {
                 ina3221_data_read(id, fpga_state, type);
@@ -59,7 +59,7 @@ static void get_voltage_monitor (struct ina3221_data *id, int fpga_state, int ty
         }
 }
 
-static void get_tmp (struct tmp175_data *td, int fpga_state) {
+static void get_tmp (struct tmp175_data *td, enum FpgaState fpga_state) {
         int retry = 3;
         while (retry) {
                 tmp175_data_read(td, fpga_state);

@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "fpga.h"
+
 #define REG_VOLTAGE_BASE 0x01
 
 struct ina3221_data {
@@ -20,4 +22,4 @@ struct ina3221_data {
         int  error;
 };
 
-extern int ina3221_data_read (struct ina3221_data *id, int fpga_state, int type);
+extern int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, int type);

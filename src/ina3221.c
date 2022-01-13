@@ -12,8 +12,9 @@
 #include "interrupt.h"
 #include "i2c.h"
 #include "ina3221.h"
+#include "fpga.h"
 
-int ina3221_data_read (struct ina3221_data *id, int fpga_state, int type) {
+int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, int type) {
         uint8_t addr = (uint8_t)(id->addr << 1);
         uint8_t reg_addr = (uint8_t)((id->channel -1) * 2 + type + REG_VOLTAGE_BASE);
         int err = 0;

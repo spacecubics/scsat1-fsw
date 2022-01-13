@@ -10,6 +10,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "fpga.h"
 
 #define REG_TEMP   0x00
 #define REG_CONFIG 0x01
@@ -23,4 +24,4 @@ struct tmp175_data {
         int  error;
 };
 
-extern int tmp175_data_read (struct tmp175_data *td, int fpga_state);
+extern int tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state);

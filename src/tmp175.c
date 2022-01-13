@@ -12,8 +12,9 @@
 #include "interrupt.h"
 #include "i2c.h"
 #include "tmp175.h"
+#include "fpga.h"
 
-int tmp175_data_read (struct tmp175_data *td, int fpga_state) {
+int tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state) {
         uint8_t addr = (uint8_t)(td->addr << 1);
         int err = 0;
         if (i2c_get(td->master, fpga_state))

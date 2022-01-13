@@ -13,7 +13,7 @@
 #include "i2c.h"
 #include "fpga.h"
 
-int i2c_get (int m, int fpga_state) {
+int i2c_get (int m, enum FpgaState fpga_state) {
         if (fpga_state == FPGA_STATE_CONFIG |
             fpga_state == FPGA_STATE_ACTIVE)
                 return 1;
