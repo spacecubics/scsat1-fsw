@@ -17,6 +17,7 @@
 #include "tmp175.h"
 #include "ina3221.h"
 #include "spi.h"
+#include "timer.h"
 
 #define BUF_LEN 20
 
@@ -44,6 +45,11 @@ static char conv_asc2hex (char data) {
                 return 0x00;
 }
 
+#define bswap32(x) ((uint32_t) ( (((x) & 0x000000ff) << 24) |	\
+				 (((x) & 0x0000ff00) <<  8) |	\
+				 (((x) & 0x00ff0000) >>  8) |	\
+				 (((x) & 0xff000000) >> 24)) )
+
 void cmd_parser (struct fpga_management_data *fmd) {
         uint8_t buf[BUF_LEN] = { };
         uint8_t data;
@@ -65,6 +71,13 @@ void cmd_parser (struct fpga_management_data *fmd) {
                         usart_send_msg(" Unconfiguration Error");
                 else
                         fmd->config_ok = 0;
+
+        // Timer
+	} else if (!strncmp(rx_msg.msg, "gtimer", 6)) {
+		uint32_t ticks = timer_get_gtimer();
+		ticks = bswap32(ticks);
+		usart_send_msg("Global Timer");
+		conv_message((uint8_t *)&ticks, sizeof(ticks));
 
         // Configuration Memory Select
         } else if (!strncmp(rx_msg.msg,"ms",2)) {
