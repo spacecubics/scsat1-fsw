@@ -69,7 +69,7 @@ void usart_send_msg (char *msg) {
 void usart_start_receive (void) {
         char buf;
         RCSTAbits.CREN = 1;
-        if (RCSTAbits.FERR | PIR1bits.RCIF)
+        if (RCSTAbits.FERR || PIR1bits.RCIF)
                 buf = RCREG;
         rx_msg.active = 0;
         rx_msg.addr = 0;
@@ -82,7 +82,7 @@ void usart_start_receive (void) {
 void usart_receive_msg_isr (void) {
         char buf;
 
-        if (RCSTAbits.OERR | RCSTAbits.FERR) {
+        if (RCSTAbits.OERR || RCSTAbits.FERR) {
                 rx_msg.active = 1;
                 rx_msg.err = 1;
                 if (RCSTAbits.OERR)
