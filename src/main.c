@@ -129,7 +129,7 @@ void main (void) {
         timer2_init();
         tmr2.etiming = 250;
         timer2_ctrl(1);
-        interrupt_unlock();
+        interrupt_enable();
 
         /*
          * Space Cubics OBC TRCH-Firmware Main

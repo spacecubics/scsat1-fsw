@@ -25,14 +25,14 @@ int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, int t
 
         i2c_get(id->master);
 
-        interrupt_lock();
+        interrupt_disable();
         i2c_send_start(id->master);
         err |= i2c_send_data(id->master, addr);
         err |= i2c_send_data(id->master, reg_addr);
         i2c_send_stop(id->master);
-        interrupt_unlock();
+        interrupt_enable();
 
-        interrupt_lock();
+        interrupt_disable();
         i2c_send_start(id->master);
         err |= i2c_send_data(id->master, addr | 0x01);
         if (type) {
@@ -43,7 +43,7 @@ int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, int t
                 id->shunt[1] = i2c_receive_data(id->master);
         }
         i2c_send_stop(id->master);
-        interrupt_unlock();
+        interrupt_enable();
 
         id->error = err;
         return 0;

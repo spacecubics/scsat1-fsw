@@ -9,5 +9,5 @@
 
 #pragma once
 
-extern void interrupt_lock (void);
-extern void interrupt_unlock (void);
+extern void interrupt_disable (void);
+extern void interrupt_enable (void);

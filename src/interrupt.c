@@ -11,12 +11,12 @@
 
 #include <pic.h>
 
-void interrupt_lock () {
+void interrupt_disable () {
 	INTCONbits.PEIE = 0;
 	INTCONbits.GIE = 0;
 }
 
-void interrupt_unlock () {
+void interrupt_enable () {
 	INTCONbits.PEIE = 1;
 	INTCONbits.GIE = 1;
 }
