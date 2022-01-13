@@ -89,7 +89,7 @@ static uint8_t receive_bit (int m) {
         return r;
 }
 
-int i2c_send_data (int master, uint8_t data) {
+uint8_t i2c_send_data (int master, uint8_t data) {
         send_bit(master, (data >> 7));
         send_bit(master, (data >> 6));
         send_bit(master, (data >> 5));
