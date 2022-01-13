@@ -5,8 +5,6 @@
  *
  */
 
-#define AUTO_CONFIG 1
-
 #include <xc.h>
 #include <pic.h>
 
@@ -30,6 +28,8 @@
 #pragma config CPD = OFF        // Data EEPROM Memory Code Protection bit (Data EEPROM code protection off)
 #pragma config WRT = OFF        // Flash Program Memory Write Enable bits (Write protection off; all program memory may be written to by EECON control)
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
+
+#define FPGA_AUTO_CONFIG 1
 
 struct trch_state {
         unsigned long gtimer;
@@ -120,9 +120,9 @@ void main (void) {
         // Initialize trch-firmware
         trch_init();
         fpga_init(&(tst.fmd));
-#if AUTO_CONFIG
-        tst.fmd.config_ok = 1;
-#endif
+
+        tst.fmd.config_ok = FPGA_AUTO_CONFIG;
+
         spi_init();
         usart_init();
         tst.gtimer = 0;
