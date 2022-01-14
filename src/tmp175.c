@@ -20,7 +20,7 @@ int8_t tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state) {
         uint8_t nak = 0;
         int8_t ret = -1;
 
-        if (fpga_is_i2c_accessible(fpga_state)) {
+        if (!fpga_is_i2c_accessible(fpga_state)) {
                 td->error = TMP175_ERROR_I2C_UNACCESSIBLE;
                 return ret;
         }
