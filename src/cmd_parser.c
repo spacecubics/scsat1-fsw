@@ -50,6 +50,51 @@ static char conv_asc2hex (char data) {
 				 (((x) & 0x00ff0000) >>  8) |	\
 				 (((x) & 0xff000000) >> 24)) )
 
+static void cmd_chkreg(struct fpga_management_data *fmd) {
+	uint8_t buf[BUF_LEN];
+
+	usart_send_msg("TRISA");
+	buf[0] = TRISA;
+	conv_message(buf, 1);
+	usart_send_msg("PORTA");
+	buf[0] = PORTA;
+	conv_message(buf, 1);
+
+	usart_send_msg("TRISB");
+	buf[0] = TRISB;
+	conv_message(buf, 1);
+	usart_send_msg("PORTB");
+	buf[0] = PORTB;
+	conv_message(buf, 1);
+
+	usart_send_msg("TRISC");
+	buf[0] = TRISC;
+	conv_message(buf, 1);
+	usart_send_msg("PORTC");
+	buf[0] = PORTC;
+	conv_message(buf, 1);
+
+	usart_send_msg("TRISD");
+	buf[0] = TRISD;
+	conv_message(buf, 1);
+	usart_send_msg("PORTD");
+	buf[0] = PORTD;
+	conv_message(buf, 1);
+
+	usart_send_msg("TRISE");
+	buf[0] = TRISE;
+	conv_message(buf, 1);
+	usart_send_msg("PORTE");
+	buf[0] = PORTE;
+	conv_message(buf, 1);
+
+	usart_send_msg("FPGA State");
+	buf[0] = fmd->state;
+	conv_message(buf, 1);
+	buf[0] = (char)(fmd->count);
+	conv_message(buf, 1);
+}
+
 void cmd_parser (struct fpga_management_data *fmd, char *msg) {
         uint8_t buf[BUF_LEN] = { };
         uint8_t data;
@@ -234,47 +279,7 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
 
         // Register Check
         } else if (!strcmp(msg,"chkreg")) {
-                usart_send_msg("TRISA");
-                buf[0] = TRISA;
-                conv_message(buf, 1);
-                usart_send_msg("PORTA");
-                buf[0] = PORTA;
-                conv_message(buf, 1);
-
-                usart_send_msg("TRISB");
-                buf[0] = TRISB;
-                conv_message(buf, 1);
-                usart_send_msg("PORTB");
-                buf[0] = PORTB;
-                conv_message(buf, 1);
-
-                usart_send_msg("TRISC");
-                buf[0] = TRISC;
-                conv_message(buf, 1);
-                usart_send_msg("PORTC");
-                buf[0] = PORTC;
-                conv_message(buf, 1);
-
-                usart_send_msg("TRISD");
-                buf[0] = TRISD;
-                conv_message(buf, 1);
-                usart_send_msg("PORTD");
-                buf[0] = PORTD;
-                conv_message(buf, 1);
-
-                usart_send_msg("TRISE");
-                buf[0] = TRISE;
-                conv_message(buf, 1);
-                usart_send_msg("PORTE");
-                buf[0] = PORTE;
-                conv_message(buf, 1);
-
-                usart_send_msg("FPGA State");
-                buf[0] = fmd->state;
-                conv_message(buf, 1);
-                buf[0] = (char)(fmd->count);
-                conv_message(buf, 1);
-
+		cmd_chkreg(fmd);
         } else
                 usart_send_msg("cmd error");
         usart_receive_msg_clear();
