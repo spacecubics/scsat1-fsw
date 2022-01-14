@@ -63,7 +63,7 @@ static void f_fpga_active (struct fpga_management_data *fmd) {
 }
 
 STATEFUNC fpgafunc[] = {
-	f_power_off,
-	f_fpga_ready,
-	f_fpga_config,
-	f_fpga_active };
+        f_power_off,
+        f_fpga_ready,
+        f_fpga_config,
+        f_fpga_active };

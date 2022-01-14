@@ -12,11 +12,11 @@
 #include <stdbool.h>
 
 enum FpgaState{
-	FPGA_STATE_POWER_OFF,
-	FPGA_STATE_READY,
-	FPGA_STATE_CONFIG,
-	FPGA_STATE_ACTIVE,
-	FPGA_STATE_LAST,
+        FPGA_STATE_POWER_OFF,
+        FPGA_STATE_READY,
+        FPGA_STATE_CONFIG,
+        FPGA_STATE_ACTIVE,
+        FPGA_STATE_LAST,
 };
 
 struct fpga_management_data {

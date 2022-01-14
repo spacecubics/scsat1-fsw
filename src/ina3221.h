@@ -14,13 +14,13 @@
 #include "fpga.h"
 
 enum Ina3221VoltageType {
-	INA3221_VOLTAGE_SHUNT,
-	INA3221_VOLTAGE_BUS,
+        INA3221_VOLTAGE_SHUNT,
+        INA3221_VOLTAGE_BUS,
 };
 
-#define INA3221_ERROR_I2C_UNACCESSIBLE		(1)
-#define INA3221_ERROR_I2C_NAK			(2)
-#define INA3221_ERROR_INVALID_VOLTAGE_TYPE	(3)
+#define INA3221_ERROR_I2C_UNACCESSIBLE          (1)
+#define INA3221_ERROR_I2C_NAK                   (2)
+#define INA3221_ERROR_INVALID_VOLTAGE_TYPE      (3)
 
 struct ina3221_data {
         int  master;

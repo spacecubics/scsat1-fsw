@@ -9,7 +9,7 @@
 
 #include "timer.h"
 
-#include <pic.h>
+#include <pic16f877.h>
 #include <stdint.h>
 
 #include "interrupt.h"
@@ -22,11 +22,11 @@ static uint32_t current_ticks;
 
 uint32_t timer_get_ticks(void)
 {
-	interrupt_disable();
-	uint32_t ret = current_ticks;
-	interrupt_enable();
+        interrupt_disable();
+        uint32_t ret = current_ticks;
+        interrupt_enable();
 
-	return ret;
+        return ret;
 }
 
 /*
@@ -37,7 +37,7 @@ void timer2_init (void) {
         T2CONbits.T2CKPS = 0b10;
         PR2 = 0xFA;
 
-	current_ticks = 0;
+        current_ticks = 0;
 }
 
 void timer2_ctrl (uint8_t control) {
@@ -46,14 +46,14 @@ void timer2_ctrl (uint8_t control) {
 }
 
 void timer2_isr (void) {
-	static uint8_t count = 0;
+        static uint8_t count = 0;
 
-	PIR1bits.TMR2IF = 0;
+        PIR1bits.TMR2IF = 0;
 
-	count++;
-	count %= SEC_IN_MSEC(1) / TIMER_INTERVAL;
+        count++;
+        count %= SEC_IN_MSEC(1) / TIMER_INTERVAL;
 
-	if (count == 0) {
-		current_ticks++;
-	}
+        if (count == 0) {
+                current_ticks++;
+        }
 }

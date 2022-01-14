@@ -50,7 +50,7 @@ void usart_send_msg (char *msg) {
         int i;
         tx_msg.msg = msg;
         tx_msg.active = 1;
-	char newline[2] = {0x0d, 0x0a};
+        char newline[2] = {0x0d, 0x0a};
 
         // Transfer start
         while (tx_msg.active) {
@@ -104,20 +104,20 @@ void usart_receive_msg_isr (void) {
 }
 
 void usart_receive_msg_clear (void) {
-	interrupt_disable();
+        interrupt_disable();
         memset(rx_msg.msg, 0, MSG_LEN);
         rx_msg.active = 0;
         rx_msg.err = 0;
         rx_msg.addr = 0;
-	interrupt_enable();
+        interrupt_enable();
 }
 
 void usart_copy_received_msg(char *msg) {
-	interrupt_disable();
-	memcpy(msg, rx_msg.msg, MSG_LEN);
-	interrupt_enable();
+        interrupt_disable();
+        memcpy(msg, rx_msg.msg, MSG_LEN);
+        interrupt_enable();
 }
 
 bool usart_is_received_msg_active (void) {
-	return rx_msg.active;
+        return rx_msg.active;
 }

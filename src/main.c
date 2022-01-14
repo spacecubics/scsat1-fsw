@@ -49,7 +49,7 @@ struct board_status {
 
 static void get_voltage_monitor (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type) {
         int retry = 3;
-	int8_t ret;
+        int8_t ret;
 
         while (retry) {
                 ret = ina3221_data_read(id, fpga_state, type);
@@ -62,7 +62,7 @@ static void get_voltage_monitor (struct ina3221_data *id, enum FpgaState fpga_st
 
 static void get_tmp (struct tmp175_data *td, enum FpgaState fpga_state) {
         int retry = 3;
-	int8_t ret;
+        int8_t ret;
 
         while (retry) {
                 ret = tmp175_data_read(td, fpga_state);
@@ -197,10 +197,10 @@ void main (void) {
                 fpgafunc[tst.fmd.state](&tst.fmd);
 
                 if (usart_is_received_msg_active()) {
-			char msg[MSG_LEN];
-			usart_copy_received_msg(msg);
+                        char msg[MSG_LEN];
+                        usart_copy_received_msg(msg);
                         cmd_parser(&tst.fmd, msg);
-		}
+                }
         }
         return;
 }

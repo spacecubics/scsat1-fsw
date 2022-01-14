@@ -18,12 +18,12 @@
 int8_t tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state) {
         uint8_t addr = (uint8_t)(td->addr << 1);
         uint8_t nak = 0;
-	int8_t ret = -1;
+        int8_t ret = -1;
 
-	if (fpga_is_i2c_accessible(fpga_state)) {
-		td->error = TMP175_ERROR_I2C_UNACCESSIBLE;
-		return ret;
-	}
+        if (fpga_is_i2c_accessible(fpga_state)) {
+                td->error = TMP175_ERROR_I2C_UNACCESSIBLE;
+                return ret;
+        }
 
         i2c_get(td->master);
 
@@ -38,10 +38,10 @@ int8_t tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state) {
         i2c_send_stop(td->master);
         interrupt_enable();
 
-	if (nak != 0) {
-		td->error = TMP175_ERROR_I2C_NAK;
-		return ret;
-	}
+        if (nak != 0) {
+                td->error = TMP175_ERROR_I2C_NAK;
+                return ret;
+        }
 
         return 0;
 }

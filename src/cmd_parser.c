@@ -45,54 +45,54 @@ static char conv_asc2hex (char data) {
                 return 0x00;
 }
 
-#define bswap32(x) ((uint32_t) ( (((x) & 0x000000ff) << 24) |	\
-				 (((x) & 0x0000ff00) <<  8) |	\
-				 (((x) & 0x00ff0000) >>  8) |	\
-				 (((x) & 0xff000000) >> 24)) )
+#define bswap32(x) ((uint32_t) ( (((x) & 0x000000ff) << 24) |   \
+                                 (((x) & 0x0000ff00) <<  8) |   \
+                                 (((x) & 0x00ff0000) >>  8) |   \
+                                 (((x) & 0xff000000) >> 24)) )
 
 static void cmd_chkreg(struct fpga_management_data *fmd) {
-	uint8_t buf[BUF_LEN];
+        uint8_t buf[BUF_LEN];
 
-	usart_send_msg("TRISA");
-	buf[0] = TRISA;
-	conv_message(buf, 1);
-	usart_send_msg("PORTA");
-	buf[0] = PORTA;
-	conv_message(buf, 1);
+        usart_send_msg("TRISA");
+        buf[0] = TRISA;
+        conv_message(buf, 1);
+        usart_send_msg("PORTA");
+        buf[0] = PORTA;
+        conv_message(buf, 1);
 
-	usart_send_msg("TRISB");
-	buf[0] = TRISB;
-	conv_message(buf, 1);
-	usart_send_msg("PORTB");
-	buf[0] = PORTB;
-	conv_message(buf, 1);
+        usart_send_msg("TRISB");
+        buf[0] = TRISB;
+        conv_message(buf, 1);
+        usart_send_msg("PORTB");
+        buf[0] = PORTB;
+        conv_message(buf, 1);
 
-	usart_send_msg("TRISC");
-	buf[0] = TRISC;
-	conv_message(buf, 1);
-	usart_send_msg("PORTC");
-	buf[0] = PORTC;
-	conv_message(buf, 1);
+        usart_send_msg("TRISC");
+        buf[0] = TRISC;
+        conv_message(buf, 1);
+        usart_send_msg("PORTC");
+        buf[0] = PORTC;
+        conv_message(buf, 1);
 
-	usart_send_msg("TRISD");
-	buf[0] = TRISD;
-	conv_message(buf, 1);
-	usart_send_msg("PORTD");
-	buf[0] = PORTD;
-	conv_message(buf, 1);
+        usart_send_msg("TRISD");
+        buf[0] = TRISD;
+        conv_message(buf, 1);
+        usart_send_msg("PORTD");
+        buf[0] = PORTD;
+        conv_message(buf, 1);
 
-	usart_send_msg("TRISE");
-	buf[0] = TRISE;
-	conv_message(buf, 1);
-	usart_send_msg("PORTE");
-	buf[0] = PORTE;
-	conv_message(buf, 1);
+        usart_send_msg("TRISE");
+        buf[0] = TRISE;
+        conv_message(buf, 1);
+        usart_send_msg("PORTE");
+        buf[0] = PORTE;
+        conv_message(buf, 1);
 
-	usart_send_msg("FPGA State");
-	buf[0] = fmd->state;
-	conv_message(buf, 1);
-	buf[0] = (char)(fmd->count);
-	conv_message(buf, 1);
+        usart_send_msg("FPGA State");
+        buf[0] = fmd->state;
+        conv_message(buf, 1);
+        buf[0] = (char)(fmd->count);
+        conv_message(buf, 1);
 }
 
 void cmd_parser (struct fpga_management_data *fmd, char *msg) {
@@ -118,11 +118,11 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
                         fmd->config_ok = 0;
 
         // Timer
-	} else if (!strncmp(msg, "gtimer", 6)) {
-		uint32_t ticks = timer_get_ticks();
-		ticks = bswap32(ticks);
-		usart_send_msg("Global Timer");
-		conv_message((uint8_t *)&ticks, sizeof(ticks));
+        } else if (!strncmp(msg, "gtimer", 6)) {
+                uint32_t ticks = timer_get_ticks();
+                ticks = bswap32(ticks);
+                usart_send_msg("Global Timer");
+                conv_message((uint8_t *)&ticks, sizeof(ticks));
 
         // Configuration Memory Select
         } else if (!strncmp(msg,"ms",2)) {
@@ -201,9 +201,9 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
                         usart_send_msg("Sensor number error");
 
                 if (temp.addr != 0) {
-			int8_t ret;
+                        int8_t ret;
 
-			ret = tmp175_data_read(&temp, fmd->state);
+                        ret = tmp175_data_read(&temp, fmd->state);
                         if (ret < 0 && temp.error == TMP175_ERROR_I2C_NAK)
                                 usart_send_msg("i2c bus error");
                         conv_message(temp.data,2);
@@ -225,10 +225,10 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
                         usart_send_msg("Sensor number error");
                 voltage.channel = buf[1];
                 if (buf[2] == 0x00 || buf[2] == 0x01) {
-			int8_t ret;
+                        int8_t ret;
 
                         type = buf[2] == 0x0 ? INA3221_VOLTAGE_SHUNT : INA3221_VOLTAGE_BUS;
-			ret = ina3221_data_read(&voltage, fmd->state, type);
+                        ret = ina3221_data_read(&voltage, fmd->state, type);
                         if (ret < 0 && voltage.error == INA3221_ERROR_I2C_NAK)
                                 usart_send_msg("i2c bus error");
                         if (type == INA3221_VOLTAGE_BUS)
@@ -285,7 +285,7 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
 
         // Register Check
         } else if (!strcmp(msg,"chkreg")) {
-		cmd_chkreg(fmd);
+                cmd_chkreg(fmd);
         } else
                 usart_send_msg("cmd error");
         usart_receive_msg_clear();
