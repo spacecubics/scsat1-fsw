@@ -18,6 +18,10 @@ enum Ina3221VoltageType {
 	INA3221_VOLTAGE_BUS,
 };
 
+#define INA3221_ERROR_I2C_UNACCESSIBLE		(1)
+#define INA3221_ERROR_I2C_NAK			(2)
+#define INA3221_ERROR_INVALID_VOLTAGE_TYPE	(3)
+
 struct ina3221_data {
         int  master;
         uint8_t addr;
@@ -27,4 +31,4 @@ struct ina3221_data {
         int  error;
 };
 
-extern int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type);
+extern int8_t ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type);

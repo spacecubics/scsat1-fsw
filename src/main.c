@@ -49,9 +49,11 @@ struct board_status {
 
 static void get_voltage_monitor (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type) {
         int retry = 3;
+	int8_t ret;
+
         while (retry) {
-                ina3221_data_read(id, fpga_state, type);
-                if (id->error)
+                ret = ina3221_data_read(id, fpga_state, type);
+                if (ret < 0 && id->error == INA3221_ERROR_I2C_NAK)
                         retry--;
                 else
                         return;

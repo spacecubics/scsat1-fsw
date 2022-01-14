@@ -31,15 +31,20 @@ static uint8_t to_reg (uint8_t channel, enum Ina3221VoltageType type) {
 	return ((channel - 1) * 2) + REG_VOLTAGE_BASE + type;
 }
 
-int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type) {
+int8_t ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type) {
         uint8_t addr = (uint8_t)(id->addr << 1);
         uint8_t reg_addr;
-        int err = 0;
+        uint8_t err = 0;
+	int8_t ret = -1;
 
-	if (!(type == INA3221_VOLTAGE_SHUNT || type == INA3221_VOLTAGE_BUS))
-		return 1;
-	if (!fpga_is_i2c_accessible(fpga_state))
-		return 1;
+	if (!(type == INA3221_VOLTAGE_SHUNT || type == INA3221_VOLTAGE_BUS)) {
+		id->error = INA3221_ERROR_INVALID_VOLTAGE_TYPE;
+		return ret;
+	}
+	if (!fpga_is_i2c_accessible(fpga_state)) {
+		id->error = INA3221_ERROR_I2C_UNACCESSIBLE;
+		return ret;
+	}
 
 	reg_addr = to_reg(id->channel, type);
         i2c_get(id->master);
@@ -64,6 +69,10 @@ int ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, enum 
         i2c_send_stop(id->master);
         interrupt_enable();
 
-        id->error = err;
+	if (err != 0) {
+		id->error = INA3221_ERROR_I2C_NAK;
+		return ret;
+	}
+
         return 0;
 }

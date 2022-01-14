@@ -225,8 +225,11 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
                         usart_send_msg("Sensor number error");
                 voltage.channel = buf[1];
                 if (buf[2] == 0x00 || buf[2] == 0x01) {
+			int8_t ret;
+
                         type = buf[2] == 0x0 ? INA3221_VOLTAGE_SHUNT : INA3221_VOLTAGE_BUS;
-                        if (ina3221_data_read(&voltage, fmd->state, type))
+			ret = ina3221_data_read(&voltage, fmd->state, type);
+                        if (ret < 0 && voltage.error == INA3221_ERROR_I2C_NAK)
                                 usart_send_msg("i2c bus error");
                         if (type == INA3221_VOLTAGE_BUS)
                                 conv_message(voltage.bus,2);
