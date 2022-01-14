@@ -136,7 +136,7 @@ void main (void) {
         /*
          * Space Cubics OBC TRCH-Firmware Main
          */
-        usart_send_msg("SC OBC TRCH-FW v0.3");
+        usart_send_msg("SC OBC TRCH-FW v0.4");
 
         /*
          *  Get Board Status
