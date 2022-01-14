@@ -30,6 +30,7 @@
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
 #define FPGA_AUTO_CONFIG 1
+#define ENABLE_CMD_PARSER 0
 
 struct trch_state {
         struct fpga_management_data fmd;
@@ -191,16 +192,20 @@ void main (void) {
         get_voltage_monitor_all(&tst,  &bs);
         get_tmp_all(&tst, &bs);
 
+#if ENABLE_CMD_PARSER
         usart_start_receive();
+#endif
         while (1) {
                 // FPGA State Control
                 fpgafunc[tst.fmd.state](&tst.fmd);
 
+#if ENABLE_CMD_PARSER
                 if (usart_is_received_msg_active()) {
                         char msg[MSG_LEN];
                         usart_copy_received_msg(msg);
                         cmd_parser(&tst.fmd, msg);
                 }
+#endif
         }
         return;
 }
