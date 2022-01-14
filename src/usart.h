@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #define MSG_LEN 20
 
 struct usart_tx_msg {
@@ -23,7 +25,6 @@ struct usart_rx_msg {
         unsigned active :1;
         unsigned err :1;
 };
-extern struct usart_rx_msg rx_msg;
 
 extern void usart_init (void);
 extern void usart_send_msg (char *msg);
@@ -31,3 +32,4 @@ extern void usart_start_receive (void);
 extern void usart_receive_msg_isr (void);
 extern void usart_receive_msg_clear (void);
 extern void usart_copy_received_msg (char *msg);
+extern bool usart_is_received_msg_active (void);

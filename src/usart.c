@@ -16,7 +16,7 @@
 
 /* Variables shared with main */
 struct usart_tx_msg tx_msg;
-struct usart_rx_msg rx_msg;
+static struct usart_rx_msg rx_msg;
 
 /*
  * USART Initialize
@@ -116,4 +116,8 @@ void usart_copy_received_msg(char *msg) {
 	interrupt_disable();
 	memcpy(msg, rx_msg.msg, MSG_LEN);
 	interrupt_enable();
+}
+
+bool usart_is_received_msg_active (void) {
+	return rx_msg.active;
 }
