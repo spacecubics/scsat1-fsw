@@ -34,7 +34,7 @@ static uint8_t to_reg (uint8_t channel, enum Ina3221VoltageType type) {
 int8_t ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, enum Ina3221VoltageType type) {
         uint8_t addr = (uint8_t)(id->addr << 1);
         uint8_t reg_addr;
-        uint8_t err = 0;
+        uint8_t nak = 0;
 	int8_t ret = -1;
 
 	if (!(type == INA3221_VOLTAGE_SHUNT || type == INA3221_VOLTAGE_BUS)) {
@@ -51,14 +51,14 @@ int8_t ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, en
 
         interrupt_disable();
         i2c_send_start(id->master);
-        err |= i2c_send_data(id->master, addr);
-        err |= i2c_send_data(id->master, reg_addr);
+        nak |= i2c_send_data(id->master, addr);
+        nak |= i2c_send_data(id->master, reg_addr);
         i2c_send_stop(id->master);
         interrupt_enable();
 
         interrupt_disable();
         i2c_send_start(id->master);
-        err |= i2c_send_data(id->master, addr | 0x01);
+        nak |= i2c_send_data(id->master, addr | 0x01);
         if (type == INA3221_VOLTAGE_BUS) {
                 id->bus[0] = i2c_receive_data(id->master);
                 id->bus[1] = i2c_receive_data(id->master);
@@ -69,7 +69,7 @@ int8_t ina3221_data_read (struct ina3221_data *id, enum FpgaState fpga_state, en
         i2c_send_stop(id->master);
         interrupt_enable();
 
-	if (err != 0) {
+	if (nak != 0) {
 		id->error = INA3221_ERROR_I2C_NAK;
 		return ret;
 	}
