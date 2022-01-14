@@ -15,9 +15,11 @@
 
 void i2c_get (int m) {
         if (!m) {
+                I2C_PORT = I2C_PORT & ~INT_I2C_MASK;
                 INT_SCL_DIR = 1;
                 INT_SDA_DIR = 1;
         } else {
+                I2C_PORT = I2C_PORT & ~EXT_I2C_MASK;
                 EXT_SCL_DIR = 1;
                 EXT_SDA_DIR = 1;
         }
