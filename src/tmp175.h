@@ -17,6 +17,9 @@
 #define REG_TLOW   0x02
 #define REG_THIGH  0x03
 
+#define TMP175_ERROR_I2C_UNACCESSIBLE		(1)
+#define TMP175_ERROR_I2C_NAK			(2)
+
 struct tmp175_data {
         uint8_t master;
         uint8_t addr;
@@ -24,4 +27,4 @@ struct tmp175_data {
         uint8_t error;
 };
 
-extern int tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state);
+extern int8_t tmp175_data_read (struct tmp175_data *td, enum FpgaState fpga_state);

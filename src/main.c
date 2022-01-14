@@ -60,9 +60,11 @@ static void get_voltage_monitor (struct ina3221_data *id, enum FpgaState fpga_st
 
 static void get_tmp (struct tmp175_data *td, enum FpgaState fpga_state) {
         int retry = 3;
+	int8_t ret;
+
         while (retry) {
-                tmp175_data_read(td, fpga_state);
-                if (td->error)
+                ret = tmp175_data_read(td, fpga_state);
+                if (ret < 0 && td->error == TMP175_ERROR_I2C_NAK)
                         retry--;
                 else
                         return;

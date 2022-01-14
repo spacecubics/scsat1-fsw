@@ -201,7 +201,10 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
                         usart_send_msg("Sensor number error");
 
                 if (temp.addr != 0) {
-                        if (tmp175_data_read(&temp, fmd->state) || temp.error)
+			int8_t ret;
+
+			ret = tmp175_data_read(&temp, fmd->state);
+                        if (ret < 0 && temp.error == TMP175_ERROR_I2C_NAK)
                                 usart_send_msg("i2c bus error");
                         conv_message(temp.data,2);
                 }
