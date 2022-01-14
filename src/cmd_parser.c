@@ -204,9 +204,22 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
                         int8_t ret;
 
                         ret = tmp175_data_read(&temp, fmd->state);
-                        if (ret < 0 && temp.error == TMP175_ERROR_I2C_NAK)
-                                usart_send_msg("i2c bus error");
-                        conv_message(temp.data,2);
+                        if (ret < 0) {
+                                switch (temp.error) {
+                                case TMP175_ERROR_I2C_UNACCESSIBLE:
+                                        usart_send_msg("i2c access error");
+                                        break;
+                                case TMP175_ERROR_I2C_NAK:
+                                        usart_send_msg("i2c bus error");
+                                        break;
+                                default:
+                                        usart_send_msg("Unknown error");
+                                        break;
+                                }
+                        }
+                        else {
+                                conv_message(temp.data, 2);
+                        }
                 }
 
         // Voltage sensor read Command
@@ -229,12 +242,30 @@ void cmd_parser (struct fpga_management_data *fmd, char *msg) {
 
                         type = buf[2] == 0x0 ? INA3221_VOLTAGE_SHUNT : INA3221_VOLTAGE_BUS;
                         ret = ina3221_data_read(&voltage, fmd->state, type);
-                        if (ret < 0 && voltage.error == INA3221_ERROR_I2C_NAK)
-                                usart_send_msg("i2c bus error");
-                        if (type == INA3221_VOLTAGE_BUS)
-                                conv_message(voltage.bus,2);
-                        else
-                                conv_message(voltage.shunt,2);
+                        if (ret < 0) {
+                                switch (voltage.error) {
+                                case INA3221_ERROR_I2C_UNACCESSIBLE:
+                                        usart_send_msg("i2c access error");
+                                        break;
+                                case INA3221_ERROR_I2C_NAK:
+                                        usart_send_msg("i2c bus error");
+                                        break;
+                                case INA3221_ERROR_INVALID_VOLTAGE_TYPE:
+                                        usart_send_msg("Invalid type error");
+                                        break;
+                                default:
+                                        usart_send_msg("Unknown error");
+                                        break;
+                                }
+                        }
+                        else {
+                                if (type == INA3221_VOLTAGE_BUS) {
+                                        conv_message(voltage.bus, 2);
+                                }
+                                else {
+                                        conv_message(voltage.shunt, 2);
+                                }
+                        }
                 } else
                         usart_send_msg("type error");
 
