@@ -9,7 +9,7 @@
 
 #include "timer.h"
 
-#include <pic16f877.h>
+#include <pic.h>
 #include <stdint.h>
 
 #include "interrupt.h"
