@@ -16,6 +16,8 @@
 void fpga_init (struct fpga_management_data *fmd) {
         fmd->state = FPGA_STATE_POWER_OFF;
         fmd->config_ok = 0;
+        fmd->mem_select = 0;
+        fmd->boot_mode = FPGA_BOOT_48MHZ;
         fmd->count = 0;
         fmd->time = 0;
 }
@@ -35,6 +37,9 @@ static void f_power_off (struct fpga_management_data *fmd) {
 
 static void f_fpga_ready (struct fpga_management_data *fmd) {
         if (fmd->config_ok) {
+                TRCH_CFG_MEM_SEL = (char)fmd->mem_select;
+                FPGA_BOOT0 = 0b01 & fmd->boot_mode;
+                FPGA_BOOT1 = 0b01 & (fmd->boot_mode >> 1);
                 if (fmd->count == 0)
                         FPGA_INIT_B_DIR = 1;
                 else

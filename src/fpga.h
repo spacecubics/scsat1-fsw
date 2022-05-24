@@ -11,6 +11,10 @@
 
 #include <stdbool.h>
 
+#define FPGA_BOOT_24MHZ 0
+#define FPGA_BOOT_48MHZ 1
+#define FPGA_BOOT_96MHZ 2
+
 enum FpgaState{
         FPGA_STATE_POWER_OFF,
         FPGA_STATE_READY,
@@ -22,6 +26,8 @@ enum FpgaState{
 struct fpga_management_data {
         enum FpgaState state;
         unsigned config_ok: 1;
+        int mem_select;
+        unsigned boot_mode: 2;
         int count;
         int time;
 };

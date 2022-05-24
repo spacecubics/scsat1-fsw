@@ -30,6 +30,8 @@
 
 #define TRISA_FPGA_READY   0x00
 #define TRCH_CFG_MEM_SEL   PORTAbits.RA0
+#define FPGA_BOOT0         PORTAbits.RA1
+#define FPGA_BOOT1         PORTAbits.RA2
 #define FPGA_PROGRAM_B     PORTAbits.RA3
 #define FPGA_PROGRAM_B_DIR TRISAbits.TRISA3
 #define FPGA_INIT_B        PORTAbits.RA4
