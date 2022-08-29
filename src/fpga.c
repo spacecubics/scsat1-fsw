@@ -53,7 +53,7 @@ static void f_fpga_config (struct fpga_management_data *fmd) {
         if (!fmd->config_ok) {
                 FPGA_PROGRAM_B = 0;
                 fmd->state = FPGA_STATE_READY;
-        } else if (CFG_DONE)
+        } else
                 fmd->state = FPGA_STATE_ACTIVE;
 }
 
@@ -61,10 +61,8 @@ static void f_fpga_active (struct fpga_management_data *fmd) {
         if (!fmd->config_ok) {
                 FPGA_PROGRAM_B = 0;
                 fmd->state = FPGA_STATE_READY;
-        } else if (CFG_DONE)
+        } else
                 TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
-        else
-                fmd->state = FPGA_STATE_CONFIG;
 }
 
 STATEFUNC fpgafunc[] = {
