@@ -41,7 +41,7 @@
  * PORTB Hardware
  *  Bit    Name                               Initial Dir  Initial Level
  *  bit 0: SPICAN_INT_B                       In           -
- *  bit 1: (Reserved)                         In           -
+ *  bit 1: FPGA_PWR_CYCLE_REQ                 In           -
  *  bit 2: TRCH_CFG_MEM_MONI                  In           -
  *  bit 3: No Function (High Level)           In           -
  *  bit 4: FPGA_WATCHDOG                      In           0
@@ -52,6 +52,7 @@
 #define TRISB_INIT         0xFF
 #define PORTB_INIT         0x00
 
+#define FPGA_PWR_CYCLE_REQ PORTBbits.RB1
 #define FPGA_WATCHDOG      PORTBbits.RB4
 #define FPGA_CFG_MEM_SEL   PORTBbits.RB5
 

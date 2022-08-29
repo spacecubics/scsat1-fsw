@@ -196,6 +196,9 @@ void main (void) {
         while (1) {
                 tst.fmd.config_ok = FPGA_AUTO_CONFIG;
 
+                if (FPGA_PWR_CYCLE_REQ) {
+                        tst.fmd.config_ok = 0;
+                }
                 // FPGA State Control
                 fpgafunc[tst.fmd.state](&tst.fmd);
 
