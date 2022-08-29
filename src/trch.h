@@ -52,6 +52,7 @@
 #define TRISB_INIT         0xFF
 #define PORTB_INIT         0x00
 
+#define FPGA_WATCHDOG      PORTBbits.RB4
 #define FPGA_CFG_MEM_SEL   PORTBbits.RB5
 
 /*

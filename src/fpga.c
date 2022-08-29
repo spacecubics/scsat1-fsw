@@ -12,6 +12,28 @@
 #include <pic.h>
 #include <stdbool.h>
 #include "trch.h"
+#include "timer.h"
+
+#define FPGA_WATCHDOG_TIMEOUT 3
+
+static void fpga_wdt_init(struct fpga_management_data *fmd) {
+#ifdef CONFIG_ENABLE_WDT_RESET
+        fmd->wdt_value = 0;
+        fmd->wdt_last_tick = timer_get_ticks();
+#endif
+}
+
+static void fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t tick) {
+#ifdef CONFIG_ENABLE_WDT_RESET
+        if (fmd->wdt_value != wdt_value) {
+                fmd->wdt_value = !fmd->wdt_value;
+                fmd->wdt_last_tick = tick;
+        }
+
+        if (fmd->wdt_last_tick + FPGA_WATCHDOG_TIMEOUT < tick)
+                fmd->config_ok = 0;
+#endif
+}
 
 void fpga_init (struct fpga_management_data *fmd) {
         fmd->state = FPGA_STATE_POWER_OFF;
@@ -44,20 +66,25 @@ static void f_fpga_ready (struct fpga_management_data *fmd) {
                         FPGA_INIT_B_DIR = 1;
                 else
                         FPGA_PROGRAM_B = 1;
+                fpga_wdt_init(fmd);
                 fmd->state = FPGA_STATE_CONFIG;
                 fmd->count++;
         }
 }
 
 static void f_fpga_config (struct fpga_management_data *fmd) {
+        fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
+
         if (!fmd->config_ok) {
                 FPGA_PROGRAM_B = 0;
                 fmd->state = FPGA_STATE_READY;
-        } else
+        } else if (FPGA_WATCHDOG)
                 fmd->state = FPGA_STATE_ACTIVE;
 }
 
 static void f_fpga_active (struct fpga_management_data *fmd) {
+        fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
+
         if (!fmd->config_ok) {
                 FPGA_PROGRAM_B = 0;
                 fmd->state = FPGA_STATE_READY;

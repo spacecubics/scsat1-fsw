@@ -1,3 +1,7 @@
+# Conditional Compilation for features
+CONFIG_WDT_RESET = -DCONFIG_ENABLE_WDT_RESET
+
+DEFINES = ${CONFIG_WDT_RESET}
 
 # Design Parameter
 MODULE := trch-firmware
@@ -31,8 +35,8 @@ $(PRGDAT).hex: $(OBJS)
 	echo '*' > $(HEXDIR)/.gitignore
 	$(CC) -mcpu=$(DEVICE) -o $(HEXDIR)/$(MODULE) $^
 
-%.p1: %.c
-	$(CC) -mcpu=$(DEVICE) -c -o $@ $<
+%.p1: %.c Makefile
+	$(CC) $(DEFINES) -mcpu=$(DEVICE) -c -o $@ $<
 
 .PHONY: program
 program: $(PRGDAT).hex

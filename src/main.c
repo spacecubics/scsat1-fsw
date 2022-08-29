@@ -125,8 +125,6 @@ void main (void) {
         trch_init();
         fpga_init(&(tst.fmd));
 
-        tst.fmd.config_ok = FPGA_AUTO_CONFIG;
-
         spi_init();
         usart_init();
         timer2_init();
@@ -196,6 +194,8 @@ void main (void) {
         usart_start_receive();
 #endif
         while (1) {
+                tst.fmd.config_ok = FPGA_AUTO_CONFIG;
+
                 // FPGA State Control
                 fpgafunc[tst.fmd.state](&tst.fmd);
 
