@@ -29,8 +29,6 @@
 #pragma config WRT = OFF        // Flash Program Memory Write Enable bits (Write protection off; all program memory may be written to by EECON control)
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
-#define FPGA_AUTO_CONFIG 1
-
 struct trch_state {
         struct fpga_management_data fmd;
 };
@@ -193,7 +191,7 @@ void main (void) {
         usart_start_receive();
 #endif
         while (1) {
-                tst.fmd.config_ok = FPGA_AUTO_CONFIG;
+                tst.fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;
 
                 if (FPGA_PWR_CYCLE_REQ) {
                         tst.fmd.config_ok = 0;
