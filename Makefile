@@ -11,7 +11,7 @@ DEVICE := 16LF877
 TARGET := PPK4
 
 # Command variables
-CC     := xc8-cc -mc90lib
+CC     := xc8-cc -mc90lib -mcpu=$(DEVICE)
 IPECMD := ipecmd.sh
 RM     := rm -rf
 
@@ -35,10 +35,10 @@ build: $(PRGDAT).hex
 $(PRGDAT).hex: $(OBJS)
 	mkdir -p $(HEXDIR)
 	echo '*' > $(HEXDIR)/.gitignore
-	$(CC) -mcpu=$(DEVICE) -o $(HEXDIR)/$(MODULE) $^
+	$(CC) -o $(HEXDIR)/$(MODULE) $^
 
 %.p1: %.c Makefile
-	$(CC) $(DEFINES) -mcpu=$(DEVICE) -c -o $@ $<
+	$(CC) $(DEFINES) -c -o $@ $<
 
 .PHONY: program
 program: $(PRGDAT).hex
