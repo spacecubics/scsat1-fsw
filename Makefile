@@ -42,7 +42,7 @@ $(PRGDAT).hex: $(OBJS)
 
 .PHONY: program
 program: $(PRGDAT).hex
-	$(IPECMD) -P$(DEVICE) -T$(TARGET) -F$< -M
+	$(IPECMD) -P$(DEVICE) -T$(TARGET) -F$< -M -OL
 
 .PHONY: erase
 erase:
