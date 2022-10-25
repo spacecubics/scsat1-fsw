@@ -3,3 +3,6 @@
 *.d
 log.*
 MPLABXLog.xml
+GPATH
+GRTAGS
+GTAGS
