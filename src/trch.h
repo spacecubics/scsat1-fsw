@@ -1,4 +1,4 @@
-/* 
+/*
  * Definitions for TRCH Hardware
  *
  * (C) Copyright 2021-2022
@@ -23,7 +23,7 @@
  *  bit 2: FPGA_BOO11                         Out          0
  *  bit 3: FPGA_PROGRAM_B                     In           0
  *  bit 4: FPGA_INIT_B                        Out          0
- *  bit 5: FPGA_CDRST_B                       Out          0
+ *  bit 5: FPGA_PWR_EN                        Out          0
  */
 #define TRISA_INIT         0x08
 #define PORTA_INIT         0x00
