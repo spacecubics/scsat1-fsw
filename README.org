@@ -1,1 +1,3 @@
 * SC OBC TRCH Firmware
+
+  This is for SC-OBC A1001.  Do NOT use it for EM1.
