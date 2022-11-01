@@ -61,7 +61,7 @@
  *  Bit    Name                               Initial Dir  Initial Level
  *  bit 0: TRCH_CAN_SLEEP_EN                  Out          0
  *  bit 1: SPICAN_CS_B                        Out          1
- *  bit 2: TRCH_UART_EN                       Out          0
+ *  bit 2: FPGA_WATCHDOG_EN                   In           -
  *  bit 3: SPICAN_SCK                         Out          0
  *  bit 4: SPICAN_MISO                        In           -
  *  bit 5: SPICAN_MOSI                        Out          0
