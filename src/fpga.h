@@ -37,8 +37,6 @@ struct fpga_management_data {
 #endif
 };
 
-typedef void (*STATEFUNC)(struct fpga_management_data *fmd);
-extern STATEFUNC fpgafunc[FPGA_STATE_LAST];
-
 extern void fpga_init (struct fpga_management_data *fmd);
 extern bool fpga_is_i2c_accessible (enum FpgaState state);
+extern void fpga_state_control(struct fpga_management_data *fmd);

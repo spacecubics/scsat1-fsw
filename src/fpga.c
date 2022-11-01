@@ -94,8 +94,15 @@ static void f_fpga_active (struct fpga_management_data *fmd) {
                 TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
 }
 
-STATEFUNC fpgafunc[] = {
+typedef void (*STATEFUNC)(struct fpga_management_data *fmd);
+
+static STATEFUNC fpgafunc[] = {
         f_power_off,
         f_fpga_ready,
         f_fpga_config,
         f_fpga_active };
+
+void fpga_state_control(struct fpga_management_data *fmd)
+{
+       fpgafunc[fmd->state](fmd);
+}

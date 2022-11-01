@@ -196,8 +196,8 @@ void main (void) {
                 if (FPGA_PWR_CYCLE_REQ) {
                         the_state.fmd.config_ok = 0;
                 }
-                // FPGA State Control
-                fpgafunc[the_state.fmd.state](&the_state.fmd);
+
+                fpga_state_control(&the_state.fmd);
         }
         return;
 }
