@@ -17,7 +17,6 @@
 #include "usart.h"
 #include "timer.h"
 #include "interrupt.h"
-#include "cmd_parser.h"
 
 // PIC16LF877A Configuration Bit Settings
 #pragma config FOSC = HS        // Oscillator Selection bits (HS oscillator)
@@ -191,9 +190,6 @@ void main (void) {
         get_voltage_monitor_all(&the_state,  &volts);
         get_tmp_all(&the_state, &temps);
 
-#ifdef CONFIG_ENABLE_CMD_PARSER
-        usart_start_receive();
-#endif
         while (1) {
                 the_state.fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;
 
@@ -202,14 +198,6 @@ void main (void) {
                 }
                 // FPGA State Control
                 fpgafunc[the_state.fmd.state](&the_state.fmd);
-
-#ifdef CONFIG_ENABLE_CMD_PARSER
-                if (usart_is_received_msg_active()) {
-                        char msg[MSG_LEN];
-                        usart_copy_received_msg(msg);
-                        cmd_parser(&the_state.fmd, msg);
-                }
-#endif
         }
         return;
 }
