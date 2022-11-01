@@ -41,6 +41,8 @@
 #define FPGA_PROGRAM_B_DIR TRISAbits.TRISA3
 #define FPGA_INIT_B        PORTAbits.RA4
 #define FPGA_INIT_B_DIR    TRISAbits.TRISA4
+#define FPGA_PWR_EN        PORTAbits.RA5
+#define FPGA_PWR_EN_DIR    TRISAbits.TRISA5
 
 /*
  * PORTB Hardware
