@@ -33,10 +33,13 @@ struct trch_state {
         struct fpga_management_data fmd;
 };
 
-struct board_status {
+struct temp_sensors {
         struct tmp175_data ts1;
         struct tmp175_data ts2;
         struct tmp175_data ts3;
+};
+
+struct voltage_sensors {
         struct ina3221_data vm1v0;
         struct ina3221_data vm1v8;
         struct ina3221_data vm3v3;
@@ -71,25 +74,25 @@ static void get_tmp (struct tmp175_data *td, enum FpgaState fpga_state) {
         }
 }
 
-static void get_voltage_monitor_all (struct trch_state *the_state, struct board_status *bs) {
-        get_voltage_monitor(&bs->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+static void get_voltage_monitor_all (struct trch_state *the_state, struct voltage_sensors *volts) {
+        get_voltage_monitor(&volts->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
 }
 
-static void get_tmp_all (struct trch_state *the_state, struct board_status *bs) {
-        get_tmp(&bs->ts1, the_state->fmd.state);
-        get_tmp(&bs->ts2, the_state->fmd.state);
-        get_tmp(&bs->ts3, the_state->fmd.state);
+static void get_tmp_all (struct trch_state *the_state, struct temp_sensors *temps) {
+        get_tmp(&temps->ts1, the_state->fmd.state);
+        get_tmp(&temps->ts2, the_state->fmd.state);
+        get_tmp(&temps->ts3, the_state->fmd.state);
 }
 
 static void __interrupt() isr(void) {
@@ -117,7 +120,8 @@ static void trch_init (void) {
 
 void main (void) {
         struct trch_state the_state;
-        struct board_status bs;
+        struct voltage_sensors volts;
+        struct temp_sensors temps;
         // Initialize trch-firmware
         trch_init();
         fpga_init(&(the_state.fmd));
@@ -158,34 +162,34 @@ void main (void) {
          *   - Channel 2 (VDD 3V3B)
          *   - Channel 3 (VDD 3V3IO)
          */
-        bs.ts1.master     = 0;
-        bs.ts1.addr       = 0x4C;
-        bs.ts2.master     = 0;
-        bs.ts2.addr       = 0x4D;
-        bs.ts3.master     = 0;
-        bs.ts3.addr       = 0x4E;
+        temps.ts1.master     = 0;
+        temps.ts1.addr       = 0x4C;
+        temps.ts2.master     = 0;
+        temps.ts2.addr       = 0x4D;
+        temps.ts3.master     = 0;
+        temps.ts3.addr       = 0x4E;
 
-        bs.vm1v0.master   = 0;
-        bs.vm1v0.addr     = 0x40;
-        bs.vm1v0.channel  = 1;
-        bs.vm1v8.master   = 0;
-        bs.vm1v8.addr     = 0x40;
-        bs.vm1v8.channel  = 2;
-        bs.vm3v3.master   = 0;
-        bs.vm3v3.addr     = 0x40;
-        bs.vm3v3.channel  = 3;
-        bs.vm3v3a.master  = 0;
-        bs.vm3v3a.addr    = 0x41;
-        bs.vm3v3a.channel = 1;
-        bs.vm3v3b.master  = 0;
-        bs.vm3v3b.addr    = 0x41;
-        bs.vm3v3b.channel = 2;
-        bs.vm3v3i.master  = 0;
-        bs.vm3v3i.addr    = 0x41;
-        bs.vm3v3i.channel = 3;
+        volts.vm1v0.master   = 0;
+        volts.vm1v0.addr     = 0x40;
+        volts.vm1v0.channel  = 1;
+        volts.vm1v8.master   = 0;
+        volts.vm1v8.addr     = 0x40;
+        volts.vm1v8.channel  = 2;
+        volts.vm3v3.master   = 0;
+        volts.vm3v3.addr     = 0x40;
+        volts.vm3v3.channel  = 3;
+        volts.vm3v3a.master  = 0;
+        volts.vm3v3a.addr    = 0x41;
+        volts.vm3v3a.channel = 1;
+        volts.vm3v3b.master  = 0;
+        volts.vm3v3b.addr    = 0x41;
+        volts.vm3v3b.channel = 2;
+        volts.vm3v3i.master  = 0;
+        volts.vm3v3i.addr    = 0x41;
+        volts.vm3v3i.channel = 3;
 
-        get_voltage_monitor_all(&the_state,  &bs);
-        get_tmp_all(&the_state, &bs);
+        get_voltage_monitor_all(&the_state,  &volts);
+        get_tmp_all(&the_state, &temps);
 
 #ifdef CONFIG_ENABLE_CMD_PARSER
         usart_start_receive();
