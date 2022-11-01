@@ -71,25 +71,25 @@ static void get_tmp (struct tmp175_data *td, enum FpgaState fpga_state) {
         }
 }
 
-static void get_voltage_monitor_all (struct trch_state *tst, struct board_status *bs) {
-        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&bs->vm3v3a, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm3v3b, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm1v0, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm1v8, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm3v3, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&bs->vm3v3i, tst->fmd.state, INA3221_VOLTAGE_SHUNT);
+static void get_voltage_monitor_all (struct trch_state *the_state, struct board_status *bs) {
+        get_voltage_monitor(&bs->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&bs->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&bs->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
 }
 
-static void get_tmp_all (struct trch_state *tst, struct board_status *bs) {
-        get_tmp(&bs->ts1, tst->fmd.state);
-        get_tmp(&bs->ts2, tst->fmd.state);
-        get_tmp(&bs->ts3, tst->fmd.state);
+static void get_tmp_all (struct trch_state *the_state, struct board_status *bs) {
+        get_tmp(&bs->ts1, the_state->fmd.state);
+        get_tmp(&bs->ts2, the_state->fmd.state);
+        get_tmp(&bs->ts3, the_state->fmd.state);
 }
 
 static void __interrupt() isr(void) {
@@ -116,11 +116,11 @@ static void trch_init (void) {
 }
 
 void main (void) {
-        struct trch_state tst;
+        struct trch_state the_state;
         struct board_status bs;
         // Initialize trch-firmware
         trch_init();
-        fpga_init(&(tst.fmd));
+        fpga_init(&(the_state.fmd));
 
         spi_init();
         usart_init();
@@ -184,26 +184,26 @@ void main (void) {
         bs.vm3v3i.addr    = 0x41;
         bs.vm3v3i.channel = 3;
 
-        get_voltage_monitor_all(&tst,  &bs);
-        get_tmp_all(&tst, &bs);
+        get_voltage_monitor_all(&the_state,  &bs);
+        get_tmp_all(&the_state, &bs);
 
 #ifdef CONFIG_ENABLE_CMD_PARSER
         usart_start_receive();
 #endif
         while (1) {
-                tst.fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;
+                the_state.fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;
 
                 if (FPGA_PWR_CYCLE_REQ) {
-                        tst.fmd.config_ok = 0;
+                        the_state.fmd.config_ok = 0;
                 }
                 // FPGA State Control
-                fpgafunc[tst.fmd.state](&tst.fmd);
+                fpgafunc[the_state.fmd.state](&the_state.fmd);
 
 #ifdef CONFIG_ENABLE_CMD_PARSER
                 if (usart_is_received_msg_active()) {
                         char msg[MSG_LEN];
                         usart_copy_received_msg(msg);
-                        cmd_parser(&tst.fmd, msg);
+                        cmd_parser(&the_state.fmd, msg);
                 }
 #endif
         }
