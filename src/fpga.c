@@ -23,7 +23,15 @@ static void fpga_wdt_init(struct fpga_management_data *fmd) {
 #endif
 }
 
-static void fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t tick) {
+/*
+ * Check the FPGA Watchdog kick
+ *
+ * Return true if detected. false otherwise.
+ */
+static bool fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t tick)
+{
+        bool ret = true;
+
 #ifdef CONFIG_ENABLE_WDT_RESET
         if (fmd->wdt_value != wdt_value) {
                 fmd->wdt_value = !fmd->wdt_value;
@@ -31,8 +39,9 @@ static void fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
         }
 
         if (fmd->wdt_last_tick + FPGA_WATCHDOG_TIMEOUT < tick)
-                fmd->activate_fpga = 0;
+                ret = false;
 #endif
+        return ret;
 }
 
 enum FpgaState fpga_init(struct fpga_management_data *fmd)
@@ -152,7 +161,12 @@ static void f_fpga_ready (struct fpga_management_data *fmd)
  */
 static void f_fpga_config (struct fpga_management_data *fmd)
 {
-        fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
+        bool kicked;
+
+        kicked = fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
+        if (!kicked) {
+                fmd->activate_fpga = 0;
+        }
 
         /* check user request */
         if (!fmd->activate_fpga) {
@@ -196,7 +210,12 @@ static void f_fpga_config (struct fpga_management_data *fmd)
  */
 static void f_fpga_active (struct fpga_management_data *fmd)
 {
-        fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
+        bool kicked;
+
+        kicked = fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
+        if (!kicked) {
+                fmd->activate_fpga = 0;
+        }
 
         /* check user request */
         if (!fmd->activate_fpga) {
