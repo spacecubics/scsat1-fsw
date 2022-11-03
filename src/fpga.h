@@ -24,17 +24,6 @@ enum FpgaState{
         FPGA_STATE_LAST,
 };
 
-struct fpga_management_data {
-        enum FpgaState state;
-        int mem_select;
-        unsigned boot_mode: 2;
-        int time;
-#ifdef CONFIG_ENABLE_WDT_RESET
-        bool wdt_value;
-        uint32_t wdt_last_tick;
-#endif
-};
-
-extern enum FpgaState fpga_init(struct fpga_management_data *fmd);
+extern enum FpgaState fpga_init(void);
 extern bool fpga_is_i2c_accessible (enum FpgaState state);
-extern enum FpgaState fpga_state_control(struct fpga_management_data *fmd, bool activate_fpga);
+extern enum FpgaState fpga_state_control(bool activate_fpga);

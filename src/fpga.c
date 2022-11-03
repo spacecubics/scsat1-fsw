@@ -14,7 +14,20 @@
 #include "trch.h"
 #include "timer.h"
 
+struct fpga_management_data {
+        enum FpgaState state;
+        int mem_select;
+        unsigned boot_mode: 2;
+        int time;
+#ifdef CONFIG_ENABLE_WDT_RESET
+        bool wdt_value;
+        uint32_t wdt_last_tick;
+#endif
+};
+
 #define FPGA_WATCHDOG_TIMEOUT 3
+
+static struct fpga_management_data the_fmd;
 
 static void fpga_wdt_init(struct fpga_management_data *fmd) {
 #ifdef CONFIG_ENABLE_WDT_RESET
@@ -44,14 +57,14 @@ static bool fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
         return ret;
 }
 
-enum FpgaState fpga_init(struct fpga_management_data *fmd)
+enum FpgaState fpga_init()
 {
-        fmd->state = FPGA_STATE_POWER_OFF;
-        fmd->mem_select = 0;
-        fmd->boot_mode = FPGA_BOOT_48MHZ;
-        fmd->time = 0;
+        the_fmd.state = FPGA_STATE_POWER_OFF;
+        the_fmd.mem_select = 0;
+        the_fmd.boot_mode = FPGA_BOOT_48MHZ;
+        the_fmd.time = 0;
 
-        return fmd->state;
+        return the_fmd.state;
 }
 
 bool fpga_is_i2c_accessible (enum FpgaState state) {
@@ -243,7 +256,7 @@ static STATEFUNC fpgafunc[] = {
         f_fpga_config,
         f_fpga_active };
 
-enum FpgaState fpga_state_control(struct fpga_management_data *fmd, bool activate_fpga)
+enum FpgaState fpga_state_control(bool activate_fpga)
 {
-        return fpgafunc[fmd->state](fmd, activate_fpga);
+        return fpgafunc[the_fmd.state](&the_fmd, activate_fpga);
 }

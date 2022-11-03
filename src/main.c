@@ -117,13 +117,12 @@ static void trch_init (void) {
 
 void main (void)
 {
-        struct fpga_management_data fmd;
         struct voltage_sensors volts;
         struct temp_sensors temps;
         enum FpgaState fpga_state;
         // Initialize trch-firmware
         trch_init();
-        fpga_state = fpga_init(&fmd);
+        fpga_state = fpga_init();
 
         spi_init();
         usart_init();
@@ -199,7 +198,7 @@ void main (void)
                         activate_fpga = false;
                 }
 
-                fpga_state_control(&fmd, activate_fpga);
+                fpga_state_control(activate_fpga);
         }
         return;
 }
