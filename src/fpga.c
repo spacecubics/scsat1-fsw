@@ -31,14 +31,14 @@ static void fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
         }
 
         if (fmd->wdt_last_tick + FPGA_WATCHDOG_TIMEOUT < tick)
-                fmd->config_ok = 0;
+                fmd->activate_fpga = 0;
 #endif
 }
 
 enum FpgaState fpga_init(struct fpga_management_data *fmd)
 {
         fmd->state = FPGA_STATE_POWER_OFF;
-        fmd->config_ok = 0;
+        fmd->activate_fpga = 0;
         fmd->mem_select = 0;
         fmd->boot_mode = FPGA_BOOT_48MHZ;
         fmd->time = 0;
@@ -58,13 +58,13 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
  *  - FPGA_PWR_EN: LOW
  * post-condition
  *  - state: READY
- *    - config_ok: 1
+ *    - activate_fpga: 1
  *    - FPGA_PWR_EN: HIGH
  *  - state: POWER_OFF
- *    - config_ok: 0
+ *    - activate_fpga: 0
  *    - FPGA_PWR_EN: LOW
  *
- * When the user ask to actiavte the FPGA by setting config_ok to 1,
+ * When the user ask to actiavte the FPGA by setting activate_fpga to 1,
  * set FPGA_PWR_EN HIGH to start the power sequence, and transition to
  * READY state.
  *
@@ -73,7 +73,7 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
 static void f_power_off (struct fpga_management_data *fmd)
 {
         /* check user request */
-        if (fmd->config_ok) {
+        if (fmd->activate_fpga) {
                 FPGA_PWR_EN = 1;
                 fmd->state = FPGA_STATE_READY;
         }
@@ -87,27 +87,27 @@ static void f_power_off (struct fpga_management_data *fmd)
  *  - FPGA_PWR_EN: HIGH
  * post-condtion
  *  - state: POWER_OFF
- *    - config_ok: 0
+ *    - activate_fpga: 0
  *    - FPGA_PWR_EN: LOW
  *  - state: CONFIG
- *    - config_ok: 1
+ *    - activate_fpga: 1
  *    - FPGA_PWR_EN: HIGH
  *    - VDD_3V3: 1
  *  - state: READY
- *    - config_ok: 1
+ *    - activate_fpga: 1
  *    - FPGA_PWR_EN: HIGH
  *    - VDD_3V3: HIGH
  *
  * Wait for FPGA power to be stable by monitoring VDD_3V3 become high.
  *
- * Go back to POWER_OFF when config_ok become 0.
+ * Go back to POWER_OFF when activate_fpga become 0.
  *
  * Stay in READY otherwise.
  */
 static void f_fpga_ready (struct fpga_management_data *fmd)
 {
         /* check user request */
-        if (!fmd->config_ok) {
+        if (!fmd->activate_fpga) {
                 FPGA_PWR_EN = 0;
                 fmd->state = FPGA_STATE_POWER_OFF;
                 return;
@@ -132,10 +132,10 @@ static void f_fpga_ready (struct fpga_management_data *fmd)
  *  - VDD_3V3: HIGH
  * post-condtion
  *  - state: POWER_OFF
- *    - config_ok: 0
+ *    - activate_fpga: 0
  *    - FPGA_PWR_EN: LOW
  *  - state: CONFIG
- *    - config_ok: 1
+ *    - activate_fpga: 1
  *    - FPGA_PWR_EN: HIGH
  *    - VDD_3V3: HIGH
  *    - FPGA_INIT_B: NOT LOW
@@ -143,19 +143,19 @@ static void f_fpga_ready (struct fpga_management_data *fmd)
  * Wait for the completion of the FPGA configuration sequence.  The
  * FPGA must drive FPGA_WATCHDOG HIGH once the configuration is done.
  *
- * Go back to POWER_OFF when config_ok become 0.
+ * Go back to POWER_OFF when activate_fpga become 0.
  *
  * Stay in CONFIG state, otherwise.
  *
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
- * config_ok to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
+ * activate_fpga to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
  */
 static void f_fpga_config (struct fpga_management_data *fmd)
 {
         fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
 
         /* check user request */
-        if (!fmd->config_ok) {
+        if (!fmd->activate_fpga) {
                 FPGA_PWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
                 fmd->state = FPGA_STATE_POWER_OFF;
@@ -178,10 +178,10 @@ static void f_fpga_config (struct fpga_management_data *fmd)
  *  - FPGA_INIT_B: NOT LOW
  * post-condtion
  *  - state: POWER_OFF
- *    - config_ok: 0
+ *    - activate_fpga: 0
  *    - FPGA_PWR_EN: LOW
  *  - state: ACTIVE
- *    - config_ok: 1
+ *    - activate_fpga: 1
  *    - FPGA_PWR_EN: HIGH
  *    - VDD_3V3: HIGH
  *    - FPGA_INIT_B: NOT LOW
@@ -192,14 +192,14 @@ static void f_fpga_config (struct fpga_management_data *fmd)
  * Stay in ACTIVE state, otherwise.
  *
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
- * config_ok to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
+ * activate_fpga to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
  */
 static void f_fpga_active (struct fpga_management_data *fmd)
 {
         fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
 
         /* check user request */
-        if (!fmd->config_ok) {
+        if (!fmd->activate_fpga) {
                 FPGA_PWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
                 fmd->state = FPGA_STATE_POWER_OFF;

@@ -191,10 +191,10 @@ void main (void)
         get_tmp_all(fpga_state, &temps);
 
         while (1) {
-                fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;
+                fmd.activate_fpga = CONFIG_FPGA_DO_CONFIGURE;
 
                 if (FPGA_PWR_CYCLE_REQ) {
-                        fmd.config_ok = 0;
+                        fmd.activate_fpga = 0;
                 }
 
                 fpga_state_control(&fmd);

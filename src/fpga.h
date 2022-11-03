@@ -26,7 +26,7 @@ enum FpgaState{
 
 struct fpga_management_data {
         enum FpgaState state;
-        unsigned config_ok: 1;
+        unsigned activate_fpga: 1;
         int mem_select;
         unsigned boot_mode: 2;
         int time;
