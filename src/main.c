@@ -28,10 +28,6 @@
 #pragma config WRT = OFF        // Flash Program Memory Write Enable bits (Write protection off; all program memory may be written to by EECON control)
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
-struct trch_state {
-        struct fpga_management_data fmd;
-};
-
 struct temp_sensors {
         struct tmp175_data ts1;
         struct tmp175_data ts2;
@@ -119,14 +115,15 @@ static void trch_init (void) {
         TRISE = TRISE_INIT;
 }
 
-void main (void) {
-        struct trch_state the_state;
+void main (void)
+{
+        struct fpga_management_data fmd;
         struct voltage_sensors volts;
         struct temp_sensors temps;
         enum FpgaState fpga_state;
         // Initialize trch-firmware
         trch_init();
-        fpga_state = fpga_init(&(the_state.fmd));
+        fpga_state = fpga_init(&fmd);
 
         spi_init();
         usart_init();
@@ -194,13 +191,13 @@ void main (void) {
         get_tmp_all(fpga_state, &temps);
 
         while (1) {
-                the_state.fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;
+                fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;
 
                 if (FPGA_PWR_CYCLE_REQ) {
-                        the_state.fmd.config_ok = 0;
+                        fmd.config_ok = 0;
                 }
 
-                fpga_state_control(&the_state.fmd);
+                fpga_state_control(&fmd);
         }
         return;
 }
