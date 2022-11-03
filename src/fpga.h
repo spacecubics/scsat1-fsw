@@ -37,4 +37,4 @@ struct fpga_management_data {
 
 extern enum FpgaState fpga_init(struct fpga_management_data *fmd);
 extern bool fpga_is_i2c_accessible (enum FpgaState state);
-extern void fpga_state_control(struct fpga_management_data *fmd, bool activate_fpga);
+extern enum FpgaState fpga_state_control(struct fpga_management_data *fmd, bool activate_fpga);
