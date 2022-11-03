@@ -73,25 +73,27 @@ static void get_tmp (struct tmp175_data *td, enum FpgaState fpga_state) {
         }
 }
 
-static void get_voltage_monitor_all (struct trch_state *the_state, struct voltage_sensors *volts) {
-        get_voltage_monitor(&volts->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&volts->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&volts->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&volts->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&volts->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&volts->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_BUS);
-        get_voltage_monitor(&volts->vm3v3a, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&volts->vm3v3b, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&volts->vm1v0, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&volts->vm1v8, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&volts->vm3v3, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
-        get_voltage_monitor(&volts->vm3v3i, the_state->fmd.state, INA3221_VOLTAGE_SHUNT);
+static void get_voltage_monitor_all(enum FpgaState fpga_state, struct voltage_sensors *volts)
+{
+        get_voltage_monitor(&volts->vm3v3a, fpga_state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3b, fpga_state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm1v0, fpga_state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm1v8, fpga_state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3, fpga_state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3i, fpga_state, INA3221_VOLTAGE_BUS);
+        get_voltage_monitor(&volts->vm3v3a, fpga_state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm3v3b, fpga_state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm1v0, fpga_state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm1v8, fpga_state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm3v3, fpga_state, INA3221_VOLTAGE_SHUNT);
+        get_voltage_monitor(&volts->vm3v3i, fpga_state, INA3221_VOLTAGE_SHUNT);
 }
 
-static void get_tmp_all (struct trch_state *the_state, struct temp_sensors *temps) {
-        get_tmp(&temps->ts1, the_state->fmd.state);
-        get_tmp(&temps->ts2, the_state->fmd.state);
-        get_tmp(&temps->ts3, the_state->fmd.state);
+static void get_tmp_all(enum FpgaState fpga_state, struct temp_sensors *temps)
+{
+        get_tmp(&temps->ts1, fpga_state);
+        get_tmp(&temps->ts2, fpga_state);
+        get_tmp(&temps->ts3, fpga_state);
 }
 
 static void __interrupt() isr(void) {
@@ -121,9 +123,10 @@ void main (void) {
         struct trch_state the_state;
         struct voltage_sensors volts;
         struct temp_sensors temps;
+        enum FpgaState fpga_state;
         // Initialize trch-firmware
         trch_init();
-        fpga_init(&(the_state.fmd));
+        fpga_state = fpga_init(&(the_state.fmd));
 
         spi_init();
         usart_init();
@@ -187,8 +190,8 @@ void main (void) {
         volts.vm3v3i.addr    = 0x41;
         volts.vm3v3i.channel = 3;
 
-        get_voltage_monitor_all(&the_state,  &volts);
-        get_tmp_all(&the_state, &temps);
+        get_voltage_monitor_all(fpga_state,  &volts);
+        get_tmp_all(fpga_state, &temps);
 
         while (1) {
                 the_state.fmd.config_ok = CONFIG_FPGA_DO_CONFIGURE;

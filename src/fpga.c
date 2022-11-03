@@ -35,12 +35,15 @@ static void fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
 #endif
 }
 
-void fpga_init (struct fpga_management_data *fmd) {
+enum FpgaState fpga_init(struct fpga_management_data *fmd)
+{
         fmd->state = FPGA_STATE_POWER_OFF;
         fmd->config_ok = 0;
         fmd->mem_select = 0;
         fmd->boot_mode = FPGA_BOOT_48MHZ;
         fmd->time = 0;
+
+        return fmd->state;
 }
 
 bool fpga_is_i2c_accessible (enum FpgaState state) {
