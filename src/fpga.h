@@ -29,7 +29,6 @@ struct fpga_management_data {
         unsigned config_ok: 1;
         int mem_select;
         unsigned boot_mode: 2;
-        int count;
         int time;
 #ifdef CONFIG_ENABLE_WDT_RESET
         bool wdt_value;

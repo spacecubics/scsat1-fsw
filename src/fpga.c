@@ -40,7 +40,6 @@ void fpga_init (struct fpga_management_data *fmd) {
         fmd->config_ok = 0;
         fmd->mem_select = 0;
         fmd->boot_mode = FPGA_BOOT_48MHZ;
-        fmd->count = 0;
         fmd->time = 0;
 }
 
@@ -48,50 +47,65 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
         return state == FPGA_STATE_POWER_OFF || state == FPGA_STATE_READY;
 }
 
-static void f_power_off (struct fpga_management_data *fmd) {
-        if (VDD_3V3) {
+static void f_power_off (struct fpga_management_data *fmd)
+{
+        /* check user request */
+        if (fmd->config_ok) {
+                FPGA_PWR_EN = 1;
                 fmd->state = FPGA_STATE_READY;
-                FPGA_INIT_B_DIR = 0;
-                FPGA_PROGRAM_B = 1;
-                FPGA_PROGRAM_B_DIR = 0;
         }
 }
 
-static void f_fpga_ready (struct fpga_management_data *fmd) {
-        if (fmd->config_ok) {
+static void f_fpga_ready (struct fpga_management_data *fmd)
+{
+        /* check user request */
+        if (!fmd->config_ok) {
+                FPGA_PWR_EN = 0;
+                fmd->state = FPGA_STATE_POWER_OFF;
+                return;
+        }
+
+        /* wait for VDD_3V3 */
+        if (VDD_3V3) {
                 TRCH_CFG_MEM_SEL = (char)fmd->mem_select;
                 FPGA_BOOT0 = 0b01 & fmd->boot_mode;
                 FPGA_BOOT1 = 0b01 & (fmd->boot_mode >> 1);
-                if (fmd->count == 0)
-                        FPGA_INIT_B_DIR = 1;
-                else
-                        FPGA_PROGRAM_B = 1;
                 fpga_wdt_init(fmd);
                 fmd->state = FPGA_STATE_CONFIG;
-                fmd->count++;
         }
 }
 
-static void f_fpga_config (struct fpga_management_data *fmd) {
+static void f_fpga_config (struct fpga_management_data *fmd)
+{
         fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
 
+        /* check user request */
         if (!fmd->config_ok) {
-                FPGA_PROGRAM_B = 0;
+                FPGA_PWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
-                fmd->state = FPGA_STATE_READY;
-        } else if (FPGA_WATCHDOG)
+                fmd->state = FPGA_STATE_POWER_OFF;
+                return;
+        }
+
+        /* wait for watchdog pulse from the fpga */
+        if (FPGA_WATCHDOG) {
                 fmd->state = FPGA_STATE_ACTIVE;
+        }
 }
 
-static void f_fpga_active (struct fpga_management_data *fmd) {
+static void f_fpga_active (struct fpga_management_data *fmd)
+{
         fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
 
+        /* check user request */
         if (!fmd->config_ok) {
-                FPGA_PROGRAM_B = 0;
+                FPGA_PWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
-                fmd->state = FPGA_STATE_READY;
-        } else
-                TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
+                fmd->state = FPGA_STATE_POWER_OFF;
+                return;
+        }
+
+        TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
 }
 
 typedef void (*STATEFUNC)(struct fpga_management_data *fmd);

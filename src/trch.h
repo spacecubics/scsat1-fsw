@@ -27,10 +27,10 @@
  *  bit 1: FPGA_BOOT0                         Out          0
  *  bit 2: FPGA_BOO11                         Out          0
  *  bit 3: FPGA_PROGRAM_B                     In           0
- *  bit 4: FPGA_INIT_B                        Out          0
+ *  bit 4: FPGA_INIT_B                        In           0
  *  bit 5: FPGA_PWR_EN                        Out          0
  */
-#define TRISA_INIT         0x08
+#define TRISA_INIT         0x18
 #define PORTA_INIT         0x00
 
 #define TRISA_FPGA_READY   0x00
