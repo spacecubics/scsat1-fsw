@@ -47,7 +47,6 @@ static bool fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
 enum FpgaState fpga_init(struct fpga_management_data *fmd)
 {
         fmd->state = FPGA_STATE_POWER_OFF;
-        fmd->activate_fpga = 0;
         fmd->mem_select = 0;
         fmd->boot_mode = FPGA_BOOT_48MHZ;
         fmd->time = 0;
@@ -79,10 +78,10 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
  *
  * Keep the FPGA power off, otherwise.
  */
-static void f_power_off (struct fpga_management_data *fmd)
+static void f_power_off(struct fpga_management_data *fmd, bool activate_fpga)
 {
         /* check user request */
-        if (fmd->activate_fpga) {
+        if (activate_fpga) {
                 FPGA_PWR_EN = 1;
                 fmd->state = FPGA_STATE_READY;
         }
@@ -113,10 +112,10 @@ static void f_power_off (struct fpga_management_data *fmd)
  *
  * Stay in READY otherwise.
  */
-static void f_fpga_ready (struct fpga_management_data *fmd)
+static void f_fpga_ready(struct fpga_management_data *fmd, bool activate_fpga)
 {
         /* check user request */
-        if (!fmd->activate_fpga) {
+        if (!activate_fpga) {
                 FPGA_PWR_EN = 0;
                 fmd->state = FPGA_STATE_POWER_OFF;
                 return;
@@ -159,17 +158,17 @@ static void f_fpga_ready (struct fpga_management_data *fmd)
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
  * activate_fpga to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
  */
-static void f_fpga_config (struct fpga_management_data *fmd)
+static void f_fpga_config(struct fpga_management_data *fmd, bool activate_fpga)
 {
         bool kicked;
 
         kicked = fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
         if (!kicked) {
-                fmd->activate_fpga = 0;
+                activate_fpga = false;
         }
 
         /* check user request */
-        if (!fmd->activate_fpga) {
+        if (!activate_fpga) {
                 FPGA_PWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
                 fmd->state = FPGA_STATE_POWER_OFF;
@@ -208,17 +207,17 @@ static void f_fpga_config (struct fpga_management_data *fmd)
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
  * activate_fpga to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
  */
-static void f_fpga_active (struct fpga_management_data *fmd)
+static void f_fpga_active(struct fpga_management_data *fmd, bool activate_fpga)
 {
         bool kicked;
 
         kicked = fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
         if (!kicked) {
-                fmd->activate_fpga = 0;
+                activate_fpga = false;
         }
 
         /* check user request */
-        if (!fmd->activate_fpga) {
+        if (!activate_fpga) {
                 FPGA_PWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
                 fmd->state = FPGA_STATE_POWER_OFF;
@@ -228,7 +227,7 @@ static void f_fpga_active (struct fpga_management_data *fmd)
         TRCH_CFG_MEM_SEL = FPGA_CFG_MEM_SEL;
 }
 
-typedef void (*STATEFUNC)(struct fpga_management_data *fmd);
+typedef void (*STATEFUNC)(struct fpga_management_data *fmd, bool activate_fpga);
 
 static STATEFUNC fpgafunc[] = {
         f_power_off,
@@ -236,7 +235,7 @@ static STATEFUNC fpgafunc[] = {
         f_fpga_config,
         f_fpga_active };
 
-void fpga_state_control(struct fpga_management_data *fmd)
+void fpga_state_control(struct fpga_management_data *fmd, bool activate_fpga)
 {
-       fpgafunc[fmd->state](fmd);
+        fpgafunc[fmd->state](fmd, activate_fpga);
 }

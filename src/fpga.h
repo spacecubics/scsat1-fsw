@@ -26,7 +26,6 @@ enum FpgaState{
 
 struct fpga_management_data {
         enum FpgaState state;
-        unsigned activate_fpga: 1;
         int mem_select;
         unsigned boot_mode: 2;
         int time;
@@ -38,4 +37,4 @@ struct fpga_management_data {
 
 extern enum FpgaState fpga_init(struct fpga_management_data *fmd);
 extern bool fpga_is_i2c_accessible (enum FpgaState state);
-extern void fpga_state_control(struct fpga_management_data *fmd);
+extern void fpga_state_control(struct fpga_management_data *fmd, bool activate_fpga);
