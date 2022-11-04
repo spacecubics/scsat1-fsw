@@ -28,7 +28,7 @@
  *  bit 2: FPGA_BOO11                         Out          0
  *  bit 3: FPGA_PROGRAM_B                     In           0
  *  bit 4: FPGA_INIT_B                        In           0
- *  bit 5: FPGA_PWR_EN                        Out          0
+ *  bit 5: FPGAPWR_EN                         Out          0
  */
 #define TRISA_INIT         0x18
 #define PORTA_INIT         0x00
@@ -41,8 +41,8 @@
 #define FPGA_PROGRAM_B_DIR TRISAbits.TRISA3
 #define FPGA_INIT_B        PORTAbits.RA4
 #define FPGA_INIT_B_DIR    TRISAbits.TRISA4
-#define FPGA_PWR_EN        PORTAbits.RA5
-#define FPGA_PWR_EN_DIR    TRISAbits.TRISA5
+#define FPGAPWR_EN         PORTAbits.RA5
+#define FPGAPWR_EN_DIR     TRISAbits.TRISA5
 
 /*
  * PORTB Hardware

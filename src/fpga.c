@@ -63,17 +63,17 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
  *
  * pre-condition
  *  - state: POWER_OFF
- *  - FPGA_PWR_EN: LOW
+ *  - FPGAPWR_EN: LOW
  * post-condition
  *  - state: READY
  *    - activate_fpga: 1
- *    - FPGA_PWR_EN: HIGH
+ *    - FPGAPWR_EN: HIGH
  *  - state: POWER_OFF
  *    - activate_fpga: 0
- *    - FPGA_PWR_EN: LOW
+ *    - FPGAPWR_EN: LOW
  *
  * When the user ask to actiavte the FPGA by setting activate_fpga to 1,
- * set FPGA_PWR_EN HIGH to start the power sequence, and transition to
+ * set FPGAPWR_EN HIGH to start the power sequence, and transition to
  * READY state.
  *
  * Keep the FPGA power off, otherwise.
@@ -82,7 +82,7 @@ static void f_power_off(struct fpga_management_data *fmd, bool activate_fpga)
 {
         /* check user request */
         if (activate_fpga) {
-                FPGA_PWR_EN = 1;
+                FPGAPWR_EN = 1;
                 fmd->state = FPGA_STATE_READY;
         }
 }
@@ -92,18 +92,18 @@ static void f_power_off(struct fpga_management_data *fmd, bool activate_fpga)
  *
  * pre-condition
  *  - state: READY
- *  - FPGA_PWR_EN: HIGH
+ *  - FPGAPWR_EN: HIGH
  * post-condtion
  *  - state: POWER_OFF
  *    - activate_fpga: 0
- *    - FPGA_PWR_EN: LOW
+ *    - FPGAPWR_EN: LOW
  *  - state: CONFIG
  *    - activate_fpga: 1
- *    - FPGA_PWR_EN: HIGH
+ *    - FPGAPWR_EN: HIGH
  *    - VDD_3V3: 1
  *  - state: READY
  *    - activate_fpga: 1
- *    - FPGA_PWR_EN: HIGH
+ *    - FPGAPWR_EN: HIGH
  *    - VDD_3V3: HIGH
  *
  * Wait for FPGA power to be stable by monitoring VDD_3V3 become high.
@@ -116,7 +116,7 @@ static void f_fpga_ready(struct fpga_management_data *fmd, bool activate_fpga)
 {
         /* check user request */
         if (!activate_fpga) {
-                FPGA_PWR_EN = 0;
+                FPGAPWR_EN = 0;
                 fmd->state = FPGA_STATE_POWER_OFF;
                 return;
         }
@@ -136,15 +136,15 @@ static void f_fpga_ready(struct fpga_management_data *fmd, bool activate_fpga)
  *
  * pre-condition
  *  - state: CONFIG
- *  - FPGA_PWR_EN: HIGH
+ *  - FPGAPWR_EN: HIGH
  *  - VDD_3V3: HIGH
  * post-condtion
  *  - state: POWER_OFF
  *    - activate_fpga: 0
- *    - FPGA_PWR_EN: LOW
+ *    - FPGAPWR_EN: LOW
  *  - state: CONFIG
  *    - activate_fpga: 1
- *    - FPGA_PWR_EN: HIGH
+ *    - FPGAPWR_EN: HIGH
  *    - VDD_3V3: HIGH
  *    - FPGA_INIT_B: NOT LOW
  *
@@ -169,7 +169,7 @@ static void f_fpga_config(struct fpga_management_data *fmd, bool activate_fpga)
 
         /* check user request */
         if (!activate_fpga) {
-                FPGA_PWR_EN = 0;
+                FPGAPWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
                 fmd->state = FPGA_STATE_POWER_OFF;
                 return;
@@ -186,16 +186,16 @@ static void f_fpga_config(struct fpga_management_data *fmd, bool activate_fpga)
  *
  * pre-condition
  *  - state: ACTIVE
- *  - FPGA_PWR_EN: HIGH
+ *  - FPGAPWR_EN: HIGH
  *  - VDD_3V3: 1
  *  - FPGA_INIT_B: NOT LOW
  * post-condtion
  *  - state: POWER_OFF
  *    - activate_fpga: 0
- *    - FPGA_PWR_EN: LOW
+ *    - FPGAPWR_EN: LOW
  *  - state: ACTIVE
  *    - activate_fpga: 1
- *    - FPGA_PWR_EN: HIGH
+ *    - FPGAPWR_EN: HIGH
  *    - VDD_3V3: HIGH
  *    - FPGA_INIT_B: NOT LOW
  *
@@ -218,7 +218,7 @@ static void f_fpga_active(struct fpga_management_data *fmd, bool activate_fpga)
 
         /* check user request */
         if (!activate_fpga) {
-                FPGA_PWR_EN = 0;
+                FPGAPWR_EN = 0;
                 fmd->mem_select = !fmd->mem_select;
                 fmd->state = FPGA_STATE_POWER_OFF;
                 return;
