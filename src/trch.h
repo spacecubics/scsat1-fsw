@@ -68,18 +68,19 @@
  *  Bit    Name                               Initial Dir  Initial Level
  *  bit 0: TRCH_CAN_SLEEP_EN                  Out          0
  *  bit 1: SPICAN_CS_B                        Out          1
- *  bit 2: FPGA_WATCHDOG_EN                   In           -
+ *  bit 2: FPGAPROG_MODE_B                    In           -
  *  bit 3: SPICAN_SCK                         Out          0
  *  bit 4: SPICAN_MISO                        In           -
  *  bit 5: SPICAN_MOSI                        Out          0
  *  bit 6: TRCH_UART_TX                       Out          0
  *  bit 7: TRCH_UART_RX                       In           -
  */
-#define TRISC_INIT         0x90
+#define TRISC_INIT         0x94
 #define PORTC_INIT         0x00
 
 #define SPICAN_CS_B_DIR    TRISCbits.TRISC1
 #define SPICAN_CS_B        PORTCbits.RC1
+#define FPGAPROG_MODE_B    PORTCbits.RC2
 #define SPICAN_SCK_DIR     TRISCbits.TRISC3
 #define SPICAN_MOSI_DIR    TRISCbits.TRISC5
 

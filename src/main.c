@@ -115,6 +115,20 @@ static void trch_init (void) {
         TRISE = TRISE_INIT;
 }
 
+static void fpga_program_maybe(void)
+{
+        if (CONFIG_FPGA_PROGRAM_MODE) {
+                if (!FPGAPROG_MODE_B) {
+                        FPGAPWR_EN = 1;
+                        while (1) {
+                                if (FPGA_CFG_MEM_SEL) {
+                                        TRCH_CFG_MEM_SEL = 1;
+                                }
+                        }
+                }
+        }
+}
+
 void main (void)
 {
         struct voltage_sensors volts;
@@ -122,6 +136,7 @@ void main (void)
         enum FpgaState fpga_state;
         // Initialize trch-firmware
         trch_init();
+        fpga_program_maybe();
         fpga_state = fpga_init();
 
         spi_init();
