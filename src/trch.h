@@ -92,16 +92,16 @@
 #define PORTD_INIT         0x00
 
 #define I2C_PORT           PORTD
-#define INT_SCL_DIR        TRISDbits.TRISD0
-#define INT_SCL_DAT        PORTDbits.RD0
-#define INT_SDA_DIR        TRISDbits.TRISD1
-#define INT_SDA_DAT        PORTDbits.RD1
-#define INT_I2C_MASK       0x03
-#define EXT_SCL_DIR        TRISDbits.TRISD2
-#define EXT_SCL_DAT        PORTDbits.RD2
-#define EXT_SDA_DIR        TRISDbits.TRISD3
-#define EXT_SDA_DAT        PORTDbits.RD3
-#define EXT_I2C_MASK       0x0C
+#define I2C_INT_SCL_DIR    TRISDbits.TRISD0
+#define I2C_INT_SCL        PORTDbits.RD0
+#define I2C_INT_SDA_DIR    TRISDbits.TRISD1
+#define I2C_INT_SDA        PORTDbits.RD1
+#define I2C_INT_MASK       (0x03)
+#define I2C_EXT_SCL_DIR    TRISDbits.TRISD2
+#define I2C_EXT_SCL        PORTDbits.RD2
+#define I2C_EXT_SDA_DIR    TRISDbits.TRISD3
+#define I2C_EXT_SDA        PORTDbits.RD3
+#define I2C_EXT_I2C_MASK   (0x0C)
 #define UIO3_00            PORTDbits.RD4
 #define UIO3_01            PORTDbits.RD5
 #define UIO3_02            PORTDbits.RD6

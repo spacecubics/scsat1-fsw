@@ -15,78 +15,78 @@
 
 void i2c_get (int m) {
         if (!m) {
-                I2C_PORT = I2C_PORT & ~INT_I2C_MASK;
-                INT_SCL_DIR = 1;
-                INT_SDA_DIR = 1;
+                I2C_PORT = I2C_PORT & ~I2C_INT_MASK;
+                I2C_INT_SCL_DIR = 1;
+                I2C_INT_SDA_DIR = 1;
         } else {
-                I2C_PORT = I2C_PORT & ~EXT_I2C_MASK;
-                EXT_SCL_DIR = 1;
-                EXT_SDA_DIR = 1;
+                I2C_PORT = I2C_PORT & ~I2C_EXT_I2C_MASK;
+                I2C_EXT_SCL_DIR = 1;
+                I2C_EXT_SDA_DIR = 1;
         }
 }
 
 void i2c_send_start (int m) {
         if (!m) {
-                INT_SCL_DIR = 1;
-                INT_SDA_DIR = 0;
-                INT_SCL_DIR = 0;
+                I2C_INT_SCL_DIR = 1;
+                I2C_INT_SDA_DIR = 0;
+                I2C_INT_SCL_DIR = 0;
         } else {
-                EXT_SCL_DIR = 1;
-                EXT_SDA_DIR = 0;
-                EXT_SCL_DIR = 0;
+                I2C_EXT_SCL_DIR = 1;
+                I2C_EXT_SDA_DIR = 0;
+                I2C_EXT_SCL_DIR = 0;
         }
 }
 
 void i2c_send_stop (int m) {
         if (!m) {
-                INT_SDA_DIR = 0;
-                INT_SCL_DIR = 1;
-                INT_SDA_DIR = 1;
+                I2C_INT_SDA_DIR = 0;
+                I2C_INT_SCL_DIR = 1;
+                I2C_INT_SDA_DIR = 1;
         } else {
-                EXT_SDA_DIR = 0;
-                EXT_SCL_DIR = 1;
-                EXT_SDA_DIR = 1;
+                I2C_EXT_SDA_DIR = 0;
+                I2C_EXT_SCL_DIR = 1;
+                I2C_EXT_SDA_DIR = 1;
         }
 }
 
 static void send_bit (int m, uint8_t l) {
         if (!m) {
-                INT_SDA_DIR = l;
-                INT_SCL_DIR = 1;
-                INT_SCL_DIR = 0;
+                I2C_INT_SDA_DIR = l;
+                I2C_INT_SCL_DIR = 1;
+                I2C_INT_SCL_DIR = 0;
         } else {
-                EXT_SDA_DIR = l;
-                EXT_SCL_DIR = 1;
-                EXT_SCL_DIR = 0;
+                I2C_EXT_SDA_DIR = l;
+                I2C_EXT_SCL_DIR = 1;
+                I2C_EXT_SCL_DIR = 0;
         }
 }
 
 static void send_bit_befor_resp (int m, uint8_t l) {
         if (!m) {
-                INT_SDA_DIR = l;
-                INT_SCL_DIR = 1;
-                INT_SCL_DIR = 0;
-                INT_SDA_DIR = 1;
+                I2C_INT_SDA_DIR = l;
+                I2C_INT_SCL_DIR = 1;
+                I2C_INT_SCL_DIR = 0;
+                I2C_INT_SDA_DIR = 1;
         } else {
-                EXT_SDA_DIR = l;
-                EXT_SCL_DIR = 1;
-                EXT_SCL_DIR = 0;
-                EXT_SDA_DIR = 1;
+                I2C_EXT_SDA_DIR = l;
+                I2C_EXT_SCL_DIR = 1;
+                I2C_EXT_SCL_DIR = 0;
+                I2C_EXT_SDA_DIR = 1;
         }
 }
 
 static uint8_t receive_bit (int m) {
         uint8_t r = 0x00;
         if (!m) {
-                INT_SDA_DIR = 1;
-                INT_SCL_DIR = 1;
-                r = INT_SDA_DAT;
-                INT_SCL_DIR = 0;
+                I2C_INT_SDA_DIR = 1;
+                I2C_INT_SCL_DIR = 1;
+                r = I2C_INT_SDA;
+                I2C_INT_SCL_DIR = 0;
         } else {
-                EXT_SDA_DIR = 1;
-                EXT_SCL_DIR = 1;
-                r = INT_SDA_DAT;
-                EXT_SCL_DIR = 0;
+                I2C_EXT_SDA_DIR = 1;
+                I2C_EXT_SCL_DIR = 1;
+                r = I2C_INT_SDA;
+                I2C_EXT_SCL_DIR = 0;
         }
         return r;
 }
