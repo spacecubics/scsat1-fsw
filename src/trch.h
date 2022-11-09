@@ -15,6 +15,11 @@
  */
 #define _XTAL_FREQ 4000000
 
+#define PORT_DIR_OUT (0)
+#define PORT_DIR_IN (1)
+#define PORT_DATA_LOW (0)
+#define PORT_DATA_HIGH (1)
+
 /*
  * PORTA Hardware
  *  Bit    Name                               Initial Dir  Initial Level
