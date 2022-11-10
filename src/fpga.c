@@ -18,7 +18,6 @@ struct fpga_management_data {
         enum FpgaState state;
         uint8_t mem_select;
         uint8_t boot_mode;
-        int time;
 #ifdef CONFIG_ENABLE_WDT_RESET
         bool wdt_value;
         uint32_t wdt_last_tick;
@@ -62,7 +61,6 @@ enum FpgaState fpga_init()
         the_fmd.state = FPGA_STATE_POWER_OFF;
         the_fmd.mem_select = 0;
         the_fmd.boot_mode = FPGA_BOOT_48MHZ;
-        the_fmd.time = 0;
 
         return the_fmd.state;
 }
