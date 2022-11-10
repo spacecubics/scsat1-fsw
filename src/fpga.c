@@ -111,8 +111,8 @@ static enum FpgaState trans_to_config(uint8_t mem_select, uint8_t boot_mode)
         FPGA_BOOT0 = 0b01 & boot_mode;
         FPGA_BOOT1 = 0b01 & (boot_mode >> 1);
         /* FPGA_PROGRAM_B_DIR keep */
-        FPGA_INIT_B = PORT_DATA_HIGH;
-        FPGA_INIT_B_DIR = PORT_DIR_OUT;
+        /* FPGA_INIT_B don't care */
+        FPGA_INIT_B_DIR = PORT_DIR_IN;
         /* FPGAPWR_EN keep */
         /* FPGAPWR_EN_DIR keep */
         I2C_INT_SCL_DIR = PORT_DIR_IN;
@@ -130,7 +130,7 @@ static enum FpgaState trans_to_active(void)
         /* FPGA_BOOT1 keep */
         /* FPGA_PROGRAM_B_DIR keep */
         /* FPGA_INIT_B don't care */
-        FPGA_INIT_B_DIR = PORT_DIR_IN;
+        /* FPGA_INIT_B_DIR keep */
         /* FPGAPWR_EN keep */
         /* FPGAPWR_EN_DIR keep */
         /* I2C_INT_SCL_DIR keep */
