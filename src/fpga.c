@@ -16,7 +16,7 @@
 
 struct fpga_management_data {
         enum FpgaState state;
-        int mem_select;
+        uint8_t mem_select;
         unsigned boot_mode: 2;
         int time;
 #ifdef CONFIG_ENABLE_WDT_RESET
@@ -107,9 +107,9 @@ static enum FpgaState trans_to_ready(void)
         return FPGA_STATE_READY;
 }
 
-static enum FpgaState trans_to_config(char mem_select, int boot_mode)
+static enum FpgaState trans_to_config(uint8_t mem_select, int boot_mode)
 {
-        TRCH_CFG_MEM_SEL = mem_select;
+        TRCH_CFG_MEM_SEL = mem_select & 0x01;
         FPGA_BOOT0 = 0b01 & boot_mode;
         FPGA_BOOT1 = 0b01 & (boot_mode >> 1);
         /* FPGA_PROGRAM_B_DIR keep */
@@ -209,7 +209,7 @@ static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, bool activa
 
         /* wait for VDD_3V3 */
         if (VDD_3V3) {
-                fmd->state = trans_to_config((char)fmd->mem_select, fmd->boot_mode);
+                fmd->state = trans_to_config(fmd->mem_select, fmd->boot_mode);
                 fpga_wdt_init(fmd);
         }
 
