@@ -71,6 +71,78 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
         return state == FPGA_STATE_POWER_OFF || state == FPGA_STATE_READY;
 }
 
+static enum FpgaState trans_to_power_off(void)
+{
+        TRCH_CFG_MEM_SEL = PORT_DATA_LOW;
+        FPGA_BOOT0 = PORT_DATA_LOW;
+        FPGA_BOOT1 = PORT_DATA_LOW;
+        FPGA_PROGRAM_B_DIR = PORT_DIR_IN;
+        /* FPGA_INIT_B don't care */
+        FPGA_INIT_B_DIR = PORT_DIR_IN;
+        FPGAPWR_EN = PORT_DATA_LOW;
+        FPGAPWR_EN_DIR = PORT_DIR_OUT;
+        /* I2C_INT_SCL_DIR keep */
+        /* I2C_INT_SDA_DIR keep */
+        /* I2C_EXT_SCL_DIR keep */
+        /* I2C_EXT_SDA_DIR keep */
+
+        return FPGA_STATE_POWER_OFF;
+}
+
+static enum FpgaState trans_to_ready(void)
+{
+        /* TRCH_CFG_MEM_SEL keep */
+        /* FPGA_BOOT0 keep */
+        /* FPGA_BOOT1 keep */
+        /* FPGA_PROGRAM_B_DIR keep */
+        FPGA_INIT_B = PORT_DATA_LOW;
+        FPGA_INIT_B_DIR = PORT_DIR_OUT;
+        FPGAPWR_EN = PORT_DATA_HIGH;
+        FPGAPWR_EN_DIR = PORT_DIR_OUT;
+        /* I2C_INT_SCL_DIR keep */
+        /* I2C_INT_SDA_DIR keep */
+        /* I2C_EXT_SCL_DIR keep */
+        /* I2C_EXT_SDA_DIR keep */
+
+        return FPGA_STATE_READY;
+}
+
+static enum FpgaState trans_to_config(char mem_select, int boot_mode)
+{
+        TRCH_CFG_MEM_SEL = mem_select;
+        FPGA_BOOT0 = 0b01 & boot_mode;
+        FPGA_BOOT1 = 0b01 & (boot_mode >> 1);
+        /* FPGA_PROGRAM_B_DIR keep */
+        FPGA_INIT_B = PORT_DATA_HIGH;
+        FPGA_INIT_B_DIR = PORT_DIR_OUT;
+        /* FPGAPWR_EN keep */
+        /* FPGAPWR_EN_DIR keep */
+        I2C_INT_SCL_DIR = PORT_DIR_IN;
+        I2C_INT_SDA_DIR = PORT_DIR_IN;
+        I2C_EXT_SCL_DIR = PORT_DIR_IN;
+        I2C_EXT_SDA_DIR = PORT_DIR_IN;
+
+        return FPGA_STATE_CONFIG;
+}
+
+static enum FpgaState trans_to_active(void)
+{
+        /* TRCH_CFG_MEM_SEL keep */
+        /* FPGA_BOOT0 keep */
+        /* FPGA_BOOT1 keep */
+        /* FPGA_PROGRAM_B_DIR keep */
+        /* FPGA_INIT_B don't care */
+        FPGA_INIT_B_DIR = PORT_DIR_IN;
+        /* FPGAPWR_EN keep */
+        /* FPGAPWR_EN_DIR keep */
+        /* I2C_INT_SCL_DIR keep */
+        /* I2C_INT_SDA_DIR keep */
+        /* I2C_EXT_SCL_DIR keep */
+        /* I2C_EXT_SDA_DIR keep */
+
+        return FPGA_STATE_ACTIVE;
+}
+
 /*
  * POWER_OFF state
  *
@@ -95,21 +167,7 @@ static enum FpgaState f_power_off(struct fpga_management_data *fmd, bool activat
 {
         /* check user request */
         if (activate_fpga) {
-                /* Transition to READY */
-                /* TRCH_CFG_MEM_SEL keep */
-                /* FPGA_BOOT0 keep */
-                /* FPGA_BOOT1 keep */
-                /* FPGA_PROGRAM_B_DIR keep */
-                FPGA_INIT_B = PORT_DATA_LOW;
-                FPGA_INIT_B_DIR = PORT_DIR_OUT;
-                FPGAPWR_EN = PORT_DATA_HIGH;
-                FPGAPWR_EN_DIR = PORT_DIR_OUT;
-                /* I2C_INT_SCL_DIR keep */
-                /* I2C_INT_SDA_DIR keep */
-                /* I2C_EXT_SCL_DIR keep */
-                /* I2C_EXT_SDA_DIR keep */
-
-                fmd->state = FPGA_STATE_READY;
+                fmd->state = trans_to_ready();
         }
 
         return fmd->state;
@@ -144,44 +202,15 @@ static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, bool activa
 {
         /* check user request */
         if (!activate_fpga) {
-                /* Transition to POWER_OFF */
-                /* TRCH_CFG_MEM_SEL keep */
-                /* FPGA_BOOT0 keep */
-                /* FPGA_BOOT1 keep */
-                /* FPGA_PROGRAM_B_DIR keep */
-                /* FPGA_INIT_B don't care */
-                FPGA_INIT_B_DIR = PORT_DIR_IN;
-                FPGAPWR_EN = PORT_DATA_LOW;
-                FPGAPWR_EN_DIR = PORT_DIR_OUT;
-                /* I2C_INT_SCL_DIR keep */
-                /* I2C_INT_SDA_DIR keep */
-                /* I2C_EXT_SCL_DIR keep */
-                /* I2C_EXT_SDA_DIR keep */
-
-                fmd->state = FPGA_STATE_POWER_OFF;
+                fmd->state = trans_to_power_off();
 
                 return fmd->state;
         }
 
         /* wait for VDD_3V3 */
         if (VDD_3V3) {
-                /* Transition to CONFIG */
-                TRCH_CFG_MEM_SEL = (char)fmd->mem_select;
-                FPGA_BOOT0 = 0b01 & fmd->boot_mode;
-                FPGA_BOOT1 = 0b01 & (fmd->boot_mode >> 1);
-                /* FPGA_PROGRAM_B_DIR keep */
-                FPGA_INIT_B = PORT_DATA_HIGH;
-                FPGA_INIT_B_DIR = PORT_DIR_OUT;
-                /* FPGAPWR_EN keep */
-                /* FPGAPWR_EN_DIR keep */
-                I2C_INT_SCL_DIR = PORT_DIR_IN;
-                I2C_INT_SDA_DIR = PORT_DIR_IN;
-                I2C_EXT_SCL_DIR = PORT_DIR_IN;
-                I2C_EXT_SDA_DIR = PORT_DIR_IN;
-
+                fmd->state = trans_to_config((char)fmd->mem_select, fmd->boot_mode);
                 fpga_wdt_init(fmd);
-
-                fmd->state = FPGA_STATE_CONFIG;
         }
 
         return fmd->state;
@@ -225,43 +254,17 @@ static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activ
 
         /* check user request */
         if (!activate_fpga) {
-                /* Transition to POWER_OFF */
-                TRCH_CFG_MEM_SEL = PORT_DATA_LOW;
-                FPGA_BOOT0 = PORT_DATA_LOW;
-                FPGA_BOOT1 = PORT_DATA_LOW;
-                FPGA_PROGRAM_B_DIR = PORT_DIR_IN;
-                /* FPGA_INIT_B don't care */
-                FPGA_INIT_B_DIR = PORT_DIR_IN;
-                FPGAPWR_EN = PORT_DATA_LOW;
-                FPGAPWR_EN_DIR = PORT_DIR_OUT;
-                /* I2C_INT_SCL_DIR keep */
-                /* I2C_INT_SDA_DIR keep */
-                /* I2C_EXT_SCL_DIR keep */
-                /* I2C_EXT_SDA_DIR keep */
-
                 fmd->mem_select = !fmd->mem_select;
-                fmd->state = FPGA_STATE_POWER_OFF;
+                fmd->state = trans_to_power_off();
 
                 return fmd->state;
         }
 
         /* wait for watchdog pulse from the fpga */
         if (FPGA_WATCHDOG) {
-                /* Transition to ACTIVE */
-                /* TRCH_CFG_MEM_SEL keep */
-                /* FPGA_BOOT0 keep */
-                /* FPGA_BOOT1 keep */
-                /* FPGA_PROGRAM_B_DIR keep */
-                /* FPGA_INIT_B don't care */
-                FPGA_INIT_B_DIR = PORT_DIR_IN;
-                /* FPGAPWR_EN keep */
-                /* FPGAPWR_EN_DIR keep */
-                /* I2C_INT_SCL_DIR keep */
-                /* I2C_INT_SDA_DIR keep */
-                /* I2C_EXT_SCL_DIR keep */
-                /* I2C_EXT_SDA_DIR keep */
+                fmd->state = trans_to_active();
 
-                fmd->state = FPGA_STATE_ACTIVE;
+                return fmd->state;
         }
 
         return fmd->state;
@@ -304,22 +307,8 @@ static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activ
 
         /* check user request */
         if (!activate_fpga) {
-                /* Transition to POWER_OFF */
-                TRCH_CFG_MEM_SEL = PORT_DATA_LOW;
-                FPGA_BOOT0 = PORT_DATA_LOW;
-                FPGA_BOOT1 = PORT_DATA_LOW;
-                FPGA_PROGRAM_B_DIR = PORT_DIR_IN;
-                /* FPGA_INIT_B don't care */
-                FPGA_INIT_B_DIR = PORT_DIR_IN;
-                FPGAPWR_EN = PORT_DATA_LOW;
-                FPGAPWR_EN_DIR = PORT_DIR_OUT;
-                /* I2C_INT_SCL_DIR keep */
-                /* I2C_INT_SDA_DIR keep */
-                /* I2C_EXT_SCL_DIR keep */
-                /* I2C_EXT_SDA_DIR keep */
-
                 fmd->mem_select = !fmd->mem_select;
-                fmd->state = FPGA_STATE_POWER_OFF;
+                fmd->state = trans_to_power_off();
 
                 return fmd->state;
         }
