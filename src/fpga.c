@@ -69,6 +69,26 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
         return state == FPGA_STATE_POWER_OFF || state == FPGA_STATE_READY;
 }
 
+/*
+ * Transition to the POWER_OFF state
+ *
+ * In order to shut the FPGA down, we must set a few signal as
+ * appropriate.  Do not drive any pins HIGH, which are connected to the
+ * FPGA, directly.  We can drive LOW or make it HiZ.
+ *
+ * TRCH_CFG_MEM_SEL: It is connected from TRCH to the FPGA.  Must be LOW.
+ *
+ * FPGA_BOOT0 and FPGA_BOOT1: These are also directly connected to the
+ * FPGA. Make sure they are LOW.
+ *
+ * FPGA_PROGRAM_B: We don't use it but just in case users set it, make
+ * it HiZ by setting the dir IN so that it pulled-up externally.
+ *
+ * FPGA_INIT_B: Actually we don't care because the FPGA is off. But we
+ * make sure that the pin is HiZ.
+ *
+ * FPGAPWR_EN: Drive LOW to shut the power down.
+ */
 static enum FpgaState trans_to_power_off(void)
 {
         TRCH_CFG_MEM_SEL = PORT_DATA_LOW;
@@ -87,6 +107,18 @@ static enum FpgaState trans_to_power_off(void)
         return FPGA_STATE_POWER_OFF;
 }
 
+/*
+ * Transition to the READY state
+ *
+ * Provide power to the FPGA.  We are not sure the power to the FPGA
+ * is stable yet.  Do not drive any pins HIGH, which are connected to
+ * the FPGA, directly.  We can drive pins LOW or make them HiZ.  You
+ * can drive the pins in the VDD_3V3_SYS domain HIGH.
+ *
+ * FPGA_INIT_B: Drive LOW to make the FPGA wait after power up.
+ *
+ * FPGAPWR_EN: Drive HIGH to power up the FPGA.
+ */
 static enum FpgaState trans_to_ready(void)
 {
         /* TRCH_CFG_MEM_SEL keep */
@@ -105,6 +137,24 @@ static enum FpgaState trans_to_ready(void)
         return FPGA_STATE_READY;
 }
 
+/*
+ * Transition to the CONFIG state
+ *
+ * Start the configuration of the FPGA.  The power to the FPGA is
+ * stable and VDD_3V3 is HIGH.  The FPGA is already powered up but
+ * waiting on INIT_B.  So we can drive the pins to the FPGA.
+ *
+ * TRCH_CFG_MEM_SEL: Select the configuration memory.
+ *
+ * FPGA_BOOT0 and FPGA_BOOT1: Tell the FPGA what clock speed.
+ *
+ * FPGA_INIT_B: Make it pull-up HIGH by seting the port HiZ to
+ * initiate the FPGA configuraiton.
+ *
+ * I2C_*: Make sure the pins are HiZ while FPGA is active.  We don't
+ * want to disturb both the internal and the external I2C lines.  Let
+ * the FPGA control them exclusively.
+ */
 static enum FpgaState trans_to_config(uint8_t mem_select, uint8_t boot_mode)
 {
         TRCH_CFG_MEM_SEL = mem_select & 0x01;
@@ -123,6 +173,12 @@ static enum FpgaState trans_to_config(uint8_t mem_select, uint8_t boot_mode)
         return FPGA_STATE_CONFIG;
 }
 
+/*
+ * Transition to the ACTIVE state
+ *
+ * In the ACTIVE state, FPGA is fully functioning.
+ *
+ */
 static enum FpgaState trans_to_active(void)
 {
         /* TRCH_CFG_MEM_SEL keep */
@@ -144,22 +200,10 @@ static enum FpgaState trans_to_active(void)
 /*
  * POWER_OFF state
  *
- * pre-condition
- *  - state: POWER_OFF
- *  - FPGAPWR_EN: LOW
- * post-condition
- *  - state: READY
- *    - activate_fpga: 1
- *    - FPGAPWR_EN: HIGH
- *  - state: POWER_OFF
- *    - activate_fpga: 0
- *    - FPGAPWR_EN: LOW
+ * When the user ask to actiavte the FPGA by setting activate_fpga to
+ * 1, transition to READY state.
  *
- * When the user ask to actiavte the FPGA by setting activate_fpga to 1,
- * set FPGAPWR_EN HIGH to start the power sequence, and transition to
- * READY state.
- *
- * Keep the FPGA power off, otherwise.
+ * Stay in POWER_OFF, otherwise.
  */
 static enum FpgaState f_power_off(struct fpga_management_data *fmd, bool activate_fpga)
 {
@@ -174,23 +218,7 @@ static enum FpgaState f_power_off(struct fpga_management_data *fmd, bool activat
 /*
  * READY state
  *
- * pre-condition
- *  - state: READY
- *  - FPGAPWR_EN: HIGH
- * post-condtion
- *  - state: POWER_OFF
- *    - activate_fpga: 0
- *    - FPGAPWR_EN: LOW
- *  - state: CONFIG
- *    - activate_fpga: 1
- *    - FPGAPWR_EN: HIGH
- *    - VDD_3V3: 1
- *  - state: READY
- *    - activate_fpga: 1
- *    - FPGAPWR_EN: HIGH
- *    - VDD_3V3: HIGH
- *
- * Wait for FPGA power to be stable by monitoring VDD_3V3 become high.
+ * Wait for FPGA power to be stable by monitoring VDD_3V3 become HIGH.
  *
  * Go back to POWER_OFF when activate_fpga become 0.
  *
@@ -216,20 +244,6 @@ static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, bool activa
 
 /*
  * CONFIG state
- *
- * pre-condition
- *  - state: CONFIG
- *  - FPGAPWR_EN: HIGH
- *  - VDD_3V3: HIGH
- * post-condtion
- *  - state: POWER_OFF
- *    - activate_fpga: 0
- *    - FPGAPWR_EN: LOW
- *  - state: CONFIG
- *    - activate_fpga: 1
- *    - FPGAPWR_EN: HIGH
- *    - VDD_3V3: HIGH
- *    - FPGA_INIT_B: NOT LOW
  *
  * Wait for the completion of the FPGA configuration sequence.  The
  * FPGA must drive FPGA_WATCHDOG HIGH once the configuration is done.
@@ -270,21 +284,6 @@ static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activ
 
 /*
  * ACTIVE state
- *
- * pre-condition
- *  - state: ACTIVE
- *  - FPGAPWR_EN: HIGH
- *  - VDD_3V3: 1
- *  - FPGA_INIT_B: NOT LOW
- * post-condtion
- *  - state: POWER_OFF
- *    - activate_fpga: 0
- *    - FPGAPWR_EN: LOW
- *  - state: ACTIVE
- *    - activate_fpga: 1
- *    - FPGAPWR_EN: HIGH
- *    - VDD_3V3: HIGH
- *    - FPGA_INIT_B: NOT LOW
  *
  * Monitor watchdog kicks from the FPGA.  Shutdown the FPGA if no kick
  * is observed in FPGA_WATCHDOG_TIMEOUT ticks.
