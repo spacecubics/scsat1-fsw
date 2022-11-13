@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include "trch.h"
 #include "timer.h"
+#include "utils.h"
 
 struct fpga_management_data {
         enum FpgaState state;
@@ -28,11 +29,12 @@ struct fpga_management_data {
 
 static struct fpga_management_data the_fmd;
 
-static void fpga_wdt_init(struct fpga_management_data *fmd) {
-#ifdef CONFIG_ENABLE_WDT_RESET
-        fmd->wdt_value = 0;
-        fmd->wdt_last_tick = timer_get_ticks();
-#endif
+static void fpga_wdt_init(struct fpga_management_data *fmd)
+{
+        if (IS_ENABLED(CONFIG_ENABLE_WDT_RESET)) {
+                fmd->wdt_value = 0;
+                fmd->wdt_last_tick = timer_get_ticks();
+        }
 }
 
 /*
@@ -44,15 +46,15 @@ static bool fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
 {
         bool ret = true;
 
-#ifdef CONFIG_ENABLE_WDT_RESET
-        if (fmd->wdt_value != wdt_value) {
-                fmd->wdt_value = !fmd->wdt_value;
-                fmd->wdt_last_tick = tick;
-        }
+        if (IS_ENABLED(CONFIG_ENABLE_WDT_RESET)) {
+                if (fmd->wdt_value != wdt_value) {
+                        fmd->wdt_value = !fmd->wdt_value;
+                        fmd->wdt_last_tick = tick;
+                }
 
-        if (fmd->wdt_last_tick + FPGA_WATCHDOG_TIMEOUT < tick)
-                ret = false;
-#endif
+                if (fmd->wdt_last_tick + FPGA_WATCHDOG_TIMEOUT < tick)
+                        ret = false;
+        }
         return ret;
 }
 
