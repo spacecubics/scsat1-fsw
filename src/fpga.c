@@ -25,8 +25,6 @@ struct fpga_management_data {
 #endif
 };
 
-#define FPGA_WATCHDOG_TIMEOUT 3
-
 static struct fpga_management_data the_fmd;
 
 static void fpga_wdt_init(struct fpga_management_data *fmd)
@@ -52,7 +50,7 @@ static bool fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
                         fmd->wdt_last_tick = tick;
                 }
 
-                if (fmd->wdt_last_tick + FPGA_WATCHDOG_TIMEOUT < tick)
+                if (fmd->wdt_last_tick + CONFIG_FPGA_WATCHDOG_TIMEOUT < tick)
                         ret = false;
         }
         return ret;
@@ -255,7 +253,7 @@ static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, bool activa
  * Stay in CONFIG state, otherwise.
  *
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
- * activate_fpga to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
+ * activate_fpga to 0 if the count exceeds CONFIG_FPGA_WATCHDOG_TIMEOUT.
  */
 static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activate_fpga)
 {
@@ -288,12 +286,12 @@ static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activ
  * ACTIVE state
  *
  * Monitor watchdog kicks from the FPGA.  Shutdown the FPGA if no kick
- * is observed in FPGA_WATCHDOG_TIMEOUT ticks.
+ * is observed in CONFIG_FPGA_WATCHDOG_TIMEOUT ticks.
  *
  * Stay in ACTIVE state, otherwise.
  *
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
- * activate_fpga to 0 if the count exceeds FPGA_WATCHDOG_TIMEOUT.
+ * activate_fpga to 0 if the count exceeds CONFIG_FPGA_WATCHDOG_TIMEOUT.
  */
 static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activate_fpga)
 {
