@@ -9,6 +9,7 @@
 #include <pic.h>
 
 #include "trch.h"
+#include "utils.h"
 #include "fpga.h"
 #include "spi.h"
 #include "i2c.h"
@@ -117,7 +118,7 @@ static void trch_init (void) {
 
 static void fpga_program_maybe(void)
 {
-        if (CONFIG_FPGA_PROGRAM_MODE) {
+        if (IS_ENABLED(CONFIG_FPGA_PROGRAM_MODE)) {
                 if (!FPGAPROG_MODE_B) {
                         FPGAPWR_EN = 1;
                         while (1) {
@@ -207,7 +208,7 @@ void main (void)
         while (1) {
                 bool activate_fpga;
 
-                activate_fpga = CONFIG_FPGA_DO_CONFIGURE;
+                activate_fpga = IS_ENABLED(CONFIG_FPGA_DO_CONFIGURE);
 
                 if (FPGA_PWR_CYCLE_REQ) {
                         activate_fpga = false;
