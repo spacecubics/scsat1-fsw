@@ -14,7 +14,6 @@
 
 #include "interrupt.h"
 
-#define MSEC_PER_SEC (1000)
 #define MSEC(x) (x)
 #define TIMER_INTERVAL (MSEC(4))
 

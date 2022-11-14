@@ -12,6 +12,8 @@
 #include <stdint.h>
 
 #define HZ (1)
+#define MSEC_PER_SEC (1000)
+#define MSEC_TO_TICKS(ms) (((ms) + ((MSEC_PER_SEC / HZ) - 1)) / (MSEC_PER_SEC / HZ))
 
 extern void timer2_init (void);
 extern void timer2_ctrl (uint8_t control);
