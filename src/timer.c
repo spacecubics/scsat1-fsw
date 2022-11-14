@@ -51,7 +51,7 @@ void timer2_isr (void) {
         PIR1bits.TMR2IF = 0;
 
         count++;
-        count %= MSEC_PER_SEC / TIMER_INTERVAL;
+        count %= (MSEC_PER_SEC / HZ) / TIMER_INTERVAL;
 
         if (count == 0) {
                 current_ticks++;
