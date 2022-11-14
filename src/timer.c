@@ -14,7 +14,7 @@
 
 #include "interrupt.h"
 
-#define SEC_IN_MSEC(x) (1000 * (x))
+#define MSEC_PER_SEC (1000)
 #define MSEC(x) (x)
 #define TIMER_INTERVAL (MSEC(4))
 
@@ -51,7 +51,7 @@ void timer2_isr (void) {
         PIR1bits.TMR2IF = 0;
 
         count++;
-        count %= SEC_IN_MSEC(1) / TIMER_INTERVAL;
+        count %= MSEC_PER_SEC / TIMER_INTERVAL;
 
         if (count == 0) {
                 current_ticks++;
