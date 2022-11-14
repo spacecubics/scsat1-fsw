@@ -50,7 +50,7 @@ static bool fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
                         fmd->wdt_last_tick = tick;
                 }
 
-                if (fmd->wdt_last_tick + CONFIG_FPGA_WATCHDOG_TIMEOUT < tick)
+                if (fmd->wdt_last_tick + MSEC_TO_TICKS(CONFIG_FPGA_WATCHDOG_TIMEOUT * 1000) < tick)
                         ret = false;
         }
         return ret;
