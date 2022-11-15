@@ -228,6 +228,31 @@ static enum FpgaState f_power_off(struct fpga_management_data *fmd, bool activat
 #define WAIT_STABLE_VDD_3V3_LOW (MSEC_TO_TICKS(150u))
 #define WAIT_STABLE_VDD_3V3_HIGH (MSEC_TO_TICKS(3u))
 
+typedef enum FpgaState (*trans_func)(void);
+
+static enum FpgaState _power_transient(enum FpgaState state, bool port_state, uint16_t wait, trans_func trans_func)
+{
+        static bool vdd3v3_change_detected = false;
+        static uint16_t detected_tick;
+        uint16_t current_tick;
+
+        current_tick = (uint16_t)timer_get_ticks();
+
+        if (VDD_3V3 == port_state) {
+                if (!vdd3v3_change_detected) {
+                        vdd3v3_change_detected = true;
+                        detected_tick = current_tick;
+                }
+                else {
+                        if ((current_tick - detected_tick) >= wait) {
+                                vdd3v3_change_detected = false;
+                                state = trans_func();
+                        }
+                }
+        }
+        return state;
+}
+
 /*
  * POWER_DOWN
  *
@@ -238,24 +263,7 @@ static enum FpgaState f_power_off(struct fpga_management_data *fmd, bool activat
  */
 static enum FpgaState f_fpga_power_down(struct fpga_management_data *fmd, bool activate_fpga)
 {
-        static bool vdd3v3_change_detected = false;
-        static uint16_t detected_tick;
-        uint16_t current_tick;
-
-        current_tick = (uint16_t)timer_get_ticks();
-
-        if (!VDD_3V3) {
-                if (!vdd3v3_change_detected) {
-                        vdd3v3_change_detected = true;
-                        detected_tick = current_tick;
-                }
-                else {
-                        if ((current_tick - detected_tick) >= WAIT_STABLE_VDD_3V3_LOW) {
-                                vdd3v3_change_detected = false;
-                                fmd->state = trans_to_power_off();
-                        }
-                }
-        }
+        fmd->state = _power_transient(FPGA_STATE_POWER_DOWN, PORT_DATA_LOW, WAIT_STABLE_VDD_3V3_LOW, trans_to_power_off);
         return fmd->state;
 }
 
@@ -268,25 +276,7 @@ static enum FpgaState f_fpga_power_down(struct fpga_management_data *fmd, bool a
  */
 static enum FpgaState f_fpga_power_up(struct fpga_management_data *fmd, bool activate_fpga)
 {
-        static bool vdd3v3_change_detected = false;
-        static uint16_t detected_tick;
-        uint16_t current_tick;
-
-        current_tick = (uint16_t)timer_get_ticks();
-
-        if (VDD_3V3) {
-                if (!vdd3v3_change_detected) {
-                        vdd3v3_change_detected = true;
-                        detected_tick = current_tick;
-                }
-                else {
-                        if ((current_tick - detected_tick) >= WAIT_STABLE_VDD_3V3_HIGH) {
-                                vdd3v3_change_detected = false;
-                                fmd->state = trans_to_ready();
-                        }
-                }
-
-        }
+        fmd->state = _power_transient(FPGA_STATE_POWER_UP, PORT_DATA_HIGH, WAIT_STABLE_VDD_3V3_HIGH, trans_to_ready);
         return fmd->state;
 }
 
