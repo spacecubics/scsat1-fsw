@@ -17,7 +17,9 @@
 #define FPGA_BOOT_96MHZ 2
 
 enum FpgaState{
+        FPGA_STATE_POWER_DOWN,
         FPGA_STATE_POWER_OFF,
+        FPGA_STATE_POWER_UP,
         FPGA_STATE_READY,
         FPGA_STATE_CONFIG,
         FPGA_STATE_ACTIVE,

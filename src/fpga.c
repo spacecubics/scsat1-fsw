@@ -58,7 +58,7 @@ static bool fpga_wdt(struct fpga_management_data *fmd, bool wdt_value, uint32_t 
 
 enum FpgaState fpga_init()
 {
-        the_fmd.state = FPGA_STATE_POWER_OFF;
+        the_fmd.state = FPGA_STATE_POWER_DOWN;
         the_fmd.mem_select = 0;
         the_fmd.boot_mode = FPGA_BOOT_48MHZ;
 
@@ -70,7 +70,7 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
 }
 
 /*
- * Transition to the POWER_OFF state
+ * Transition to the POWER_DOWN state
  *
  * In order to shut the FPGA down, we must set a few signal as
  * appropriate.  Do not drive any pins HIGH, which are connected to the
@@ -89,7 +89,7 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
  *
  * FPGAPWR_EN: Drive LOW to shut the power down.
  */
-static enum FpgaState trans_to_power_off(void)
+static enum FpgaState trans_to_power_down(void)
 {
         TRCH_CFG_MEM_SEL = PORT_DATA_LOW;
         FPGA_BOOT0 = PORT_DATA_LOW;
@@ -104,11 +104,16 @@ static enum FpgaState trans_to_power_off(void)
         /* I2C_EXT_SCL_DIR keep */
         /* I2C_EXT_SDA_DIR keep */
 
+        return FPGA_STATE_POWER_DOWN;
+}
+
+static enum FpgaState trans_to_power_off(void)
+{
         return FPGA_STATE_POWER_OFF;
 }
 
 /*
- * Transition to the READY state
+ * Transition to the POWER_UP state
  *
  * Provide power to the FPGA.  We are not sure the power to the FPGA
  * is stable yet.  Do not drive any pins HIGH, which are connected to
@@ -119,7 +124,7 @@ static enum FpgaState trans_to_power_off(void)
  *
  * FPGAPWR_EN: Drive HIGH to power up the FPGA.
  */
-static enum FpgaState trans_to_ready(void)
+static enum FpgaState trans_to_power_up(void)
 {
         /* TRCH_CFG_MEM_SEL keep */
         /* FPGA_BOOT0 keep */
@@ -134,6 +139,11 @@ static enum FpgaState trans_to_ready(void)
         /* I2C_EXT_SCL_DIR keep */
         /* I2C_EXT_SDA_DIR keep */
 
+        return FPGA_STATE_POWER_UP;
+}
+
+static enum FpgaState trans_to_ready(void)
+{
         return FPGA_STATE_READY;
 }
 
@@ -209,35 +219,97 @@ static enum FpgaState f_power_off(struct fpga_management_data *fmd, bool activat
 {
         /* check user request */
         if (activate_fpga) {
-                fmd->state = trans_to_ready();
+                fmd->state = trans_to_power_up();
         }
 
+        return fmd->state;
+}
+
+#define WAIT_STABLE_VDD_3V3_LOW (MSEC_TO_TICKS(150u))
+#define WAIT_STABLE_VDD_3V3_HIGH (MSEC_TO_TICKS(3u))
+
+/*
+ * POWER_DOWN
+ *
+ * Wait for FPGA power to be LOW and stable.  This is a transient
+ * state waiting for VDD_3V3.  User is not allowed to change any pin
+ * during this state.  The state will be POWER_OFF once VDD_3V3 is
+ * stable.
+ */
+static enum FpgaState f_fpga_power_down(struct fpga_management_data *fmd, bool activate_fpga)
+{
+        static bool vdd3v3_change_detected = false;
+        static uint16_t detected_tick;
+        uint16_t current_tick;
+
+        current_tick = (uint16_t)timer_get_ticks();
+
+        if (!VDD_3V3) {
+                if (!vdd3v3_change_detected) {
+                        vdd3v3_change_detected = true;
+                        detected_tick = current_tick;
+                }
+                else {
+                        if ((current_tick - detected_tick) >= WAIT_STABLE_VDD_3V3_LOW) {
+                                vdd3v3_change_detected = false;
+                                fmd->state = trans_to_power_off();
+                        }
+                }
+        }
+        return fmd->state;
+}
+
+/*
+ * POWER_UP
+ *
+ * Wait for FPGA power to be HIGH and stable.  This is a transient
+ * state waiting for VDD_3V3.  User is not allowed to change any pin
+ * during this state.  The state will be READY once VDD_3V3 is stable.
+ */
+static enum FpgaState f_fpga_power_up(struct fpga_management_data *fmd, bool activate_fpga)
+{
+        static bool vdd3v3_change_detected = false;
+        static uint16_t detected_tick;
+        uint16_t current_tick;
+
+        current_tick = (uint16_t)timer_get_ticks();
+
+        if (VDD_3V3) {
+                if (!vdd3v3_change_detected) {
+                        vdd3v3_change_detected = true;
+                        detected_tick = current_tick;
+                }
+                else {
+                        if ((current_tick - detected_tick) >= WAIT_STABLE_VDD_3V3_HIGH) {
+                                vdd3v3_change_detected = false;
+                                fmd->state = trans_to_ready();
+                        }
+                }
+
+        }
         return fmd->state;
 }
 
 /*
  * READY state
  *
- * Wait for FPGA power to be stable by monitoring VDD_3V3 become HIGH.
+ * FPGA power VDD_3V3 is HIGH and stable.
  *
  * Go back to POWER_OFF when activate_fpga become 0.
  *
- * Stay in READY otherwise.
+ * Move on to CONFIG otherwise.
  */
 static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, bool activate_fpga)
 {
         /* check user request */
         if (!activate_fpga) {
-                fmd->state = trans_to_power_off();
+                fmd->state = trans_to_power_down();
 
                 return fmd->state;
         }
 
-        /* wait for VDD_3V3 */
-        if (VDD_3V3) {
-                fmd->state = trans_to_config(fmd->mem_select, fmd->boot_mode);
-                fpga_wdt_init(fmd);
-        }
+        fmd->state = trans_to_config(fmd->mem_select, fmd->boot_mode);
+        fpga_wdt_init(fmd);
 
         return fmd->state;
 }
@@ -267,7 +339,7 @@ static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activ
         /* check user request */
         if (!activate_fpga) {
                 fmd->mem_select = !fmd->mem_select;
-                fmd->state = trans_to_power_off();
+                fmd->state = trans_to_power_down();
 
                 return fmd->state;
         }
@@ -305,7 +377,7 @@ static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activ
         /* check user request */
         if (!activate_fpga) {
                 fmd->mem_select = !fmd->mem_select;
-                fmd->state = trans_to_power_off();
+                fmd->state = trans_to_power_down();
 
                 return fmd->state;
         }
@@ -318,7 +390,9 @@ static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activ
 typedef enum FpgaState (*STATEFUNC)(struct fpga_management_data *fmd, bool activate_fpga);
 
 static STATEFUNC fpgafunc[] = {
+        f_fpga_power_down,
         f_power_off,
+        f_fpga_power_up,
         f_fpga_ready,
         f_fpga_config,
         f_fpga_active };
