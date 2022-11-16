@@ -136,6 +136,7 @@ void main (void)
         struct temp_sensors temps;
         enum FpgaState fpga_state;
         bool activate_fpga = false;
+        int config_memory = 0;
 
         // Initialize trch-firmware
         trch_init();
@@ -212,7 +213,7 @@ void main (void)
                         activate_fpga = false;
                 }
 
-                fpga_state = fpga_state_control(activate_fpga);
+                fpga_state = fpga_state_control(activate_fpga, config_memory);
                 switch(fpga_state) {
                 case FPGA_STATE_POWER_DOWN:
                         break;
@@ -235,6 +236,7 @@ void main (void)
 
                 case FPGA_STATE_ERROR:
                         activate_fpga = false;
+                        config_memory = !config_memory;
                         break;
 
                 default:
