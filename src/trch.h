@@ -53,10 +53,10 @@
  *  bit 3: No Function (High Level)           In           -
  *  bit 4: FPGA_WATCHDOG                      In           0
  *  bit 5: FPGA_CFG_MEM_SEL                   In           0
- *  bit 6: No Function (for Debug: ICSP_PGC)  In           -
- *  bit 7: No Function (for Debug: ICSP_PGD)  In           -
+ *  bit 6: No Function (for Debug: ICSP_PGC)  Out          0
+ *  bit 7: No Function (for Debug: ICSP_PGD)  Out          0
  */
-#define TRISB_INIT         0xFF
+#define TRISB_INIT         0x3F
 #define PORTB_INIT         0x00
 
 #define FPGA_PWR_CYCLE_REQ PORTBbits.RB1
