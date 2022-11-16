@@ -215,7 +215,7 @@ static enum FpgaState trans_to_active(void)
  *
  * Stay in POWER_OFF, otherwise.
  */
-static enum FpgaState f_power_off(struct fpga_management_data *fmd, bool activate_fpga)
+static enum FpgaState f_fpga_power_off(struct fpga_management_data *fmd, bool activate_fpga)
 {
         /* check user request */
         if (activate_fpga) {
@@ -381,7 +381,7 @@ typedef enum FpgaState (*STATEFUNC)(struct fpga_management_data *fmd, bool activ
 
 static STATEFUNC fpgafunc[] = {
         f_fpga_power_down,
-        f_power_off,
+        f_fpga_power_off,
         f_fpga_power_up,
         f_fpga_ready,
         f_fpga_config,
