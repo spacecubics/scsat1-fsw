@@ -208,6 +208,56 @@ static enum FpgaState trans_to_active(void)
 }
 
 /*
+ * Transition to the ERROR state
+ *
+ * In the ERROR state, do NOT touch anything.  Let User decide what to
+ * do.
+ *
+ */
+static enum FpgaState trans_to_error(void)
+{
+        /* TRCH_CFG_MEM_SEL keep */
+        /* FPGA_BOOT0 keep */
+        /* FPGA_BOOT1 keep */
+        /* FPGA_PROGRAM_B_DIR keep */
+        /* FPGA_INIT_B don't care */
+        /* FPGA_INIT_B_DIR keep */
+        /* FPGAPWR_EN keep */
+        /* FPGAPWR_EN_DIR keep */
+        /* I2C_INT_SCL_DIR keep */
+        /* I2C_INT_SDA_DIR keep */
+        /* I2C_EXT_SCL_DIR keep */
+        /* I2C_EXT_SDA_DIR keep */
+
+        return FPGA_STATE_ERROR;
+}
+
+/*
+ * ERROR state
+ *
+ * When something goes wrong, the state machine goes to the error
+ * state, to let user know some bad things happend.
+ *
+ * There are only two choises for the User.  Shut the FPGA down by
+ * setting activate_fpga to false, or let IO board know we want to be
+ * shut down via WDOG_OUT.
+ *
+ * Thus, we only transtion to POWER_DOWN state when activate_fpga
+ * become false.
+ *
+ * Stay in ERROR, otherwise.
+ */
+static enum FpgaState f_fpga_error(struct fpga_management_data *fmd, bool activate_fpga)
+{
+        /* check user request */
+        if (!activate_fpga) {
+                fmd->state = trans_to_power_down();
+        }
+
+        return fmd->state;
+}
+
+/*
  * POWER_OFF state
  *
  * When the user ask to actiavte the FPGA by setting activate_fpga to
@@ -323,7 +373,10 @@ static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activ
 
         kicked = fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
         if (!kicked) {
-                activate_fpga = false;
+                fmd->mem_select = !fmd->mem_select;
+                fmd->state = trans_to_error();
+
+                return fmd->state;
         }
 
         /* check user request */
@@ -361,7 +414,10 @@ static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activ
 
         kicked = fpga_wdt(fmd, FPGA_WATCHDOG, timer_get_ticks());
         if (!kicked) {
-                activate_fpga = false;
+                fmd->mem_select = !fmd->mem_select;
+                fmd->state = trans_to_error();
+
+                return fmd->state;
         }
 
         /* check user request */
@@ -380,6 +436,7 @@ static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activ
 typedef enum FpgaState (*STATEFUNC)(struct fpga_management_data *fmd, bool activate_fpga);
 
 static STATEFUNC fpgafunc[] = {
+        f_fpga_error,
         f_fpga_power_down,
         f_fpga_power_off,
         f_fpga_power_up,

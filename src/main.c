@@ -135,6 +135,8 @@ void main (void)
         struct voltage_sensors volts;
         struct temp_sensors temps;
         enum FpgaState fpga_state;
+        bool activate_fpga = false;
+
         // Initialize trch-firmware
         trch_init();
         fpga_program_maybe();
@@ -206,15 +208,38 @@ void main (void)
         get_tmp_all(fpga_state, &temps);
 
         while (1) {
-                bool activate_fpga;
-
-                activate_fpga = IS_ENABLED(CONFIG_FPGA_DO_CONFIGURE);
-
                 if (FPGA_PWR_CYCLE_REQ) {
                         activate_fpga = false;
                 }
 
-                fpga_state_control(activate_fpga);
+                fpga_state = fpga_state_control(activate_fpga);
+                switch(fpga_state) {
+                case FPGA_STATE_POWER_DOWN:
+                        break;
+
+                case FPGA_STATE_POWER_OFF:
+                        activate_fpga = IS_ENABLED(CONFIG_FPGA_DO_CONFIGURE);
+                        break;
+
+                case FPGA_STATE_POWER_UP:
+                        break;
+
+                case FPGA_STATE_READY:
+                        break;
+
+                case FPGA_STATE_CONFIG:
+                        break;
+
+                case FPGA_STATE_ACTIVE:
+                        break;
+
+                case FPGA_STATE_ERROR:
+                        activate_fpga = false;
+                        break;
+
+                default:
+                        break;
+                }
         }
         return;
 }
