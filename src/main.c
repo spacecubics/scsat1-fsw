@@ -137,6 +137,7 @@ void main (void)
         enum FpgaState fpga_state;
         bool activate_fpga = false;
         int config_memory = 0;
+        int boot_mode = FPGA_BOOT_48MHZ;
 
         // Initialize trch-firmware
         trch_init();
@@ -213,7 +214,7 @@ void main (void)
                         activate_fpga = false;
                 }
 
-                fpga_state = fpga_state_control(activate_fpga, config_memory);
+                fpga_state = fpga_state_control(activate_fpga, config_memory, boot_mode);
                 switch(fpga_state) {
                 case FPGA_STATE_POWER_DOWN:
                         break;
