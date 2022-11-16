@@ -218,7 +218,7 @@ void main (void)
                         break;
 
                 case FPGA_STATE_POWER_OFF:
-                        activate_fpga = IS_ENABLED(CONFIG_FPGA_DO_CONFIGURE);
+                        activate_fpga = true;
                         break;
 
                 case FPGA_STATE_POWER_UP:
