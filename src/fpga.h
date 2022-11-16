@@ -16,6 +16,11 @@
 #define FPGA_BOOT_48MHZ 1
 #define FPGA_BOOT_96MHZ 2
 
+enum FpgaGoal {
+        FPGA_SHUTDOWN = 0,
+        FPGA_ACTIVATE = 1,
+};
+
 enum FpgaState{
         FPGA_STATE_ERROR,
         FPGA_STATE_POWER_DOWN,
@@ -29,4 +34,4 @@ enum FpgaState{
 
 extern enum FpgaState fpga_init(void);
 extern bool fpga_is_i2c_accessible (enum FpgaState state);
-extern enum FpgaState fpga_state_control(bool activate_fpga, int config_memory, int boot_mode);
+extern enum FpgaState fpga_state_control(enum FpgaGoal activate_fpga, int config_memory, int boot_mode);

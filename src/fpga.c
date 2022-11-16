@@ -243,7 +243,7 @@ static enum FpgaState trans_to_error(void)
  *
  * Stay in ERROR, otherwise.
  */
-static enum FpgaState f_fpga_error(struct fpga_management_data *fmd, bool activate_fpga, int unused1, int unused2)
+static enum FpgaState f_fpga_error(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int unused1, int unused2)
 {
         /* check user request */
         if (!activate_fpga) {
@@ -261,7 +261,7 @@ static enum FpgaState f_fpga_error(struct fpga_management_data *fmd, bool activa
  *
  * Stay in POWER_OFF, otherwise.
  */
-static enum FpgaState f_fpga_power_off(struct fpga_management_data *fmd, bool activate_fpga, int unused, int unused2)
+static enum FpgaState f_fpga_power_off(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int unused, int unused2)
 {
         /* check user request */
         if (activate_fpga) {
@@ -307,7 +307,7 @@ static enum FpgaState _power_transient(enum FpgaState state, bool port_state, ui
  * during this state.  The state will be POWER_OFF once VDD_3V3 is
  * stable.
  */
-static enum FpgaState f_fpga_power_down(struct fpga_management_data *fmd, bool activate_fpga, int unused1, int unused2)
+static enum FpgaState f_fpga_power_down(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int unused1, int unused2)
 {
         fmd->state = _power_transient(FPGA_STATE_POWER_DOWN, PORT_DATA_LOW, WAIT_STABLE_VDD_3V3_LOW, trans_to_power_off);
         return fmd->state;
@@ -320,7 +320,7 @@ static enum FpgaState f_fpga_power_down(struct fpga_management_data *fmd, bool a
  * state waiting for VDD_3V3.  User is not allowed to change any pin
  * during this state.  The state will be READY once VDD_3V3 is stable.
  */
-static enum FpgaState f_fpga_power_up(struct fpga_management_data *fmd, bool activate_fpga, int unused1, int unused2)
+static enum FpgaState f_fpga_power_up(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int unused1, int unused2)
 {
         fmd->state = _power_transient(FPGA_STATE_POWER_UP, PORT_DATA_HIGH, WAIT_STABLE_VDD_3V3_HIGH, trans_to_ready);
         return fmd->state;
@@ -335,7 +335,7 @@ static enum FpgaState f_fpga_power_up(struct fpga_management_data *fmd, bool act
  *
  * Move on to CONFIG otherwise.
  */
-static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, bool activate_fpga, int config_memory, int boot_mode)
+static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int config_memory, int boot_mode)
 {
         /* check user request */
         if (!activate_fpga) {
@@ -363,7 +363,7 @@ static enum FpgaState f_fpga_ready(struct fpga_management_data *fmd, bool activa
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
  * activate_fpga to 0 if the count exceeds CONFIG_FPGA_WATCHDOG_TIMEOUT.
  */
-static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activate_fpga, int unused1, int unused2)
+static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int unused1, int unused2)
 {
         bool kicked;
 
@@ -402,7 +402,7 @@ static enum FpgaState f_fpga_config(struct fpga_management_data *fmd, bool activ
  * Note that fpga_wdt() counts ticks from the last wdt kick and sets
  * activate_fpga to 0 if the count exceeds CONFIG_FPGA_WATCHDOG_TIMEOUT.
  */
-static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activate_fpga, int unused1, int unused2)
+static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int unused1, int unused2)
 {
         bool kicked;
 
@@ -425,7 +425,7 @@ static enum FpgaState f_fpga_active(struct fpga_management_data *fmd, bool activ
         return fmd->state;
 }
 
-typedef enum FpgaState (*STATEFUNC)(struct fpga_management_data *fmd, bool activate_fpga, int config_memory, int boot_mode);
+typedef enum FpgaState (*STATEFUNC)(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int config_memory, int boot_mode);
 
 static STATEFUNC fpgafunc[] = {
         f_fpga_error,
@@ -436,7 +436,7 @@ static STATEFUNC fpgafunc[] = {
         f_fpga_config,
         f_fpga_active };
 
-enum FpgaState fpga_state_control(bool activate_fpga, int config_memory, int boot_mode)
+enum FpgaState fpga_state_control(enum FpgaGoal activate_fpga, int config_memory, int boot_mode)
 {
         return fpgafunc[the_fmd.state](&the_fmd, activate_fpga, config_memory, boot_mode);
 }

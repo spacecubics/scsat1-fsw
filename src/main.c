@@ -135,7 +135,7 @@ void main (void)
         struct voltage_sensors volts;
         struct temp_sensors temps;
         enum FpgaState fpga_state;
-        bool activate_fpga = false;
+        enum FpgaGoal activate_fpga = FPGA_SHUTDOWN;
         int config_memory = 0;
         int boot_mode = FPGA_BOOT_48MHZ;
 
@@ -211,7 +211,7 @@ void main (void)
 
         while (1) {
                 if (FPGA_PWR_CYCLE_REQ) {
-                        activate_fpga = false;
+                        activate_fpga = FPGA_SHUTDOWN;
                 }
 
                 fpga_state = fpga_state_control(activate_fpga, config_memory, boot_mode);
@@ -220,7 +220,7 @@ void main (void)
                         break;
 
                 case FPGA_STATE_POWER_OFF:
-                        activate_fpga = true;
+                        activate_fpga = FPGA_ACTIVATE;
                         break;
 
                 case FPGA_STATE_POWER_UP:
@@ -236,7 +236,7 @@ void main (void)
                         break;
 
                 case FPGA_STATE_ERROR:
-                        activate_fpga = false;
+                        activate_fpga = FPGA_SHUTDOWN;
                         config_memory = !config_memory;
                         break;
 
