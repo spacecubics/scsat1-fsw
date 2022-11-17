@@ -18,6 +18,7 @@
 #include "usart.h"
 #include "timer.h"
 #include "interrupt.h"
+#include "version.h"
 
 // PIC16LF877A Configuration Bit Settings
 #pragma config FOSC = HS        // Oscillator Selection bits (HS oscillator)
@@ -153,7 +154,7 @@ void main (void)
         /*
          * Space Cubics OBC TRCH-Firmware Main
          */
-        usart_send_msg("SC OBC TRCH-FW v0.8");
+        usart_send_msg("SC OBC TRCH-FW " VERSION);
 
         /*
          *  Get Board Status
