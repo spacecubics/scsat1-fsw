@@ -7,6 +7,7 @@
 
 #include <xc.h>
 #include <pic.h>
+#include <stdio.h>
 
 #include "trch.h"
 #include "utils.h"
@@ -88,7 +89,7 @@ void main (void)
         /*
          * Space Cubics OBC TRCH-Firmware Main
          */
-        usart_send_msg("SC OBC TRCH-FW " VERSION);
+        puts("SC OBC TRCH-FW " VERSION);
 
         while (1) {
                 if (FPGA_PWR_CYCLE_REQ) {

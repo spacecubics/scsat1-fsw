@@ -41,31 +41,14 @@ void usart_init (void) {
         rx_msg.addr = 0;
 }
 
-void send_char (char msg) {
+void putch(char ch)
+{
+        if (ch == '\n') {
+                while (!PIR1bits.TXIF);
+                TXREG = '\r';
+        }
         while (!PIR1bits.TXIF);
-        TXREG = msg;
-}
-
-void usart_send_msg (char *msg) {
-        int i;
-        tx_msg.msg = msg;
-        tx_msg.active = 1;
-        char newline[2] = {0x0d, 0x0a};
-
-        // Transfer start
-        while (tx_msg.active) {
-                while (!PIR1bits.TXIF);
-                if (*tx_msg.msg == 0x00)
-                        tx_msg.active = 0;
-                else {
-                        TXREG = *tx_msg.msg;
-                        tx_msg.msg++;
-                }
-        }
-        for (i=0; i<2; i++) {
-                while (!PIR1bits.TXIF);
-                TXREG = newline[i];
-        }
+        TXREG = ch;
 }
 
 void usart_start_receive (void) {
@@ -93,7 +76,7 @@ void usart_receive_msg_isr (void) {
                         buf = RCREG;
         } else {
                 buf = RCREG;
-                send_char(buf);
+                putch(buf);
                 if (buf == RX_MSG_DELIMITER)
                         rx_msg.active = 1;
                 else {
