@@ -17,10 +17,8 @@
 
 struct fpga_management_data {
         enum FpgaState state;
-#ifdef CONFIG_ENABLE_WDT_RESET
         bool wdt_value;
         uint32_t wdt_last_tick;
-#endif
 };
 
 static struct fpga_management_data the_fmd;
