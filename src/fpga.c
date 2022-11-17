@@ -138,6 +138,25 @@ static enum FpgaState trans_to_power_up(void)
         return FPGA_STATE_POWER_UP;
 }
 
+static enum FpgaState trans_to_ready_from_error(void)
+{
+        /* TRCH_CFG_MEM_SEL keep */
+        /* FPGA_BOOT0 keep */
+        /* FPGA_BOOT1 keep */
+        FPGA_PROGRAM_B = PORT_DATA_LOW;
+        FPGA_PROGRAM_B_DIR = PORT_DIR_OUT;
+        /* FPGA_INIT_B keep */
+        /* FPGA_INIT_B_DIR keep */
+        /* FPGAPWR_EN keep */
+        /* FPGAPWR_EN_DIR keep */
+        /* I2C_INT_SCL_DIR keep */
+        /* I2C_INT_SDA_DIR keep */
+        /* I2C_EXT_SCL_DIR keep */
+        /* I2C_EXT_SDA_DIR keep */
+
+        return FPGA_STATE_READY;
+}
+
 static enum FpgaState trans_to_ready(void)
 {
         return FPGA_STATE_READY;
@@ -166,7 +185,7 @@ static enum FpgaState trans_to_config(int config_memory, int boot_mode)
         TRCH_CFG_MEM_SEL = config_memory & 0x1;
         FPGA_BOOT0 = 0b01 & boot_mode;
         FPGA_BOOT1 = 0b01 & (boot_mode >> 1);
-        /* FPGA_PROGRAM_B_DIR keep */
+        FPGA_PROGRAM_B_DIR = PORT_DIR_IN;
         /* FPGA_INIT_B don't care */
         FPGA_INIT_B_DIR = PORT_DIR_IN;
         /* FPGAPWR_EN keep */
@@ -243,11 +262,14 @@ static enum FpgaState trans_to_error(void)
  *
  * Stay in ERROR, otherwise.
  */
-static enum FpgaState f_fpga_error(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int unused1, int unused2)
+static enum FpgaState f_fpga_error(struct fpga_management_data *fmd, enum FpgaGoal activate_fpga, int config_memory, int boot_mode)
 {
         /* check user request */
         if (!activate_fpga) {
                 fmd->state = trans_to_power_down();
+        } else if (activate_fpga == FPGA_RECONFIGURE) {
+                fmd->state = trans_to_ready_from_error();
+                fpga_wdt_init(fmd);
         }
 
         return fmd->state;

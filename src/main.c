@@ -237,6 +237,7 @@ void main (void)
 
                 case FPGA_STATE_ERROR:
                         activate_fpga = FPGA_SHUTDOWN;
+                        /* activate_fpga = FPGA_RECONFIGURE; */
                         config_memory = !config_memory;
                         break;
 

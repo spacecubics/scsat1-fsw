@@ -19,6 +19,7 @@
 enum FpgaGoal {
         FPGA_SHUTDOWN = 0,
         FPGA_ACTIVATE = 1,
+        FPGA_RECONFIGURE = 2,
 };
 
 enum FpgaState{
