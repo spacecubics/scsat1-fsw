@@ -16,6 +16,7 @@
 /*
  * SSPSTAT.SMP      : Sample bit        : 0b0
  * SSPSTAT.CKE      : Clock Edge        : 0b1
+ *
  * SSPCON.WCOL      : Write collision   : 0b0
  * SSPCON.SSPOV     : SSP Overflow      : 0b1
  * SSPCON.SSPEN     : Serial Port Enable: 0b1
@@ -25,8 +26,10 @@
 void spi_init (void) {
         SPICAN_CS_B_DIR = 0;
         SPICAN_CS_B = 1;
-        SPICAN_MOSI_DIR = 0;
         SPICAN_SCK_DIR = 0;
+        SPICAN_MISO_DIR = 1;
+        SPICAN_MOSI_DIR = 0;
+
         SSPSTAT = 0x40;
         SSPCON = 0x60;
 }

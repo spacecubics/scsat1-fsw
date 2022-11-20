@@ -82,6 +82,7 @@
 #define SPICAN_CS_B        PORTCbits.RC1
 #define FPGAPROG_MODE_B    PORTCbits.RC2
 #define SPICAN_SCK_DIR     TRISCbits.TRISC3
+#define SPICAN_MISO_DIR    TRISCbits.TRISC4
 #define SPICAN_MOSI_DIR    TRISCbits.TRISC5
 
 /*
