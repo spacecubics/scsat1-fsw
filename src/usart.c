@@ -9,6 +9,7 @@
 
 #include "usart.h"
 
+#include <xc.h>
 #include <pic.h>
 #include <string.h>
 
@@ -46,6 +47,10 @@ void putch(char ch)
         if (ch == '\n') {
                 while (!PIR1bits.TXIF);
                 TXREG = '\r';
+                /* AN774: There is a delay of one instruction cycle
+                 * after writing to TXREG, before TXIF gets
+                 * cleared. */
+                NOP();
         }
         while (!PIR1bits.TXIF);
         TXREG = ch;
