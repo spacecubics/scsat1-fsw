@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define BIT(n)  (1UL << (n))
+
 /* IS_ENABLED(FOO) expands to 1 if defined to 1, or 0 otherwise even
  * if not defined.  This allows us to use defines in C functions
  * rather than #ifdef, which is much cleaner and compiler can verify
