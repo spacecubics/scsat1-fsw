@@ -107,3 +107,61 @@ uint32_t spi_read32(uint16_t addr)
 
         return ret;
 }
+
+void spi_write8(uint8_t data, uint16_t addr)
+{
+        uint8_t buf0;
+        uint8_t buf1;
+        uint8_t ret;
+
+        buf0 = ((addr >> 8) & 0xf) | 0x20;
+        buf1 = addr & 0xff;
+
+        spi_get();
+        spi_trans(buf0);
+        spi_trans(buf1);
+        (void)spi_trans(data);
+        spi_release();
+
+        return;
+}
+
+void spi_write16(uint16_t data, uint16_t addr)
+{
+        uint8_t buf0;
+        uint8_t buf1;
+        uint8_t ret;
+
+        buf0 = ((addr >> 8) & 0xf) | 0x20;
+        buf1 = addr & 0xff;
+
+        spi_get();
+        spi_trans(buf0);
+        spi_trans(buf1);
+        (void)spi_trans(data & 0xff);
+        (void)spi_trans((data & 0xff00) >> 8);
+        spi_release();
+
+        return;
+}
+
+void spi_write32(uint32_t data, uint16_t addr)
+{
+        uint8_t buf0;
+        uint8_t buf1;
+        uint8_t ret;
+
+        buf0 = ((addr >> 8) & 0xf) | 0x20;
+        buf1 = addr & 0xff;
+
+        spi_get();
+        spi_trans(buf0);
+        spi_trans(buf1);
+        (void)spi_trans(data & 0x000000ff);
+        (void)spi_trans((data & 0x0000ff00) >> 8);
+        (void)spi_trans((data & 0x00ff0000) >> 16);
+        (void)spi_trans((data & 0xff000000) >> 24);
+        spi_release();
+
+        return;
+}

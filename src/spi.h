@@ -18,3 +18,6 @@ uint8_t spi_trans (uint8_t buf);
 uint8_t spi_read8(uint16_t addr);
 uint16_t spi_read16(uint16_t addr);
 uint32_t spi_read32(uint16_t addr);
+void spi_write8(uint8_t data, uint16_t addr);
+void spi_write16(uint16_t data, uint16_t addr);
+void spi_write32(uint32_t data, uint16_t addr);
