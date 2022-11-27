@@ -75,8 +75,8 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
  * FPGA_BOOT0 and FPGA_BOOT1: These are also directly connected to the
  * FPGA. Make sure they are LOW.
  *
- * FPGA_PROGRAM_B: We don't use it but just in case users set it, make
- * it HiZ by setting the dir IN so that it pulled-up externally.
+ * FPGA_PROGRAM_B: Make it HiZ by setting the dir IN so that it
+ * pulled-up externally.
  *
  * FPGA_INIT_B: Actually we don't care because the FPGA is off. But we
  * make sure that the pin is HiZ.
@@ -136,6 +136,16 @@ static enum FpgaState trans_to_power_up(void)
         return FPGA_STATE_POWER_UP;
 }
 
+/*
+ * Transition to the READY state from error
+ *
+ * Make FPGA ready to reconfigure by driving PROGRAM_B LOW.
+ *
+ * FPGA_PROGRAM_B: Drive LOW to make the FPGA wait for reconfigure.
+ *
+ * FPGA_PROGRAM_B_DIR: Make it output so that we can drive the pin
+ * LOW.
+ */
 static enum FpgaState trans_to_ready_from_error(void)
 {
         /* TRCH_CFG_MEM_SEL keep */
