@@ -47,6 +47,10 @@ program: $(PRGDAT).hex
 erase:
 	$(IPECMD) -P$(DEVICE) -T$(TARGET) -E
 
+.PHONY: reset
+reset:
+	$(IPECMD) -P$(DEVICE) -T$(TARGET) -OK -OL
+
 .PHONY: clean
 clean:
 	$(RM) $(CF)
