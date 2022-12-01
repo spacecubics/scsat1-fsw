@@ -13,12 +13,6 @@
 
 #define MSG_LEN 20
 
-struct usart_tx_msg {
-        char *msg;
-        unsigned active :1;
-};
-extern struct usart_tx_msg tx_msg;
-
 struct usart_rx_msg {
         char msg[MSG_LEN];
         int addr;

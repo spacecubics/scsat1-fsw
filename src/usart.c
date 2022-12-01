@@ -16,7 +16,6 @@
 #include "interrupt.h"
 
 /* Variables shared with main */
-struct usart_tx_msg tx_msg;
 static struct usart_rx_msg rx_msg;
 
 /*
@@ -37,7 +36,6 @@ void usart_init (void) {
         RCSTAbits.ADDEN = 0;
         RCSTAbits.RX9D = 0;
         SPBRG = 0x19;
-        tx_msg.active = 0;
         rx_msg.active = 0;
         rx_msg.addr = 0;
 }
