@@ -18,7 +18,13 @@ HEXDIR := hex
 PRGDAT := $(HEXDIR)/$(MODULE)
 
 # Source and object files
-SRCS := $(wildcard src/*.c)
+SRCS := src/main.c src/fpga.c src/interrupt.c src/timer.c \
+        src/i2c-gpio.c \
+        src/ina3221.c \
+        src/spi.c \
+	src/tmp175.c \
+	src/usart.c
+
 OBJS := $(SRCS:.c=.p1)
 
 # Clean File
