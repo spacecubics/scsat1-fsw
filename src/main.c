@@ -78,10 +78,6 @@ void main (void)
         puts("SC OBC TRCH-FW " VERSION);
 
         while (1) {
-                if (FPGA_PWR_CYCLE_REQ) {
-                        activate_fpga = FPGA_SHUTDOWN;
-                }
-
                 fpga_state = fpga_state_control(activate_fpga, config_memory, boot_mode);
                 switch(fpga_state) {
                 case FPGA_STATE_POWER_DOWN:
@@ -101,6 +97,10 @@ void main (void)
                         break;
 
                 case FPGA_STATE_ACTIVE:
+                        if (FPGA_PWR_CYCLE_REQ) {
+                                activate_fpga = FPGA_SHUTDOWN;
+                        }
+
                         break;
 
                 case FPGA_STATE_ERROR:
