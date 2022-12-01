@@ -36,3 +36,4 @@ enum FpgaState{
 extern enum FpgaState fpga_init(void);
 extern bool fpga_is_i2c_accessible (enum FpgaState state);
 extern enum FpgaState fpga_state_control(enum FpgaGoal activate_fpga, int config_memory, int boot_mode);
+extern void fpga_program_maybe(void);

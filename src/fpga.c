@@ -63,6 +63,20 @@ bool fpga_is_i2c_accessible (enum FpgaState state) {
         return state == FPGA_STATE_POWER_OFF || state == FPGA_STATE_READY;
 }
 
+void fpga_program_maybe(void)
+{
+        if (IS_ENABLED(CONFIG_FPGA_PROGRAM_MODE)) {
+                if (!FPGAPROG_MODE_B) {
+                        FPGAPWR_EN = 1;
+                        while (1) {
+                                if (FPGA_CFG_MEM_SEL) {
+                                        TRCH_CFG_MEM_SEL = 1;
+                                }
+                        }
+                }
+        }
+}
+
 /*
  * Transition to the POWER_DOWN state
  *
