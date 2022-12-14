@@ -122,7 +122,7 @@
 
 #define PORTC_INIT (                            \
         LOW(TRCH_CAN_SLEEP_EN_BIT) |            \
-        LOW(SPICAN_CS_B_BIT) |                  \
+        HIGH(SPICAN_CS_B_BIT) |                 \
         LOW(FPGAPROG_MODE_B_BIT) |              \
         LOW(SPICAN_SCK_BIT) |                   \
         LOW(SPICAN_MISO_BIT) |                  \
