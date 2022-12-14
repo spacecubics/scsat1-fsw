@@ -193,7 +193,7 @@
 #define FPGA_INIT_B_IN_BIT    (_PORTE_RE2_POSITION)
 
 #define TRISE_INIT (                            \
-        IN(WDOG_OUT_BIT) |                      \
+        OUT(WDOG_OUT_BIT) |                     \
         IN(FPGA_PROGRAM_B_IN_BIT) |             \
         IN(FPGA_INIT_B_IN_BIT) )
 
