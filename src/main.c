@@ -19,6 +19,7 @@
 #include "usart.h"
 #include "timer.h"
 #include "interrupt.h"
+#include "ioboard.h"
 #include "version.h"
 
 // PIC16LF877A Configuration Bit Settings
@@ -66,6 +67,7 @@ void main (void)
         fpga_program_maybe();
         fpga_state = fpga_init();
 
+        ioboard_init();
         spi_init();
         usart_init();
         timer2_init();

@@ -17,6 +17,9 @@ RM     := rm -rf
 HEXDIR := hex
 PRGDAT := $(HEXDIR)/$(MODULE)
 
+# Include dir
+INCDIR := -I src
+
 # Source and object files
 SRCS := src/main.c src/fpga.c src/interrupt.c src/timer.c \
         src/i2c-gpio.c \
@@ -25,10 +28,17 @@ SRCS := src/main.c src/fpga.c src/interrupt.c src/timer.c \
 	src/tmp175.c \
 	src/usart.c
 
+-include src/ioboard/ioboard.mk
+SRCS += $(addprefix src/ioboard/,$(IOBOARD_SRCS))
 OBJS := $(SRCS:.c=.p1)
 
+LIB_SRCS := src/ioboard.c
+LIB_OBJS := $(LIB_SRCS:.c=.p1)
+
+LIB_IOBOARD := src/libioboard.a
+
 # Clean File
-CF      = $(HEXDIR) src/*.p1 src/*.d MPLABXLog.* log.*
+CF      = $(HEXDIR) src/*.p1 src/*.a src/*.d MPLABXLog.* log.*
 
 .PHONY: all
 all: build
@@ -36,13 +46,17 @@ all: build
 .PHONY: build
 build: $(PRGDAT).hex
 
-$(PRGDAT).hex: $(OBJS)
+# make sure $(LIB_IOBOARD) is the last
+$(PRGDAT).hex: $(OBJS) $(LIB_IOBOARD)
 	mkdir -p $(HEXDIR)
 	echo '*' > $(HEXDIR)/.gitignore
 	$(CC) -o $(HEXDIR)/$(MODULE) $^
 
 %.p1: %.c Makefile
-	$(CC) $(CONFIGS) -c -o $@ $<
+	$(CC) $(INCDIR) $(CONFIGS) -c -o $@ $<
+
+$(LIB_IOBOARD): $(LIB_OBJS)
+	xc8-ar -r $@ $^
 
 flash: program
 .PHONY: program
