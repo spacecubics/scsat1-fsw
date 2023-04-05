@@ -79,7 +79,6 @@ void usart_receive_msg_isr (void) {
                         buf = RCREG;
         } else {
                 buf = RCREG;
-                putch(buf);
                 if (buf == RX_MSG_DELIMITER)
                         rx_msg.active = 1;
                 else {
