@@ -112,7 +112,6 @@ void spi_write8(uint8_t data, uint16_t addr)
 {
         uint8_t buf0;
         uint8_t buf1;
-        uint8_t ret;
 
         buf0 = ((addr >> 8) & 0xf) | 0x20;
         buf1 = addr & 0xff;
@@ -130,7 +129,6 @@ void spi_write16(uint16_t data, uint16_t addr)
 {
         uint8_t buf0;
         uint8_t buf1;
-        uint8_t ret;
 
         buf0 = ((addr >> 8) & 0xf) | 0x20;
         buf1 = addr & 0xff;
@@ -149,7 +147,6 @@ void spi_write32(uint32_t data, uint16_t addr)
 {
         uint8_t buf0;
         uint8_t buf1;
-        uint8_t ret;
 
         buf0 = ((addr >> 8) & 0xf) | 0x20;
         buf1 = addr & 0xff;
