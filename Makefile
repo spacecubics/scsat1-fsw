@@ -17,8 +17,9 @@ RM     := rm -rf
 HEXDIR := hex
 PRGDAT := $(HEXDIR)/$(MODULE)
 
-# Include dir
-INCDIR := -I src
+# Include dir and other C related flags
+INCDIR       := -I src
+PARSER_FLAGS := -Xclang -Wall -Xclang -Wextra -Xclang -Wno-unused-parameter
 
 # Source and object files
 SRCS := src/main.c src/fpga.c src/interrupt.c src/timer.c
@@ -53,7 +54,7 @@ $(PRGDAT).hex: $(OBJS) $(LIBDEVICE)
 	$(CC) -o $(HEXDIR)/$(MODULE) $^
 
 %.p1: %.c Makefile
-	$(CC) $(INCDIR) $(CONFIGS) -c -o $@ $<
+	$(CC) $(PARSER_FLAGS) $(INCDIR) $(CONFIGS) -c -o $@ $<
 
 $(LIBDEVICE): $(LIB_OBJS)
 	xc8-ar -r $@ $^
