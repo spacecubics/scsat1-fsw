@@ -22,37 +22,26 @@
 
   #+begin_example
     $ make
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/fpga.p1 src/fpga.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/i2c-gpio.p1 src/i2c-gpio.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/ina3221.p1 src/ina3221.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/interrupt.p1 src/interrupt.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/main.p1 src/main.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/spi.p1 src/spi.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/timer.p1 src/timer.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/tmp175.p1 src/tmp175.c
-    xc8-cc -mc90lib -mcpu=16LF877 -DCONFIG_ENABLE_WDT_RESET -DCONFIG_FPGA_WATCHDOG_TIMEOUT=3 -c -o src/usart.p1 src/usart.c
-    mkdir -p hex
-    echo '*' > hex/.gitignore
-    xc8-cc -mc90lib -mcpu=16LF877 -o hex/trch-firmware src/fpga.p1 src/i2c-gpio.p1 src/ina3221.p1 src/interrupt.p1 src/main.p1 src/spi.p1 src/timer.p1 src/tmp175.p1 src/usart.p1
-    src/spi.c:37:: warning: (520) function "_spi_get" is never called
-    src/spi.c:41:: warning: (520) function "_spi_release" is never called
-    src/spi.c:45:: warning: (520) function "_spi_trans" is never called
-    src/spi.c:53:: warning: (520) function "_spi_read8" is never called
-    src/spi.c:71:: warning: (520) function "_spi_read16" is never called
-    src/spi.c:90:: warning: (520) function "_spi_read32" is never called
-    src/spi.c:111:: warning: (520) function "_spi_write8" is never called
-    src/spi.c:129:: warning: (520) function "_spi_write16" is never called
-    src/spi.c:148:: warning: (520) function "_spi_write32" is never called
-    src/usart.c:71:: warning: (520) function "_usart_start_receive" is never called
-    src/usart.c:106:: warning: (520) function "_usart_receive_msg_clear" is never called
-    src/usart.c:115:: warning: (520) function "_usart_copy_received_msg" is never called
-    src/usart.c:121:: warning: (520) function "_usart_is_received_msg_active" is never called
+	CC src/main.p1
+	CC src/fpga.p1
+	CC src/interrupt.p1
+	CC src/timer.p1
+	CC src/ioboard.p1
+    default: Empty
+	CC src/i2c-gpio.p1
+	CC src/ina3221.p1
+	CC src/spi.p1
+	CC src/tmp175.p1
+	CC src/usart.p1
+	AR src/libdevice.a
+	HEX hex/trch-firmware.hex
+    src/fpga.c:62:: warning: (520) function "_fpga_is_i2c_accessible" is never called
     src/fpga.c:28:: warning: (759) expression generates no code
     src/fpga.c:43:: warning: (759) expression generates no code
 
     Memory Summary:
-	Program space        used   B69h (  2921) of  2000h words   ( 35.7%)
-	Data space           used    B4h (   180) of   170h bytes   ( 48.9%)
+	Program space        used   58Eh (  1422) of  2000h words   ( 17.4%)
+	Data space           used    65h (   101) of   170h bytes   ( 27.4%)
 	EEPROM space         used     0h (     0) of   100h bytes   (  0.0%)
 	Configuration bits   used     1h (     1) of     1h word    (100.0%)
 	ID Location space    used     0h (     0) of     4h bytes   (  0.0%)
