@@ -32,7 +32,8 @@
 #pragma config WRT = OFF        // Flash Program Memory Write Enable bits (Write protection off; all program memory may be written to by EECON control)
 #pragma config CP = OFF         // Flash Program Memory Code Protection bit (Code protection off)
 
-static void __interrupt() isr(void) {
+static void __interrupt() isr(void) __maybe_unused
+{
         if (PIR1bits.TMR2IF) {
                 timer2_isr();
         }

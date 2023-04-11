@@ -31,3 +31,6 @@
 
 /* Take the second arg; that is 1 if defined or 0 otherwise */
 #define TRCH_IS_ENABLED3(__ignore, val, ...) val
+
+/* Handy macros for attributes */
+#define __maybe_unused __attribute__((unused))
