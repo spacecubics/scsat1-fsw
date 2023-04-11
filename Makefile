@@ -42,6 +42,13 @@ LIBDEVICE := src/libdevice.a
 # Clean File
 CF      = $(HEXDIR) src/*.p1 src/*.a src/*.d MPLABXLog.* log.*
 
+# Quiets
+ifndef V
+QUIET_CC  = @echo '   ' CC $@;
+QUIET_AR  = @echo '   ' AR $@;
+QUIET_HEX = @echo '   ' HEX $@;
+endif
+
 .PHONY: all
 all: build
 
@@ -50,15 +57,15 @@ build: $(PRGDAT).hex
 
 # make sure $(LIBDEVICE) is the last
 $(PRGDAT).hex: $(OBJS) $(LIBDEVICE)
-	mkdir -p $(HEXDIR)
-	echo '*' > $(HEXDIR)/.gitignore
-	$(CC) -o $(HEXDIR)/$(MODULE) $^
+	@mkdir -p $(HEXDIR)
+	@echo '*' > $(HEXDIR)/.gitignore
+	$(QUIET_HEX)$(CC) -o $(HEXDIR)/$(MODULE) $^
 
 %.p1: %.c Makefile
-	$(CC) $(PARSER_FLAGS) $(INCDIR) $(CONFIGS) -c -o $@ $<
+	$(QUIET_CC)$(CC) $(PARSER_FLAGS) $(INCDIR) $(CONFIGS) -c -o $@ $<
 
 $(LIBDEVICE): $(LIB_OBJS)
-	$(AR) $@ $^
+	$(QUIET_AR)$(AR) $@ $^
 
 flash: program
 .PHONY: program
