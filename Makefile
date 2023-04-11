@@ -10,6 +10,7 @@ TARGET := PPK4
 
 # Command variables
 CC     := xc8-cc -mc90lib -mcpu=$(DEVICE)
+AR     := xc8-ar r
 IPECMD := ipecmd.sh
 RM     := rm -rf
 
@@ -57,7 +58,7 @@ $(PRGDAT).hex: $(OBJS) $(LIBDEVICE)
 	$(CC) $(PARSER_FLAGS) $(INCDIR) $(CONFIGS) -c -o $@ $<
 
 $(LIBDEVICE): $(LIB_OBJS)
-	xc8-ar -r $@ $^
+	$(AR) $@ $^
 
 flash: program
 .PHONY: program
