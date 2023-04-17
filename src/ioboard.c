@@ -6,6 +6,7 @@
  * function.  Note that XC8 for PIC16LF877 with C90 library doesn't
  * have weak attribute.  This will be linked at very last to full
  * fill if not defined. */
-int ioboard_init(void) {
+int ioboard_init(void)
+{
         return 0;
-};
+}
