@@ -1,0 +1,109 @@
+#+title: SC OBC TRCH Firmware
+
+  This is for SC-OBC A1001.  Do NOT use it for EM1.
+
+* How to build and program
+** Prerequisite
+   #+begin_example
+     $ xc8-cc --version
+     Microchip MPLAB XC8 C Compiler V2.41
+     Build date: Feb  8 2023
+     Part Support Version: 2.41
+     Copyright (C) 2023 Microchip Technology Inc.
+
+     $ cd trch-firmware
+     $ git describe
+     release-v1.0
+   #+end_example
+
+** Build
+  You need GNU Make in addition to Microchip MPLAB XC8 Compiler to
+  build it. We currently support v2.41.
+
+  #+begin_example
+    $ make
+	CC src/main.p1
+	CC src/fpga.p1
+	CC src/interrupt.p1
+	CC src/timer.p1
+	CC src/ioboard.p1
+    default: Empty
+	CC src/i2c-gpio.p1
+	CC src/ina3221.p1
+	CC src/spi.p1
+	CC src/tmp175.p1
+	CC src/usart.p1
+	AR src/libdevice.a
+	HEX hex/trch-firmware.hex
+    src/fpga.c:62:: warning: (520) function "_fpga_is_i2c_accessible" is never called
+    src/fpga.c:28:: warning: (759) expression generates no code
+    src/fpga.c:43:: warning: (759) expression generates no code
+
+    Memory Summary:
+	Program space        used   58Eh (  1422) of  2000h words   ( 17.4%)
+	Data space           used    65h (   101) of   170h bytes   ( 27.4%)
+	EEPROM space         used     0h (     0) of   100h bytes   (  0.0%)
+	Configuration bits   used     1h (     1) of     1h word    (100.0%)
+	ID Location space    used     0h (     0) of     4h bytes   (  0.0%)
+  #+end_example
+
+** Program
+   You need a Microchip MPLAB IPE and MPLAB PICkit4.  Make sure it
+   works on your system and do the following.
+
+   #+begin_example
+     $ make program
+   #+end_example
+
+* Pins and Signals
+  https://docs.google.com/spreadsheets/d/1tDlF5Ewv5WGajEHtzYHvV77b9ePaPVuW5S8i3cOUTzY/edit?usp=sharing
+
+  - Domain :: Whether a pin is strictly used by the system, or open to
+    User, or reserved and not available to neither.  "User (Shared)"
+    is basically for Users but because the signals are shared between
+    TRCH and the FPGA, the system disables them by setting INPUT when
+    the FPGA is active.
+  - Categroy :: A name of a function which groups pins.
+    - Control :: Pins used for controling the FPGA behaviour are
+      categorized as "Control".
+    - Diagnosis :: Pins which Users can use to diagnose the system
+      when something goes wrong. Users can only read the pins level.
+    - User :: Pins fully open for Users are in this category.
+  - Pin Function :: Either pin is used as a GPIO or used for a function.
+  - External Pull :: Whether a pin has a pull-up, a pull-down, or none.
+    If a pull-up, it is either =VDD_3V3_SYS= or =VDD_3V3=.
+  - States :: We have =INIT=, =POWER_DOWN=, =POWER_OFF=, =POWER_UP=,
+    =READY=, =CONFIG=, =ACTIVE=, and =ERROR=.
+    - INIT :: This is a special state.  This shows the first pin
+      settings TRCH initializes to right after Power-on Reset.  This
+      state is not defined in the state machine.  Please note that
+      these pins are not guaranteed to stay with the initial values.
+      Peripheral initialize functions in C will change to whatever it
+      suites to.
+    - POWER_DOWN :: The state to power down the FPGA.  You will be in
+      this state after =FPGAPWR_EN= is deasserted and until =VDD_3V3=
+      is at the GND level.  In ~fpga.h~, this corresponds to
+      ~FPGA_STATE_POWER_DOWN~.
+    - POWER_OFF :: The state to indicate that the FPGA is fully
+      powered off and =VDD_3V3= is at the GND level.  This corresponds
+      to ~FPGA_STATE_POWER_OFF~.
+    - POWER_UP :: The state when the FPGA is powering up.  That is,
+      from =FPGAPWR_EN= is asserted to =VDD_3V3= is fully up.
+    - READY :: This indicates the FPGA is up and ready to be
+      configured.  This corresponds to ~FPGA_STATE_READY~ in the state
+      machine.
+    - CONFIG :: While in this state, the FPGA is configuring. This
+      represents ~FPGA_STATE_CONFIG~ in the source code.
+    - ACTIVE :: The FPGA is configured and
+      running. ~FPGA_STATE_ACTIVE~.
+    - ERROR :: When TRCH find the watchdog live pulse does not come
+      from the FPGA, you'll be in this state.
+  - Dirs and Levels :: TRCH pins' directions and levels.
+    - =In= :: The pin is INPUT.
+    - =Out= :: The pin is OUTPUT.
+    - =High= :: The pin is driving HIGH.
+    - =LOW= :: The pin is driving LOW.
+    - =X= :: Level can be either HIGH or LOW depending on the system or
+      a User's request.
+    - =-= :: Doesn't matter.  Usually indicates a Level when a pin is
+      configured as INPUT.

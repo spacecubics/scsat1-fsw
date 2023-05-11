@@ -1,0 +1,9 @@
+*~
+*.p1
+*.d
+*.a
+log.*
+MPLABXLog.xml
+GPATH
+GRTAGS
+GTAGS

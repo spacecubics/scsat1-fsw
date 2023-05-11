@@ -1,0 +1,11 @@
+# http://EditorConfig.org
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+[*.{c,h}]
+indent_size = 8
+indent_style = space
