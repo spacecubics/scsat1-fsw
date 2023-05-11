@@ -1,0 +1,4 @@
+#+title: Space Cubics Satellite One
+
+This repository contains all flight software for SC-Sat1, Space Cubics
+Satellite One.
