@@ -10,3 +10,8 @@ manifest:
         name-allowlist:
           - cmsis
           - picolibc
+
+    - name: libcsp
+      url: https://github.com/yashi/libcsp
+      revision: zephyr
+      path: modules/lib/libcsp

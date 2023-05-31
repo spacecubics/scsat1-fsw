@@ -5,9 +5,12 @@
  */
 
 #include <zephyr/kernel.h>
+#include <csp/csp.h>
 
 int main(void)
 {
+	csp_init();
+
 	printk("Hello World! %s\n", CONFIG_BOARD);
 	return 0;
 }
