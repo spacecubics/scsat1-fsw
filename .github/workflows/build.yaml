@@ -43,7 +43,7 @@ jobs:
         run: |
           git config --global user.email github@spacecubics.com
           git config --global user.name "Github Actions"
-          git rebase origin/${BASE_REF}
+          git rebase main/${BASE_REF}
           git checkout -b this_pr
 
       - name: West Setup
