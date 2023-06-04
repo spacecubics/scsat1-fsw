@@ -1,6 +1,10 @@
 name: Simple Build Test
 
-on: pull_request
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 21 * * *' # Run it every day at 9pm UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
@@ -37,12 +41,16 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
-      - name: Setup Git
-        env:
-          BASE_REF: ${{ github.base_ref }}
+      - name: Configure Git
         run: |
           git config --global user.email github@spacecubics.com
           git config --global user.name "Github Actions"
+
+      - name: Setup Git (pull request)
+        if: ${{ github.base_ref }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
           git rebase origin/${BASE_REF}
           git checkout -b this_pr
 
