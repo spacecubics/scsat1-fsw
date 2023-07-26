@@ -51,6 +51,10 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 /* CAN Enable Register */
 #define SCCAN_CANEN BIT(0)
 
+/* CAN Error Count Register */
+#define SCCAN_RXECNT(x) (((x)&GENMASK(15, 8)) >> 8)
+#define SCCAN_TXECNT(x) (((x)&GENMASK(7, 0)))
+
 /* CAN Bit Timing Setting Register */
 #define SCCAN_BTSR_SJW(x) ((x) << 7)
 #define SCCAN_BTSR_TS2(x) ((x) << 4)
@@ -183,6 +187,12 @@ struct sc_can_rx_filters {
 	void *rx_cb_arg;
 };
 
+
+struct sc_can_state_change_cb_data {
+	can_state_change_callback_t sc_cb;
+	void *sc_cb_arg;
+};
+
 struct sc_can_data {
 	/*
 	 * These mutex protects:
@@ -203,6 +213,8 @@ struct sc_can_data {
 	uint8_t tx_head;
 	uint8_t tx_tail;
 	struct sc_can_rx_filters *rx_filters;
+	struct sc_can_state_change_cb_data state_change_cb_data;
+	enum can_state state;
 };
 
 static inline uint32_t sc_can_get_status_reg(const struct sc_can_cfg *config)
@@ -546,10 +558,73 @@ static void sc_can_rx_isr(const struct device *dev)
 	return;
 }
 
+static void sc_can_get_error_count(const struct sc_can_cfg *config, struct can_bus_err_cnt *err_cnt)
+{
+	uint32_t errcnt_reg;
+
+	errcnt_reg = sys_read32(config->reg_addr + SCCAN_ECNTR_OFFSET);
+	err_cnt->tx_err_cnt = SCCAN_TXECNT(errcnt_reg);
+	err_cnt->rx_err_cnt = SCCAN_RXECNT(errcnt_reg);
+}
+
+static void _sc_can_get_state(const struct device *dev, enum can_state *state,
+			    struct can_bus_err_cnt *err_cnt)
+{
+	const struct sc_can_cfg *config = dev->config;
+	uint32_t status_reg;
+
+	status_reg = sc_can_get_status_reg(config);
+	switch (SCCAN_ESTS(status_reg)) {
+	case SCCAN_ESTS_CAN_DISABLE:
+		*state = CAN_STATE_STOPPED;
+		break;
+	case SCCAN_ESTS_ERROR_ACTIVE:
+		if (status_reg & SCCAN_EWRN) {
+			*state = CAN_STATE_ERROR_WARNING;
+		} else {
+			*state = CAN_STATE_ERROR_ACTIVE;
+		}
+		break;
+	case SCCAN_ESTS_ERROR_PASSIVE:
+		*state = CAN_STATE_ERROR_PASSIVE;
+		break;
+	case SCCAN_ESTS_BUS_OFF:
+	default:
+		*state = CAN_STATE_BUS_OFF;
+		break;
+	}
+
+	sc_can_get_error_count(config, err_cnt);
+}
+
 static int sc_can_get_state(const struct device *dev, enum can_state *state,
 			    struct can_bus_err_cnt *err_cnt)
 {
+	_sc_can_get_state(dev, state, err_cnt);
 	return 0;
+}
+
+static void sc_can_state_change(const struct device *dev)
+{
+	struct sc_can_data *data = dev->data;
+	const can_state_change_callback_t cb = data->state_change_cb_data.sc_cb;
+	void *user_data = data->state_change_cb_data.sc_cb_arg;
+	struct can_bus_err_cnt err_cnt;
+	enum can_state new_state;
+
+	_sc_can_get_state(dev, &new_state, &err_cnt);
+	if (data->state == new_state) {
+		return;
+	}
+
+	data->state = new_state;
+	LOG_DBG("Can state change new: %u, old: %u", new_state, data->state);
+
+	if (cb == NULL) {
+		return;
+	}
+
+	cb(dev, new_state, err_cnt, user_data);
 }
 
 static void sc_can_isr(const struct device *dev)
@@ -568,6 +643,7 @@ static void sc_can_isr(const struct device *dev)
 	sys_write32(isr, config->reg_addr + SCCAN_ISR_OFFSET);
 
 	if (isr & SCCAN_BUSOFF) {
+		sc_can_state_change(dev);
 	}
 	if (isr & SCCAN_ACKER) {
 		CAN_STATS_ACK_ERROR_INC(dev);
@@ -687,6 +763,10 @@ static int sc_can_start(const struct device *dev)
 	}
 
 	ret = sc_can_enable(config);
+	if (ret == 0) {
+		/* Notify state change to callback, if enabled */
+		sc_can_state_change(dev);
+	}
 
 	k_mutex_unlock(&data->enadis_mutex);
 
@@ -716,6 +796,9 @@ static int sc_can_stop(const struct device *dev)
 		sc_can_clear_all_fifo(config);
 
 		sc_can_notify_disable_to_tx_cb(dev);
+
+		/* Notify state change to state change callback */
+		sc_can_state_change(dev);
 	}
 
 	k_mutex_unlock(&data->enadis_mutex);
@@ -764,6 +847,10 @@ nolock:
 static void sc_can_set_state_change_callback(const struct device *dev,
 					     can_state_change_callback_t cb, void *user_data)
 {
+	struct sc_can_data *data = dev->data;
+
+	data->state_change_cb_data.sc_cb = cb;
+	data->state_change_cb_data.sc_cb_arg = user_data;
 }
 
 #ifndef CONFIG_CAN_AUTO_BUS_OFF_RECOVERY
@@ -1064,6 +1151,8 @@ static const struct can_driver_api sc_can_driver_api = {
 		.tx_head = 0,                                                                      \
 		.tx_tail = 0,                                                                      \
 		.rx_filters = rx_filters_##n,                                            \
+		.state = CAN_STATE_STOPPED,                                                        \
+		.state_change_cb_data.sc_cb = NULL,                                                \
 	};                                                                                         \
 	CAN_DEVICE_DT_INST_DEFINE(n, sc_can_init, NULL, &sc_can_data_##n, &sc_can_cfg_##n,         \
 				  POST_KERNEL, CONFIG_CAN_INIT_PRIORITY, &sc_can_driver_api);      \
