@@ -9,6 +9,7 @@
 #include <zephyr/drivers/can.h>
 #include <zephyr/drivers/can/transceiver.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/byteorder.h>
 
 LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 
@@ -93,6 +94,34 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 #define SCCAN_VER_MINOR(x) (((x)&0x00ff0000) >> 16)
 #define SCCAN_VER_PATCH(x) (((x)&0x0000ffff) >> 0)
 
+/* CAN Interrupt Status Register */
+#define SCCAN_BUSOFF  BIT(13)
+#define SCCAN_ACKER   BIT(12)
+#define SCCAN_BITER   BIT(11)
+#define SCCAN_STFER   BIT(10)
+#define SCCAN_FMER    BIT(9)
+#define SCCAN_CRCER   BIT(8)
+#define SCCAN_RXFOVF  BIT(7)
+#define SCCAN_RXFUDF  BIT(6)
+#define SCCAN_RXFVAL  BIT(5)
+#define SCCAN_RCVDN   BIT(4)
+#define SCCAN_TXFOVF  BIT(3)
+#define SCCAN_TXHBOVF BIT(2)
+#define SCCAN_ARBLST  BIT(1)
+#define SCCAN_TRNSDN  BIT(0)
+
+/* CAN Interrupt Enable Register */
+#define SCCAN_IER_ALL_ENA (0x00003FFF)
+
+/* CAN TX Message Register1 */
+#define SCCAN_TXID1(x)    (x << 21)
+#define SCCAN_TXSRTR(x)   (x << 20)
+#define SCCAN_TXIDE(x)    (x << 19)
+#define SCCAN_TXID1(x)    (x << 21)
+#define SCCAN_TXID_EX1(x) ((x & GENMASK(28, 18)) << 3)
+#define SCCAN_TXID_EX2(x) ((x & GENMASK(17, 0)) << 1)
+#define SCCAN_TXERTR(x)   (x)
+
 /* CAN FIFO and Buffer Reset Register */
 #define SCCAN_FIFORR_TXHPBRST  BIT(17)
 #define SCCAN_FIFORR_TXFIFORST BIT(16)
@@ -119,6 +148,12 @@ struct sc_can_cfg {
 	uint8_t sjw;
 	uint16_t sample_point;
 	uint32_t max_bitrate;
+	uint8_t tx_fifo_depth;
+};
+
+struct sc_can_tx_cb_data {
+	can_tx_callback_t tx_cb;
+	void *tx_cb_arg;
 };
 
 struct sc_can_data {
@@ -128,9 +163,15 @@ struct sc_can_data {
 	 *      (Including operations that require CAN to stop)
 	 *  - Set CAN Timing operations
 	 *      (need to set the multiple register)
+	 *  - TX operations
+	 *      (need to set the multiple register)
 	 */
 	struct k_mutex enadis_mutex;
 	struct k_mutex timing_mutex;
+	struct k_mutex tx_mutex;
+	struct sc_can_tx_cb_data *tx_cb_data_list;
+	uint8_t tx_head;
+	uint8_t tx_tail;
 };
 
 static inline uint32_t sc_can_get_status_reg(const struct sc_can_cfg *config)
@@ -218,6 +259,63 @@ static int sc_can_disable(const struct sc_can_cfg *config)
 	return ret;
 }
 
+static uint32_t sc_can_get_idr(uint32_t id, bool extended, bool rtr)
+{
+	uint32_t idr;
+
+	if (extended) {
+		idr = (SCCAN_TXID_EX1(id) | SCCAN_TXSRTR(1) | SCCAN_TXIDE(extended) |
+		       SCCAN_TXID_EX2(id) | SCCAN_TXERTR(rtr));
+	} else {
+		idr = (SCCAN_TXID1(id) | SCCAN_TXSRTR(rtr) | SCCAN_TXIDE(extended));
+	}
+
+	return idr;
+}
+
+static void sc_can_set_idr(const struct sc_can_cfg *config, const struct can_frame *frame)
+{
+	uint32_t idr;
+
+	idr = sc_can_get_idr(frame->id, (frame->flags & CAN_FRAME_IDE),
+			     (frame->flags & CAN_FRAME_RTR));
+	sys_write32(idr, config->reg_addr + SCCAN_TMR1_OFFSET);
+}
+
+static inline void sc_can_set_dlc(const struct sc_can_cfg *config, uint8_t dlc)
+{
+	sys_write32(dlc, config->reg_addr + SCCAN_TMR2_OFFSET);
+}
+
+static void sc_can_set_data_frame(const struct sc_can_cfg *config, const struct can_frame *frame)
+{
+	sys_write32(sys_be32_to_cpu(frame->data_32[0]), config->reg_addr + SCCAN_TMR3_OFFSET);
+	sys_write32(sys_be32_to_cpu(frame->data_32[1]), config->reg_addr + SCCAN_TMR4_OFFSET);
+}
+
+static void sc_can_tx_done(const struct device *dev, int status)
+{
+	const struct sc_can_cfg *config = dev->config;
+	struct sc_can_data *data = dev->data;
+	can_tx_callback_t callback;
+
+	callback = data->tx_cb_data_list[data->tx_tail].tx_cb;
+	if (callback == NULL) {
+		LOG_ERR("TX callback is not registerd.");
+		return;
+	}
+
+	callback(dev, status, data->tx_cb_data_list[data->tx_tail].tx_cb_arg);
+	data->tx_cb_data_list[data->tx_tail].tx_cb = NULL;
+
+	data->tx_tail++;
+	if (data->tx_tail >= config->tx_fifo_depth) {
+		data->tx_tail = 0;
+	}
+
+	return;
+}
+
 static int sc_can_get_state(const struct device *dev, enum can_state *state,
 			    struct can_bus_err_cnt *err_cnt)
 {
@@ -229,10 +327,54 @@ static void sc_can_isr(const struct device *dev)
 	const struct sc_can_cfg *config = dev->config;
 	uint32_t isr;
 
+	/* TODO:
+	 * Current SC CAN Controller notify the interrupt every times while
+	 * ACK error detected, so this driver received the many interrupt.
+	 * However we plan to improve the Interrupt Status Register.
+	 */
 	isr = sys_read32(config->reg_addr + SCCAN_ISR_OFFSET);
 	LOG_DBG("IRQ Status 0x%08x", isr);
 
 	sys_write32(isr, config->reg_addr + SCCAN_ISR_OFFSET);
+
+	if (isr & SCCAN_BUSOFF) {
+	}
+	if (isr & SCCAN_ACKER) {
+		CAN_STATS_ACK_ERROR_INC(dev);
+		sc_can_tx_done(dev, SCCAN_ACKER);
+	}
+	if (isr & SCCAN_BITER) {
+		/* SC CAN does not distinguish between BIT0 and 1 errors,
+		 * so it counts on BIT0. */
+		CAN_STATS_BIT0_ERROR_INC(dev);
+		sc_can_tx_done(dev, SCCAN_BITER);
+	}
+	if (isr & SCCAN_STFER) {
+	}
+	if (isr & SCCAN_FMER) {
+	}
+	if (isr & SCCAN_CRCER) {
+	}
+	if (isr & SCCAN_RXFOVF) {
+	}
+	if (isr & SCCAN_RXFUDF) {
+	}
+	if (isr & SCCAN_RXFVAL) {
+	}
+	if (isr & SCCAN_RCVDN) {
+	}
+	if (isr & SCCAN_TXFOVF) {
+		sc_can_tx_done(dev, SCCAN_TXFOVF);
+	}
+	if (isr & SCCAN_TXHBOVF) {
+		/* TX High Priority Buffer is not used yet */
+	}
+	if (isr & SCCAN_ARBLST) {
+		sc_can_tx_done(dev, SCCAN_ARBLST);
+	}
+	if (isr & SCCAN_TRNSDN) {
+		sc_can_tx_done(dev, 0);
+	}
 }
 
 static inline void sc_can_clear_all_fifo(const struct sc_can_cfg *config)
@@ -262,6 +404,33 @@ static void sc_can_enable_irq(const struct device *dev)
 
 	sys_set_bits(config->reg_addr + SCCAN_IER_OFFSET, SCCAN_IER_ALL);
 	config->irq_init(dev);
+}
+
+static bool sc_can_is_tx_fifo_full(const struct sc_can_cfg *config)
+{
+	uint32_t status_reg;
+
+	status_reg = sys_read32(config->reg_addr + SCCAN_FIFOSR_OFFSET);
+	if (status_reg & SCCAN_TXFFL) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+static void sc_can_notify_disable_to_tx_cb(const struct device *dev)
+{
+	const struct sc_can_cfg *config = dev->config;
+	struct sc_can_data *data = dev->data;
+	can_tx_callback_t callback;
+
+	for (int i = 0; i < config->tx_fifo_depth; i++) {
+		callback = data->tx_cb_data_list[i].tx_cb;
+		if (callback != NULL) {
+			callback(dev, -ENETDOWN, data->tx_cb_data_list[i].tx_cb_arg);
+			callback = NULL;
+		}
+	}
 }
 
 static int sc_can_get_capabilities(const struct device *dev, can_mode_t *cap)
@@ -314,6 +483,8 @@ static int sc_can_stop(const struct device *dev)
 	ret = sc_can_disable(config);
 	if (ret == 0) {
 		sc_can_clear_all_fifo(config);
+
+		sc_can_notify_disable_to_tx_cb(dev);
 	}
 
 	k_mutex_unlock(&data->enadis_mutex);
@@ -382,7 +553,73 @@ static int sc_can_recover(const struct device *dev, k_timeout_t timeout)
 static int sc_can_send(const struct device *dev, const struct can_frame *frame, k_timeout_t timeout,
 		       can_tx_callback_t callback, void *user_data)
 {
-	return 0;
+	const struct sc_can_cfg *config = dev->config;
+	struct sc_can_data *data = dev->data;
+	int ret = 0;
+
+	__ASSERT_NO_MSG(callback != NULL);
+
+	LOG_DBG("Sending %d bytes on %s. Id: 0x%x, ID type: %s %s", frame->dlc, dev->name,
+		frame->id, (frame->flags & CAN_FRAME_IDE) != 0 ? "extended" : "standard",
+		(frame->flags & CAN_FRAME_RTR) != 0 ? ", RTR frame" : "");
+
+	if (frame->dlc > CAN_MAX_DLC) {
+		LOG_ERR("DLC of %d exceeds maximum (%d)", frame->dlc, CAN_MAX_DLC);
+		ret = -EINVAL;
+		goto nolock;
+	}
+
+	if ((frame->flags & ~(CAN_FRAME_IDE | CAN_FRAME_RTR)) != 0) {
+		LOG_ERR("unsupported CAN frame flags 0x%02x", frame->flags);
+		ret = -ENOTSUP;
+		goto nolock;
+	}
+
+	if (sc_can_is_disabled(config)) {
+		ret = -ENETDOWN;
+		goto nolock;
+	}
+
+	if (sc_can_is_tx_fifo_full(config)) {
+		ret = -EAGAIN;
+		goto nolock;
+	}
+
+	ret = k_mutex_lock(&data->tx_mutex, SCCAN_MUTEX_LOCK_TIMEOUT);
+	if (ret != 0) {
+		ret = -ETIMEDOUT;
+		goto nolock;
+	}
+
+	sc_can_set_idr(config, frame);
+
+	sc_can_set_dlc(config, frame->dlc);
+
+	sc_can_set_data_frame(config, frame);
+
+	/* Save call back function */
+	/* TODO:
+	 * In the current FPA CAN IP core, CAN Packets stored in the TX Buffer
+	 * transmit to the CAN Bus in a FIFO (First In First Out).
+	 * Therefore, there is no issue with managing the list of TX callbacks
+	 * using an array.
+	 * However, due to future modifications in the FPGA CAN IP core, the
+	 * transmission order of CAN Packets stored in the TX buffer will be
+	 * rearranged based on the CAN ID (priority).
+	 * So, we will need to change the management of TX callbacks from an
+	 * array to something like an slist.
+	 */
+	data->tx_cb_data_list[data->tx_head].tx_cb = callback;
+	data->tx_cb_data_list[data->tx_head].tx_cb_arg = user_data;
+	data->tx_head++;
+	if (data->tx_head == config->tx_fifo_depth) {
+		data->tx_head = 0;
+	}
+
+	k_mutex_unlock(&data->tx_mutex);
+
+nolock:
+	return ret;
 }
 
 static int sc_can_add_rx_filter(const struct device *dev, can_rx_callback_t cb, void *cb_arg,
@@ -503,17 +740,23 @@ static const struct can_driver_api sc_can_driver_api = {
 
 #define SCCAN_INIT(n)                                                                              \
 	static void sc_can_##n##_irq_init(const struct device *dev);                               \
+	static struct sc_can_tx_cb_data tx_cb_data_list_##n[DT_INST_PROP(n, tx_fifo_depth)];       \
 	static const struct sc_can_cfg sc_can_cfg_##n = {                                          \
 		.reg_addr = DT_INST_REG_ADDR(n),                                                   \
 		.irq_init = sc_can_##n##_irq_init,                                                 \
 		.clock_frequency = DT_INST_PROP(n, clock_frequency),                               \
 		.bus_speed = DT_INST_PROP(n, bus_speed),                                           \
 		.sjw = DT_INST_PROP(n, sjw),                                                       \
+		.sample_point = DT_INST_PROP(n, sample_point),                                     \
 		.max_bitrate = DT_INST_CAN_TRANSCEIVER_MAX_BITRATE(n, 1000000),                    \
+		.tx_fifo_depth = DT_INST_PROP(n, tx_fifo_depth),                                   \
 	};                                                                                         \
 	static struct sc_can_data sc_can_data_##n = {                                              \
 		.enadis_mutex = Z_MUTEX_INITIALIZER(sc_can_data_##n.enadis_mutex),                 \
 		.timing_mutex = Z_MUTEX_INITIALIZER(sc_can_data_##n.timing_mutex),                 \
+		.tx_cb_data_list = tx_cb_data_list_##n,                                            \
+		.tx_head = 0,                                                                      \
+		.tx_tail = 0,                                                                      \
 	};                                                                                         \
 	CAN_DEVICE_DT_INST_DEFINE(n, sc_can_init, NULL, &sc_can_data_##n, &sc_can_cfg_##n,         \
 				  POST_KERNEL, CONFIG_CAN_INIT_PRIORITY, &sc_can_driver_api);      \
