@@ -58,6 +58,7 @@
 			sjw = <4>;
 			sample-point = <750>;
 			tx-fifo-depth = <64>;
+			max-filter = <4>;
 
 			can-transceiver {
 				max-bitrate = <1000000>;
@@ -73,6 +74,7 @@
 			sjw = <4>;
 			sample-point = <750>;
 			tx-fifo-depth = <64>;
+			max-filter = <4>;
 
 			can-transceiver {
 				max-bitrate = <1000000>;
@@ -88,6 +90,7 @@
 			sjw = <4>;
 			sample-point = <750>;
 			tx-fifo-depth = <64>;
+			max-filter = <4>;
 
 			can-transceiver {
 				max-bitrate = <1000000>;

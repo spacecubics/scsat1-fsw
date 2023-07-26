@@ -26,3 +26,10 @@ properties:
     type: int
     description: TX FIFO Depath on FPGA
     required: true
+
+  max-filter:
+    type: int
+    description: |
+      The maximum value for the Acceptance (RX) Filter that can be
+      configured on the FPGA.
+    required: true
