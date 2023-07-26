@@ -21,3 +21,8 @@ properties:
       always 24 MHz, irrespective of the frequency of the system
       clock.
     required: true
+
+  tx-fifo-depth:
+    type: int
+    description: TX FIFO Depath on FPGA
+    required: true
