@@ -153,6 +153,10 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 #define SCCAN_FIFO_CLEAR_ALL                                                                       \
 	(SCCAN_FIFORR_TXHPBRST | SCCAN_FIFORR_TXFIFORST | SCCAN_FIFORR_RXFIFORST)
 
+/* CAN Self Test Mode Control Register */
+#define SCCAN_STM_DISABLE (0U)
+#define SCCAN_STM_ENABLE  (1U)
+
 /* Timeout configuration for enable/disable CAN */
 #define SCCAN_ENABLE_RETRIES     (10U)
 #define SCCAN_ENABLE_DELAY_USEC  K_USEC(10)
@@ -742,6 +746,14 @@ static void sc_can_notify_disable_to_tx_cb(const struct device *dev)
 
 static int sc_can_get_capabilities(const struct device *dev, can_mode_t *cap)
 {
+	ARG_UNUSED(dev);
+
+	if (cap == NULL) {
+		return -EINVAL;
+	}
+
+	*cap = CAN_MODE_NORMAL | CAN_MODE_LOOPBACK;
+
 	return 0;
 }
 
@@ -809,6 +821,34 @@ nolock:
 
 static int sc_can_set_mode(const struct device *dev, can_mode_t mode)
 {
+	const struct sc_can_cfg *config = dev->config;
+	uint32_t mode_reg = 0;
+
+	if ((mode & ~CAN_MODE_LOOPBACK) != 0) {
+		LOG_ERR("Unsupported mode: 0x%08x", mode);
+		return -ENOTSUP;
+	}
+
+	if (sc_can_is_enabled(config)) {
+		return -EBUSY;
+	}
+
+	if ((mode & CAN_MODE_LOOPBACK) != 0) {
+		/*
+		 * Change to Loop Back mode.
+		 * In FPGA IP core specification, it is called
+		 * "Self Test mode (STM)".
+		 */
+		mode_reg = SCCAN_STM_ENABLE;
+	} else {
+		/* Change to Normal Mode */
+		mode_reg = SCCAN_STM_DISABLE;
+	}
+
+	sys_write32(mode_reg, config->reg_addr + SCCAN_STMCR_OFFSET);
+
+	LOG_DBG("Set mode:%d", mode);
+
 	return 0;
 }
 
