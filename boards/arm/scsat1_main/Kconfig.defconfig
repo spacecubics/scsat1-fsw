@@ -1,0 +1,20 @@
+# SC-Sat1 MAIN Board
+
+# Copyright (c) 2023 Space Cubics,LLC
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_SCSAT1_MAIN
+
+config BOARD
+	default "scsat1_main"
+
+config CPU_CORTEX_M_HAS_SYSTICK
+	default y
+
+config CPU_HAS_ARM_MPU
+	default y
+
+config NUM_IRQS
+	default 32
+
+endif # BOARD_SCSAT1_MAIN

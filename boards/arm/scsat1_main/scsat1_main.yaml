@@ -1,0 +1,8 @@
+identifier: scsat1_main
+name: SC-Sat1 MAIN Board
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+supported:
+  - uart

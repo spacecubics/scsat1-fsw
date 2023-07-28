@@ -1,0 +1,43 @@
+#+title: SC-Sat1 MAIN board Flight Softrare
+
+ This is for SC-Sat1 MAIN board Flight Softrare
+
+* Software
+  Flight Software for SC-Sat1 MAIN board is based on [[https://zephyrproject.org/][Zephyr
+  RTOS]]. This repository can be use as a Zephyr application
+  repository -- aka. T2 star topology.
+
+** Requirements
+   - Zephyr 3.4
+
+** Setting up a Build Environment
+   #+begin_example
+   mkdir workspace
+   cd workspace
+   git clone https://github.com/spacecubics/scsat1-fsw.git
+   pip install west
+   west init -l scsat1-fsw
+   west update
+   pip install -r zephyr/scripts/requirements-base.txt
+   #+end_example
+
+** How to build
+
+   Here is an instraction to build the flight software.  This instruction
+   uses "scsat1_main" as the target board.
+
+   #+begin_example
+     cd workspace/scsat1-fsw/main/
+     rm -rf build && west build -b scsat1_main
+   #+end_example
+
+** How to program
+
+  Currently This code is enough size to running on ITCM on 128 KB ITCM. But if
+  your code will larger than 128 KB, you need to switch to HREM with below.
+  And first flash will always fail for a known limitation, need a retry.
+
+   #+begin_example
+     west flash --cmd-pre-load 'mww 0x4f000000 0x5a5a0000'
+     west flash --cmd-pre-load 'mww 0x4f000000 0x5a5a0000'
+   #+end_example
