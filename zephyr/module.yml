@@ -1,0 +1,9 @@
+# Copyright (c) 2023 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+build:
+  kconfig: zephyr/Kconfig
+  cmake: zephyr
+  settings:
+    #board_root: .
+    dts_root: zephyr
