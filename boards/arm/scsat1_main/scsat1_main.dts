@@ -15,6 +15,7 @@
 		zephyr,console = &uartlite0;
 		zephyr,shell-uart = &uartlite0;
 		zephyr,sram = &hrmem;
+		zephyr,canbus = &can0;
 	};
 
 	cpus {
@@ -46,6 +47,48 @@
 			compatible = "xlnx,xps-uartlite-1.00.a";
 			interrupts = <0 0>;
 			reg = <0x4f010000 0x10000>;
+		};
+
+		can0: can@40400000 {
+			compatible = "sc,can";
+			clock-frequency = <24000000>;
+			interrupts = <5 0>;
+			reg = <0x40400000 0x10000>;
+			bus-speed = <1000000>;
+			sjw = <4>;
+			sample-point = <750>;
+
+			can-transceiver {
+				max-bitrate = <1000000>;
+			};
+		};
+
+		can1: can@50100000 {
+			compatible = "sc,can";
+			clock-frequency = <24000000>;
+			interrupts = <19 0>;
+			reg = <0x50100000 0x10000>;
+			bus-speed = <1000000>;
+			sjw = <4>;
+			sample-point = <750>;
+
+			can-transceiver {
+				max-bitrate = <1000000>;
+			};
+		};
+
+		can2: can@50200000 {
+			compatible = "sc,can";
+			clock-frequency = <24000000>;
+			interrupts = <20 0>;
+			reg = <0x50200000 0x10000>;
+			bus-speed = <1000000>;
+			sjw = <4>;
+			sample-point = <750>;
+
+			can-transceiver {
+				max-bitrate = <1000000>;
+			};
 		};
 	};
 };
