@@ -41,3 +41,199 @@
      west flash --cmd-pre-load 'mww 0x4f000000 0x5a5a0000'
      west flash --cmd-pre-load 'mww 0x4f000000 0x5a5a0000'
    #+end_example
+
+** How to run the ztest
+
+  This software support the CAN driver, and ztest already prepare the CAN
+  driver test code.
+  If you want to run the test code, please build the ztest program with below.
+
+   #+begin_example
+     cd workspace/
+     rm -rf build && west build -b scsat1_main zephyr/tests/drivers/can/api/ -- -DBOARD_ROOT=${PWD}/scsat1-fsw/
+   #+end_example
+
+  And then you can run the ztest for CAN driver.
+
+   #+begin_example
+     west flash --cmd-pre-load 'mww 0x4f000000 0x5a5a0000'
+     west flash --cmd-pre-load 'mww 0x4f000000 0x5a5a0000'
+     *** Booting Zephyr OS build zephyr-v3.4.0-1430-g0bfe3cc2d051 ***
+     Running TESTSUITE can_classic
+     ===================================================================
+     START - test_add_filter
+      PASS - test_add_filter in 0.006 seconds
+     ===================================================================
+     START - test_filters_added_while_stopped
+      PASS - test_filters_added_while_stopped in 0.002 seconds
+     ===================================================================
+     START - test_filters_preserved_through_bitrate_change
+      PASS - test_filters_preserved_through_bitrate_change in 0.004 seconds
+     ===================================================================
+     START - test_filters_preserved_through_mode_change
+      PASS - test_filters_preserved_through_mode_change in 0.004 seconds
+     ===================================================================
+     START - test_get_capabilities
+      PASS - test_get_capabilities in 0.001 seconds
+     ===================================================================
+     START - test_get_core_clock
+      PASS - test_get_core_clock in 0.001 seconds
+     ===================================================================
+     START - test_get_state
+      PASS - test_get_state in 0.001 seconds
+     ===================================================================
+     START - test_max_ext_filters
+     E: No free filter left
+      PASS - test_max_ext_filters in 0.005 seconds
+     ===================================================================
+     START - test_max_std_filters
+     E: No free filter left
+      PASS - test_max_std_filters in 0.005 seconds
+     ===================================================================
+     START - test_receive_timeout
+      PASS - test_receive_timeout in 0.102 seconds
+     ===================================================================
+     START - test_recover
+      PASS - test_recover in 0.001 seconds
+     ===================================================================
+     START - test_recover_while_stopped
+      PASS - test_recover_while_stopped in 0.001 seconds
+     ===================================================================
+     START - test_send_and_forget
+      PASS - test_send_and_forget in 0.002 seconds
+     ===================================================================
+     START - test_send_callback
+      PASS - test_send_callback in 0.002 seconds
+     ===================================================================
+     START - test_send_fd_format
+     E: unsupported CAN frame flags 0x04
+      PASS - test_send_fd_format in 0.004 seconds
+     ===================================================================
+     START - test_send_invalid_dlc
+     E: DLC of 9 exceeds maximum (8)
+      PASS - test_send_invalid_dlc in 0.004 seconds
+     ===================================================================
+     START - test_send_receive_ext_id
+      PASS - test_send_receive_ext_id in 0.007 seconds
+     ===================================================================
+     START - test_send_receive_ext_id_masked
+      PASS - test_send_receive_ext_id_masked in 0.007 seconds
+     ===================================================================
+     START - test_send_receive_ext_id_rtr
+      PASS - test_send_receive_ext_id_rtr in 0.207 seconds
+     ===================================================================
+     START - test_send_receive_msgq
+      PASS - test_send_receive_msgq in 0.014 seconds
+     ===================================================================
+     START - test_send_receive_std_id
+      PASS - test_send_receive_std_id in 0.006 seconds
+     ===================================================================
+     START - test_send_receive_std_id_masked
+      PASS - test_send_receive_std_id_masked in 0.006 seconds
+     ===================================================================
+     START - test_send_receive_std_id_rtr
+      PASS - test_send_receive_std_id_rtr in 0.206 seconds
+     ===================================================================
+     START - test_send_receive_wrong_id
+      PASS - test_send_receive_wrong_id in 0.103 seconds
+     ===================================================================
+     START - test_send_while_stopped
+      PASS - test_send_while_stopped in 0.001 seconds
+     ===================================================================
+     START - test_set_bitrate
+      PASS - test_set_bitrate in 0.001 seconds
+     ===================================================================
+     START - test_set_bitrate_too_high
+      PASS - test_set_bitrate_too_high in 0.001 seconds
+     ===================================================================
+     START - test_set_bitrate_while_started
+     E: Failed to set timing because enabled CAN
+      PASS - test_set_bitrate_while_started in 0.005 seconds
+     ===================================================================
+     START - test_set_mode_while_started
+      PASS - test_set_mode_while_started in 0.001 seconds
+     ===================================================================
+     START - test_set_state_change_callback
+      PASS - test_set_state_change_callback in 0.001 seconds
+     ===================================================================
+     START - test_set_timing_while_started
+     E: Failed to set timing because enabled CAN
+      PASS - test_set_timing_while_started in 0.005 seconds
+     ===================================================================
+     START - test_start_while_started
+      PASS - test_start_while_started in 0.001 seconds
+     ===================================================================
+     START - test_stop_while_stopped
+      PASS - test_stop_while_stopped in 0.001 seconds
+     ===================================================================
+     TESTSUITE can_classic succeeded
+     Running TESTSUITE can_utilities
+     ===================================================================
+     START - test_can_bytes_to_dlc
+      PASS - test_can_bytes_to_dlc in 0.001 seconds
+     ===================================================================
+     START - test_can_dlc_to_bytes
+      PASS - test_can_dlc_to_bytes in 0.001 seconds
+     ===================================================================
+     START - test_can_frame_matches_filter
+      PASS - test_can_frame_matches_filter in 0.001 seconds
+     ===================================================================
+     TESTSUITE can_utilities succeeded
+     
+     ------ TESTSUITE SUMMARY START ------
+     
+     SUITE PASS - 100.00% [can_classic]: pass = 33, fail = 0, skip = 0, total = 33 duration = 0.718 seconds
+      - PASS - [can_classic.test_add_filter] duration = 0.006 seconds
+      - PASS - [can_classic.test_filters_added_while_stopped] duration = 0.002 seconds
+      - PASS - [can_classic.test_filters_preserved_through_bitrate_change] duration = 0.004 seconds
+      - PASS - [can_classic.test_filters_preserved_through_mode_change] duration = 0.004 seconds
+      - PASS - [can_classic.test_get_capabilities] duration = 0.001 seconds
+      - PASS - [can_classic.test_get_core_clock] duration = 0.001 seconds
+      - PASS - [can_classic.test_get_state] duration = 0.001 seconds
+      - PASS - [can_classic.test_max_ext_filters] duration = 0.005 seconds
+      - PASS - [can_classic.test_max_std_filters] duration = 0.005 seconds
+      - PASS - [can_classic.test_receive_timeout] duration = 0.102 seconds
+      - PASS - [can_classic.test_recover] duration = 0.001 seconds
+      - PASS - [can_classic.test_recover_while_stopped] duration = 0.001 seconds
+      - PASS - [can_classic.test_send_and_forget] duration = 0.002 seconds
+      - PASS - [can_classic.test_send_callback] duration = 0.002 seconds
+      - PASS - [can_classic.test_send_fd_format] duration = 0.004 seconds
+      - PASS - [can_classic.test_send_invalid_dlc] duration = 0.004 seconds
+      - PASS - [can_classic.test_send_receive_ext_id] duration = 0.007 seconds
+      - PASS - [can_classic.test_send_receive_ext_id_masked] duration = 0.007 seconds
+      - PASS - [can_classic.test_send_receive_ext_id_rtr] duration = 0.207 seconds
+      - PASS - [can_classic.test_send_receive_msgq] duration = 0.014 seconds
+      - PASS - [can_classic.test_send_receive_std_id] duration = 0.006 seconds
+      - PASS - [can_classic.test_send_receive_std_id_masked] duration = 0.006 seconds
+      - PASS - [can_classic.test_send_receive_std_id_rtr] duration = 0.206 seconds
+      - PASS - [can_classic.test_send_receive_wrong_id] duration = 0.103 seconds
+      - PASS - [can_classic.test_send_while_stopped] duration = 0.001 seconds
+      - PASS - [can_classic.test_set_bitrate] duration = 0.001 seconds
+      - PASS - [can_classic.test_set_bitrate_too_high] duration = 0.001 seconds
+      - PASS - [can_classic.test_set_bitrate_while_started] duration = 0.005 seconds
+      - PASS - [can_classic.test_set_mode_while_started] duration = 0.001 seconds
+      - PASS - [can_classic.test_set_state_change_callback] duration = 0.001 seconds
+      - PASS - [can_classic.test_set_timing_while_started] duration = 0.005 seconds
+      - PASS - [can_classic.test_start_while_started] duration = 0.001 seconds
+      - PASS - [can_classic.test_stop_while_stopped] duration = 0.001 seconds
+     
+     SUITE PASS - 100.00% [can_utilities]: pass = 3, fail = 0, skip = 0, total = 3 duration = 0.003 seconds
+      - PASS - [can_utilities.test_can_bytes_to_dlc] duration = 0.001 seconds
+      - PASS - [can_utilities.test_can_dlc_to_bytes] duration = 0.001 seconds
+      - PASS - [can_utilities.test_can_frame_matches_filter] duration = 0.001 seconds
+     
+     SUITE SKIP -   0.00% [canfd]: pass = 0, fail = 0, skip = 8, total = 8 duration = 0.000 seconds
+      - SKIP - [canfd.test_filters_preserved_through_classic_to_fd_mode_change] duration = 0.000 seconds
+      - SKIP - [canfd.test_filters_preserved_through_fd_to_classic_mode_change] duration = 0.000 seconds
+      - SKIP - [canfd.test_get_capabilities] duration = 0.000 seconds
+      - SKIP - [canfd.test_send_receive_classic] duration = 0.000 seconds
+      - SKIP - [canfd.test_send_receive_fd] duration = 0.000 seconds
+      - SKIP - [canfd.test_send_receive_mixed] duration = 0.000 seconds
+      - SKIP - [canfd.test_set_bitrate_data_while_started] duration = 0.000 seconds
+      - SKIP - [canfd.test_set_timing_data_while_started] duration = 0.000 seconds
+     
+     ------ TESTSUITE SUMMARY END ------
+     
+     ===================================================================
+     PROJECT EXECUTION SUCCESSFUL
+   #+end_example
