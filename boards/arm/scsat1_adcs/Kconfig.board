@@ -1,0 +1,8 @@
+# SC-Sat1 ADCS Board configuration
+
+# Copyright (c) 2023 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_SCSAT1_ADCS
+	bool "SC-Sat1 ADCS Board"
+	depends on SOC_SERIES_ARM_DESIGNSTART

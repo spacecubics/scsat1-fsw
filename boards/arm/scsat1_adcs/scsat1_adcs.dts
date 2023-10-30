@@ -1,0 +1,72 @@
+/*
+ * Copyright (c) 2023 Space Cubics, LLC.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <arm/armv7-m.dtsi>
+#include <mem.h>
+
+/ {
+	model = "Space Cubics Satellite 1 ADCS Board";
+
+	chosen {
+		zephyr,console = &uartlite0;
+		zephyr,shell-uart = &uartlite0;
+		zephyr,sram = &hrmem;
+		zephyr,canbus = &can0;
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-m3";
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			mpu: mpu@e000ed90 {
+				compatible = "arm,armv7m-mpu";
+				reg = <0xe000ed90 0x40>;
+				arm,num-mpu-regions = <8>;
+			};
+		};
+	};
+
+	soc {
+		hrmem: memory@0 {
+			compatible = "sc,hrmem";
+			reg = <0x00000000 DT_SIZE_M(4)>;
+		};
+
+		uartlite0: uartlite@4f010000 {
+			compatible = "xlnx,xps-uartlite-1.00.a";
+			interrupts = <0 0>;
+			reg = <0x4f010000 0x10000>;
+		};
+
+		can0: can@40400000 {
+			compatible = "sc,can";
+			clock-frequency = <24000000>;
+			interrupts = <5 0>;
+			reg = <0x40400000 0x10000>;
+			bus-speed = <1000000>;
+			sjw = <4>;
+			sample-point = <750>;
+			tx-fifo-depth = <64>;
+			max-filter = <4>;
+
+			can-transceiver {
+				max-bitrate = <1000000>;
+			};
+		};
+	};
+};
+
+&nvic {
+	arm,num-irq-priority-bits = <3>;
+};
