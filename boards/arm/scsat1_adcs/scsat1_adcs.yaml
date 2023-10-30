@@ -1,0 +1,9 @@
+identifier: scsat1_adcs
+name: SC-Sat1 ADCS Board
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+supported:
+  - uart
+  - can
