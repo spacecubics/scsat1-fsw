@@ -1,0 +1,16 @@
+description: Space Cubics PWM controller
+
+compatible: "sc,pwm"
+
+include: [base.yaml]
+
+properties:
+  reg:
+    required: true
+
+  max-out-channel:
+    type: int
+    description: |
+      The maximum value for the output channel that can be
+      configured on the FPGA.
+    required: true

@@ -151,6 +151,18 @@
 			cpha = <0>;
 			spiclk_div = <0>;
 		};
+
+		pwm0: pwm@50020000 {
+			compatible = "sc,pwm";
+			reg = <0x50020000 0x10000>;
+			max-out-channel = <6>;
+		};
+
+		pwm1: pwm@50030000 {
+			compatible = "sc,pwm";
+			reg = <0x50030000 0x10000>;
+			max-out-channel = <6>;
+		};
 	};
 };
 
