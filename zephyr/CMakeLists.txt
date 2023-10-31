@@ -4,3 +4,4 @@
 add_subdirectory(drivers/can)
 add_subdirectory(drivers/i2c)
 add_subdirectory(drivers/spi)
+add_subdirectory(drivers/pwm)
