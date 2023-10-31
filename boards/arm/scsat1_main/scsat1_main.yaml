@@ -9,3 +9,4 @@ supported:
   - can
   - i2c
   - spi
+  - pwm
