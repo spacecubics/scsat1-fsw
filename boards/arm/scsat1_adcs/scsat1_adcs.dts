@@ -7,6 +7,7 @@
 /dts-v1/;
 #include <arm/armv7-m.dtsi>
 #include <mem.h>
+#include <zephyr/dt-bindings/i2c/i2c.h>
 
 / {
 	model = "Space Cubics Satellite 1 ADCS Board";
@@ -63,6 +64,42 @@
 			can-transceiver {
 				max-bitrate = <1000000>;
 			};
+		};
+
+		i2c0: i2c@4f030000 {
+			compatible = "sc,i2c";
+			interrupts = <7 0>;
+			reg = <0x4f030000 0x10000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clock-frequency = <I2C_BITRATE_STANDARD>;
+		};
+
+		i2c1: i2c@50040000 {
+			compatible = "sc,i2c";
+			interrupts = <20 0>;
+			reg = <0x50040000 0x10000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clock-frequency = <I2C_BITRATE_STANDARD>;
+		};
+
+		i2c2: i2c@50050000 {
+			compatible = "sc,i2c";
+			interrupts = <21 0>;
+			reg = <0x50050000 0x10000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clock-frequency = <I2C_BITRATE_STANDARD>;
+		};
+
+		i2c3: i2c@50060000 {
+			compatible = "sc,i2c";
+			interrupts = <22 0>;
+			reg = <0x50060000 0x10000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clock-frequency = <I2C_BITRATE_STANDARD>;
 		};
 	};
 };
