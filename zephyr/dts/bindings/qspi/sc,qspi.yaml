@@ -1,0 +1,41 @@
+# Copyright (c) 2023, Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+description: Space Cubics QSPI
+
+compatible: "sc,qspi"
+
+include: spi-controller.yaml
+
+bus: spi
+
+properties:
+  reg:
+    required: true
+
+  interrupts:
+    required: true
+
+  data-capture-mode:
+    type: boolean
+    description: Whether to capture data while sending
+
+  slave-num:
+    type: int
+    description: The number of slave device under the QSPI contoler
+    required: true
+
+  cpol:
+    type: int
+    description: Clock Polarity in SPI
+    required: true
+
+  cpha:
+    type: int
+    description: Clock Phase in SPI
+    required: true
+
+  spiclk_div:
+    type: int
+    description: Clock divider for the SPI clock relative to the system clock
+    required: true
