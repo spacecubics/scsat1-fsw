@@ -31,6 +31,26 @@
      rm -rf build && west build -b scsat1_main
    #+end_example
 
+   This instruction generates CMake Warnings as below.
+
+   #+begin_example
+     CMake Warning at /home/sasataku/scsat1/zephyr/CMakeLists.txt:889 (message):
+     No SOURCES given to Zephyr library: drivers__spi
+
+     Excluding target from build.
+   #+end_example
+
+   This reasons is that the device driver directories under the
+   zephyr proper are activated in order to build the board specific
+   device drivers but no driver source code under the zephyr proper is
+   selected.  There is a workaround: The sensor device driver, for
+   example, has
+
+       zephyr_library_property(ALLOW_EMPTY TRUE)
+
+   in the CMakeLists.txt.  Unfortunately, CMakeLists.txt under the spi
+   don't have it.
+
 ** How to program
 
   Currently This code is enough size to running on ITCM on 128 KB ITCM. But if
