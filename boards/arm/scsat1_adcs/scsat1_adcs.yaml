@@ -8,3 +8,4 @@ supported:
   - uart
   - can
   - i2c
+  - spi

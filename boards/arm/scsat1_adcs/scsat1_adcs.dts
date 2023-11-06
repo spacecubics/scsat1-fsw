@@ -101,6 +101,54 @@
 			#size-cells = <0>;
 			clock-frequency = <I2C_BITRATE_STANDARD>;
 		};
+
+		spi0: spi@40000000 {
+			compatible = "sc,qspi";
+			interrupts = <2 0>;
+			reg = <0x40000000 0x1000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			slave-num = <1>;
+			cpol = <0>;
+			cpha = <0>;
+			spiclk_div = <0>;
+		};
+
+		spi1: spi@40100000 {
+			compatible = "sc,qspi";
+			interrupts = <3 0>;
+			reg = <0x40100000 0x1000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			slave-num = <2>;
+			cpol = <0>;
+			cpha = <0>;
+			spiclk_div = <0>;
+		};
+
+		spi2: spi@40200000 {
+			compatible = "sc,qspi";
+			interrupts = <4 0>;
+			reg = <0x40200000 0x1000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			slave-num = <2>;
+			cpol = <0>;
+			cpha = <0>;
+			spiclk_div = <0>;
+		};
+
+		spi3: spi@50100000 {
+			compatible = "sc,qspi";
+			interrupts = <24 0>;
+			reg = <0x50100000 0x1000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			slave-num = <1>;
+			cpol = <1>;
+			cpha = <1>;
+			spiclk_div = <1>;
+		};
 	};
 };
 
