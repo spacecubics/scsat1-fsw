@@ -2,3 +2,4 @@
 # SPDX-License-Identifier: Apache-2.0
 
 rsource "drivers/can/Kconfig"
+rsource "drivers/i2c/Kconfig"
