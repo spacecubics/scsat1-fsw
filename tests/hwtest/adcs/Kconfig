@@ -1,0 +1,9 @@
+mainmenu "SC-Sat1 ADCS Board"
+
+menu "Application"
+
+endmenu
+
+menu "Zephyr"
+source "Kconfig.zephyr"
+endmenu
