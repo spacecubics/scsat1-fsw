@@ -50,6 +50,12 @@
 			reg = <0x4f010000 0x10000>;
 		};
 
+		gnss_uart: uartlite@50020000 {
+			compatible = "xlnx,xps-uartlite-1.00.a";
+			interrupts = <19 0>;
+			reg = <0x50020000 0x10000>;
+		};
+
 		can0: can@40400000 {
 			compatible = "sc,can";
 			clock-frequency = <24000000>;
