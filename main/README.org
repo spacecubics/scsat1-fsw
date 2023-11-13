@@ -35,6 +35,11 @@
 
    #+begin_example
      CMake Warning at /home/sasataku/scsat1/zephyr/CMakeLists.txt:889 (message):
+     No SOURCES given to Zephyr library: drivers__pwm
+
+     Excluding target from build.
+
+     CMake Warning at /home/sasataku/scsat1/zephyr/CMakeLists.txt:889 (message):
      No SOURCES given to Zephyr library: drivers__spi
 
      Excluding target from build.
@@ -48,7 +53,7 @@
 
        zephyr_library_property(ALLOW_EMPTY TRUE)
 
-   in the CMakeLists.txt.  Unfortunately, CMakeLists.txt under the spi
+   in the CMakeLists.txt.  Unfortunately, CMakeLists.txt under the pwm,spi
    don't have it.
 
 ** How to program
