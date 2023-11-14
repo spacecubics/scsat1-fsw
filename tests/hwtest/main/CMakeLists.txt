@@ -15,3 +15,5 @@ project(scsat1-main)
 
 target_sources(app PRIVATE src/main.c)
 target_sources(app PRIVATE src/pwrctrl.c)
+target_sources(app PRIVATE src/mgnm.c )
+target_sources(app PRIVATE src/mgnm_test.c )
