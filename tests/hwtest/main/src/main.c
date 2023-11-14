@@ -7,6 +7,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
 #include "temp_test.h"
+#include "cv_test.h"
 #include "mgnm_test.h"
 
 #include <zephyr/logging/log.h>
@@ -32,6 +33,8 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 
 	if (strcmp(cmd, "temp") == 0) {
 		ret = temp_test(&err_cnt);
+	} else if (strcmp(cmd, "cv") == 0) {
+		ret = cv_test(&err_cnt);
 	} else if (strcmp(cmd, "mgnm") == 0) {
 		ret = mgnm_test(&err_cnt);
 	} else {
@@ -92,6 +95,7 @@ int main(void)
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(demo, NULL, "Demo command", start_cmd_thread),
 	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
+	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
 	SHELL_CMD(mgnm, NULL, "Magnet Meteor test command", start_cmd_thread),
 	SHELL_SUBCMD_SET_END
 );
