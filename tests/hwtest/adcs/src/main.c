@@ -6,6 +6,8 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/logging/log.h>
+#include "temp_test.h"
 
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
@@ -14,8 +16,12 @@ K_THREAD_STACK_DEFINE(cmd_thread_stack, 2048);
 static struct k_thread cmd_thread;
 static struct k_event exec_event;
 
+LOG_MODULE_REGISTER(adcs_main);
+
 static void cmd_handler(void * p1, void * p2, void * p3)
 {
+	int ret = 0;
+	uint32_t err_cnt = 0;
 	char *cmd = (char*)p1;
 
 	k_event_set(&exec_event, CMD_EXEC_EVENT);
@@ -23,9 +29,21 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 	ARG_UNUSED(p2);
 	ARG_UNUSED(p3);
 
-	printk("Sub Cmd is %s\n", (char*)cmd);
+	if (strcmp(cmd, "temp") == 0) {
+		ret = temp_test(&err_cnt);
+	} else {
+		goto end;
+	}
 
+	if (ret < 0) {
+		LOG_ERR("%s test Failed. eror count: %d", cmd, err_cnt);
+	} else {
+		LOG_INF("%s test successed.", cmd);
+	}
+end:
 	k_event_clear(&exec_event, CMD_EXEC_EVENT);
+
+	return;
 }
 
 static int start_cmd_thread(const struct shell *sh, size_t argc, char **argv)
@@ -70,6 +88,7 @@ int main(void)
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(demo, NULL, "Demo command", start_cmd_thread),
+	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
 	SHELL_SUBCMD_SET_END
 );
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
