@@ -8,6 +8,7 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
 #include "temp_test.h"
+#include "cv_test.h"
 
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
@@ -31,6 +32,8 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 
 	if (strcmp(cmd, "temp") == 0) {
 		ret = temp_test(&err_cnt);
+	} else if (strcmp(cmd, "cv") == 0) {
+		ret = cv_test(&err_cnt);
 	} else {
 		goto end;
 	}
@@ -89,6 +92,7 @@ int main(void)
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(demo, NULL, "Demo command", start_cmd_thread),
 	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
+	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
 	SHELL_SUBCMD_SET_END
 );
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
