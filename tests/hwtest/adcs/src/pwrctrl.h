@@ -14,3 +14,5 @@
 
 void sc_adcs_power_enable(uint8_t target_bit);
 void sc_adcs_power_disable(uint8_t target_bit);
+void sc_adcs_imu_reset(void);
+void sc_adcs_imu_reset_release(void);
