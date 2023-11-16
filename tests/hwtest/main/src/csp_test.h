@@ -1,0 +1,9 @@
+/*
+ * Copyright (c) 2023 Space Cubics, LLC.↲
+ *↲
+ * SPDX-License-Identifier: Apache-2.0↲
+ */
+
+#pragma once
+
+int csp_test(uint32_t *err_cnt);
