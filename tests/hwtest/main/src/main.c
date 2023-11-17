@@ -10,6 +10,7 @@
 #include "cv_test.h"
 #include "mgnm_test.h"
 #include "csp_test.h"
+#include "sunsens_test.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main);
@@ -40,6 +41,8 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 		ret = mgnm_test(&err_cnt);
 	} else if (strcmp(cmd, "csp") == 0) {
 		ret = csp_test(&err_cnt);
+	} else if (strcmp(cmd, "sun") == 0) {
+		ret = sunsens_test(&err_cnt);
 	} else {
 		goto end;
 	}
@@ -101,6 +104,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
 	SHELL_CMD(mgnm, NULL, "Magnet Meteor test command", start_cmd_thread),
 	SHELL_CMD(csp, NULL, "CSP test command", start_cmd_thread),
+	SHELL_CMD(sun, NULL, "Sun Sensor test command", start_cmd_thread),
 	SHELL_SUBCMD_SET_END
 );
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
