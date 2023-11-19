@@ -12,6 +12,7 @@
 #include "csp_test.h"
 #include "sunsens_test.h"
 #include "mtq_test.h"
+#include "main_init.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main);
@@ -34,7 +35,9 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 	ARG_UNUSED(p2);
 	ARG_UNUSED(p3);
 
-	if (strcmp(cmd, "temp") == 0) {
+	if (strcmp(cmd, "init") == 0) {
+		ret = main_init(&err_cnt);
+	} else if (strcmp(cmd, "temp") == 0) {
 		ret = temp_test(&err_cnt);
 	} else if (strcmp(cmd, "cv") == 0) {
 		ret = cv_test(&err_cnt);
@@ -102,7 +105,7 @@ int main(void)
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
-	SHELL_CMD(demo, NULL, "Demo command", start_cmd_thread),
+	SHELL_CMD(init, NULL, "MAIN Board Initialization", start_cmd_thread),
 	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
 	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
 	SHELL_CMD(mgnm, NULL, "Magnet Meteor test command", start_cmd_thread),
