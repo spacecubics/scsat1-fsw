@@ -12,6 +12,7 @@
 #include "imu_test.h"
 #include "gnss_test.h"
 #include "rw_test.h"
+#include "adcs_init.h"
 
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
@@ -33,7 +34,9 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 	ARG_UNUSED(p2);
 	ARG_UNUSED(p3);
 
-	if (strcmp(cmd, "temp") == 0) {
+	if (strcmp(cmd, "init") == 0) {
+		ret = adcs_init(&err_cnt);
+	} else if (strcmp(cmd, "temp") == 0) {
 		ret = temp_test(&err_cnt);
 	} else if (strcmp(cmd, "cv") == 0) {
 		ret = cv_test(&err_cnt);
@@ -99,7 +102,7 @@ int main(void)
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
-	SHELL_CMD(demo, NULL, "Demo command", start_cmd_thread),
+	SHELL_CMD(init, NULL, "ADCS Board Initialization", start_cmd_thread),
 	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
 	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
 	SHELL_CMD(imu, NULL, "IMU test command", start_cmd_thread),
