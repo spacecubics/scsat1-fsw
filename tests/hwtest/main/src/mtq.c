@@ -21,21 +21,6 @@ struct mtq_config {
 	struct mtq_pwm_config in2;
 };
 
-static const char mtq_axes_name[][15] = {
-	"MTQ X (Main)",
-	"MTQ Y (Main)",
-	"MTQ Z (Main)",
-	"MTQ X (Backup)",
-	"MTQ Y (Backup)",
-	"MTQ Z (Backup)",
-};
-
-static const char mtq_pol_name[][6] = {
-	"Plus",
-	"Minus",
-	"Non",
-};
-
 static const struct device *get_mtq_device(enum mtq_axes axes)
 {
 	const struct device *pwm0 = DEVICE_DT_GET(DT_NODELABEL(pwm0));
