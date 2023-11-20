@@ -23,5 +23,21 @@ enum mtq_polarity {
 	MTQ_POL_NON,
 };
 
+static const char mtq_axes_name[][15] = {
+	"MTQ X (Main)",
+	"MTQ Y (Main)",
+	"MTQ Z (Main)",
+	"MTQ X (Backup)",
+	"MTQ Y (Backup)",
+	"MTQ Z (Backup)",
+};
+
+static const char mtq_pol_name[][6] = {
+	"Plus",
+	"Minus",
+	"Non",
+};
+
+
 int mtq_start(enum mtq_axes axes, enum mtq_polarity pol, float duty);
 int mtq_stop(enum mtq_axes axes);
