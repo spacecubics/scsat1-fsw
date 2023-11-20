@@ -628,63 +628,6 @@ static void sc_can_state_change(const struct device *dev)
 	cb(dev, new_state, err_cnt, user_data);
 }
 
-static void sc_can_isr(const struct device *dev)
-{
-	const struct sc_can_cfg *config = dev->config;
-	uint32_t isr;
-
-	/* TODO:
-	 * Current SC CAN Controller notify the interrupt every times while
-	 * ACK error detected, so this driver received the many interrupt.
-	 * However we plan to improve the Interrupt Status Register.
-	 */
-	isr = sys_read32(config->reg_addr + SCCAN_ISR_OFFSET);
-	LOG_DBG("IRQ Status 0x%08x", isr);
-
-	sys_write32(isr, config->reg_addr + SCCAN_ISR_OFFSET);
-
-	if (isr & SCCAN_BUSOFF) {
-		sc_can_state_change(dev);
-	}
-	if (isr & SCCAN_ACKER) {
-		CAN_STATS_ACK_ERROR_INC(dev);
-		sc_can_tx_done(dev, SCCAN_ACKER);
-	}
-	if (isr & SCCAN_BITER) {
-		/* SC CAN does not distinguish between BIT0 and 1 errors,
-		 * so it counts on BIT0. */
-		CAN_STATS_BIT0_ERROR_INC(dev);
-		sc_can_tx_done(dev, SCCAN_BITER);
-	}
-	if (isr & SCCAN_STFER) {
-	}
-	if (isr & SCCAN_FMER) {
-	}
-	if (isr & SCCAN_CRCER) {
-	}
-	if (isr & SCCAN_RXFOVF) {
-	}
-	if (isr & SCCAN_RXFUDF) {
-	}
-	if (isr & SCCAN_RXFVAL) {
-		sc_can_rx_isr(dev);
-	}
-	if (isr & SCCAN_RCVDN) {
-	}
-	if (isr & SCCAN_TXFOVF) {
-		sc_can_tx_done(dev, SCCAN_TXFOVF);
-	}
-	if (isr & SCCAN_TXHBOVF) {
-		/* TX High Priority Buffer is not used yet */
-	}
-	if (isr & SCCAN_ARBLST) {
-		sc_can_tx_done(dev, SCCAN_ARBLST);
-	}
-	if (isr & SCCAN_TRNSDN) {
-		sc_can_tx_done(dev, 0);
-	}
-}
-
 static inline void sc_can_clear_all_fifo(const struct sc_can_cfg *config)
 {
 	sys_set_bits(config->reg_addr + SCCAN_FIFORR_OFFSET, SCCAN_FIFO_CLEAR_ALL);
@@ -814,6 +757,65 @@ static int sc_can_stop(const struct device *dev)
 
 nolock:
 	return ret;
+}
+
+static void sc_can_isr(const struct device *dev)
+{
+	const struct sc_can_cfg *config = dev->config;
+	uint32_t isr;
+
+	isr = sys_read32(config->reg_addr + SCCAN_ISR_OFFSET);
+	LOG_DBG("IRQ Status 0x%08x", isr);
+
+	sys_write32(isr, config->reg_addr + SCCAN_ISR_OFFSET);
+
+	if (isr & SCCAN_BUSOFF) {
+		sc_can_state_change(dev);
+	}
+	if (isr & SCCAN_ACKER) {
+		/* TODO:
+		 * Current SC CAN Controller notify the interrupt every times while
+		 * ACK error detected, so this driver received the many interrupt.
+		 * However we plan to improve the Interrupt Status Register.
+		 * Now, when an ACK error occurs, stop the CAN control.
+		 */
+		LOG_ERR("ACK error has occurred. Since there is no one on the CAN bus, will stop the CAN.");
+		CAN_STATS_ACK_ERROR_INC(dev);
+		sc_can_stop(dev);
+	}
+	if (isr & SCCAN_BITER) {
+		/* SC CAN does not distinguish between BIT0 and 1 errors,
+		 * so it counts on BIT0. */
+		CAN_STATS_BIT0_ERROR_INC(dev);
+		sc_can_tx_done(dev, SCCAN_BITER);
+	}
+	if (isr & SCCAN_STFER) {
+	}
+	if (isr & SCCAN_FMER) {
+	}
+	if (isr & SCCAN_CRCER) {
+	}
+	if (isr & SCCAN_RXFOVF) {
+	}
+	if (isr & SCCAN_RXFUDF) {
+	}
+	if (isr & SCCAN_RXFVAL) {
+		sc_can_rx_isr(dev);
+	}
+	if (isr & SCCAN_RCVDN) {
+	}
+	if (isr & SCCAN_TXFOVF) {
+		sc_can_tx_done(dev, SCCAN_TXFOVF);
+	}
+	if (isr & SCCAN_TXHBOVF) {
+		/* TX High Priority Buffer is not used yet */
+	}
+	if (isr & SCCAN_ARBLST) {
+		sc_can_tx_done(dev, SCCAN_ARBLST);
+	}
+	if (isr & SCCAN_TRNSDN) {
+		sc_can_tx_done(dev, 0);
+	}
 }
 
 static int sc_can_set_mode(const struct device *dev, can_mode_t mode)
