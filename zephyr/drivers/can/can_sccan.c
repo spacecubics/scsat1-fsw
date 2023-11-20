@@ -114,9 +114,6 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 #define SCCAN_ARBLST  BIT(1)
 #define SCCAN_TRNSDN  BIT(0)
 
-/* CAN Interrupt Enable Register */
-#define SCCAN_IER_ALL_ENA (0x00003FFF)
-
 /* CAN TX Message Register1 */
 #define SCCAN_TXID1(x)    (x << 21)
 #define SCCAN_TXSRTR(x)   (x << 20)
