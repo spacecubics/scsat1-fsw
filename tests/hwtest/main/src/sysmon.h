@@ -35,6 +35,7 @@ enum xadc_cv_pos {
 	OBC_XADC_VCCBRAM,
 };
 
+void sc_main_print_fpga_ids(void);
 int sc_main_bhm_enable(void);
 int sc_main_bhm_disable(void);
 int sc_main_bhm_get_obc_temp(enum obc_temp_pos pos, float *temp);

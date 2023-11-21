@@ -11,8 +11,14 @@
 LOG_MODULE_REGISTER(sysmon);
 
 /* Registers */
+#define SC_ADCS_SYSREG_BASE_ADDR (0x4F000000) /* System Register */
 #define SC_ADCS_SYSMON_BASE_ADDR (0x4F040000) /* System Monitor */
 #define SC_ADCS_GPT_BASE_ADDR    (0x4F050000) /* General Purpose Timer */
+
+#define SC_ADCS_SYSREG_VER_OFFSET       (0xF000)
+#define SC_ADCS_SYSREG_BUILDINFO_OFFSET (0xFF00)
+#define SC_ADCS_SYSREG_DNA1_OFFSET      (0xFF10)
+#define SC_ADCS_SYSREG_DNA2_OFFSET      (0xFF14)
 
 #define SC_ADCS_SYSMON_WDOG_CTRL_OFFSET         (0x0000) /* Watchdog Control Register */
 #define SC_ADCS_SYSMON_XADC_TEMP_OFFSET         (0x1000) /* XADC Temperature Status */
@@ -306,6 +312,18 @@ static inline void sc_adcs_bhm_timer_disable(void)
 {
 	sys_clear_bits(SC_ADCS_GPT_BASE_ADDR + SC_ADCS_GPTMR_TECR_OFFSET,
 				 SC_ADCS_SYSMON_GPTMR_HITEN);
+}
+
+void sc_adcs_print_fpga_ids(void)
+{
+	LOG_INF("* IP Version        : %08x",
+			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_VER_OFFSET));
+	LOG_INF("* Build Information : %08x",
+			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_BUILDINFO_OFFSET));
+	LOG_INF("* Device DNA 1      : %08x",
+			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA1_OFFSET));
+	LOG_INF("* Device DNA 2      : %08x",
+			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA2_OFFSET));
 }
 
 int sc_adcs_bhm_enable(void)

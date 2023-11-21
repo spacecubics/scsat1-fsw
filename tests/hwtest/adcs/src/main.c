@@ -8,6 +8,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
+#include "sysmon.h"
 #include "temp_test.h"
 #include "cv_test.h"
 #include "imu_test.h"
@@ -36,7 +37,9 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 
 	ARG_UNUSED(p3);
 
-	if (strcmp(cmd, "init") == 0) {
+	if (strcmp(cmd, "info") == 0) {
+		sc_adcs_print_fpga_ids();
+	} else if (strcmp(cmd, "init") == 0) {
 		ret = adcs_init(&err_cnt);
 	} else if (strcmp(cmd, "temp") == 0) {
 		ret = temp_test(&err_cnt);
@@ -100,12 +103,15 @@ int main(void)
 {
 	printk("This is for HW test program for %s\n", CONFIG_BOARD);
 
+	sc_adcs_print_fpga_ids();
+
 	k_event_init(&exec_event);
 
 	return 0;
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
+	SHELL_CMD(info, NULL, "ADCS Board Information", start_cmd_thread),
 	SHELL_CMD(init, NULL, "ADCS Board Initialization", start_cmd_thread),
 	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
 	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
