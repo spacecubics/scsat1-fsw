@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <stdlib.h>
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
@@ -13,6 +14,7 @@
 #include "gnss_test.h"
 #include "rw_test.h"
 #include "adcs_init.h"
+#include "loop_test.h"
 
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
@@ -28,10 +30,10 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 	int ret = 0;
 	uint32_t err_cnt = 0;
 	char *cmd = (char*)p1;
+	char *arg = (char*)p2;
 
 	k_event_set(&exec_event, CMD_EXEC_EVENT);
 
-	ARG_UNUSED(p2);
 	ARG_UNUSED(p3);
 
 	if (strcmp(cmd, "init") == 0) {
@@ -46,6 +48,8 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 		ret = gnss_test(&err_cnt);
 	} else if (strcmp(cmd, "rw") == 0) {
 		ret = rw_test(&err_cnt);
+	} else if (strcmp(cmd, "loop") == 0) {
+		ret = loop_test(atoi(arg), &err_cnt);
 	} else {
 		goto end;
 	}
@@ -81,7 +85,7 @@ static int start_cmd_thread(const struct shell *sh, size_t argc, char **argv)
 	cmd_tid = k_thread_create(&cmd_thread, cmd_thread_stack,
 					 K_THREAD_STACK_SIZEOF(cmd_thread_stack),
 					 (k_thread_entry_t)cmd_handler,
-					 argv[0], NULL, NULL,
+					 argv[0], argv[1], NULL,
 					 CMD_HANDLER_PRIO, 0, K_NO_WAIT);
 	if (!cmd_tid) {
 		shell_error(sh, "Failed to create command thread");
@@ -108,6 +112,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(imu, NULL, "IMU test command", start_cmd_thread),
 	SHELL_CMD(gnss, NULL, "GNSS test command", start_cmd_thread),
 	SHELL_CMD(rw, NULL, "Reaction Wheel test command", start_cmd_thread),
+	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread),
 	SHELL_SUBCMD_SET_END
 );
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
