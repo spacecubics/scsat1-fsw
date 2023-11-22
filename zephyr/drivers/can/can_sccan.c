@@ -948,12 +948,6 @@ static int sc_can_send(const struct device *dev, const struct can_frame *frame, 
 		goto nolock;
 	}
 
-	sc_can_set_idr(config, frame);
-
-	sc_can_set_dlc(config, frame->dlc);
-
-	sc_can_set_data_frame(config, frame);
-
 	/* Save call back function */
 	/* TODO:
 	 * In the current FPA CAN IP core, CAN Packets stored in the TX Buffer
@@ -972,6 +966,12 @@ static int sc_can_send(const struct device *dev, const struct can_frame *frame, 
 	if (data->tx_head == config->tx_fifo_depth) {
 		data->tx_head = 0;
 	}
+
+	sc_can_set_idr(config, frame);
+
+	sc_can_set_dlc(config, frame->dlc);
+
+	sc_can_set_data_frame(config, frame);
 
 	k_mutex_unlock(&data->tx_mutex);
 
