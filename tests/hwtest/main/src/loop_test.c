@@ -35,7 +35,7 @@ static int one_loop(uint32_t *err_cnt)
 	int ret;
 	int all_ret = 0;
 
-	LOG_INF("===[Temp Test Start]===");
+	LOG_INF("===[Temp Test Start (total err: %d)]===", *err_cnt);
 	ret = temp_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
@@ -43,7 +43,7 @@ static int one_loop(uint32_t *err_cnt)
 
 	k_sleep(K_MSEC(100));
 
-	LOG_INF("===[CV Test Start]===");
+	LOG_INF("===[CV Test Start (total err: %d)]===", *err_cnt);
 	ret = cv_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
@@ -51,7 +51,7 @@ static int one_loop(uint32_t *err_cnt)
 
 	k_sleep(K_MSEC(100));
 
-	LOG_INF("===[CSP Test Start]===");
+	LOG_INF("===[CSP Test Start (total err: %d)]===", *err_cnt);
 	ret = csp_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
@@ -59,7 +59,7 @@ static int one_loop(uint32_t *err_cnt)
 
 	k_sleep(K_MSEC(100));
 
-	LOG_INF("===[Sun Sensor Test Start]===");
+	LOG_INF("===[Sun Sensor Test Start (total err: %d)]===", *err_cnt);
 	ret = sunsens_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
@@ -67,7 +67,7 @@ static int one_loop(uint32_t *err_cnt)
 
 	k_sleep(K_MSEC(100));
 
-	LOG_INF("===[Magnetometer Test Start]===");
+	LOG_INF("===[Magnetometer Test Start (total err: %d)]===", *err_cnt);
 	ret = mgnm_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
@@ -101,9 +101,10 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 	}
 
 	for (int i=1; i<=loop_count; i++) {
-		LOG_INF("===[Loop Test %d Start]===", i);
+		LOG_INF("===[Loop Test %d Start (total err: %d)]===",
+				 i, *err_cnt);
 
-		LOG_INF("===[MTQ Start]===");
+		LOG_INF("===[MTQ Start (total err: %d)]===", *err_cnt);
 		ret = mtq_start(axes_list[axes_idx], pol_list[pol_idx], duty);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -117,7 +118,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 			}
 		}
 
-		LOG_INF("===[MTQ Sttop]===");
+		LOG_INF("===[MTQ Stop (total err: %d)]===", *err_cnt);
 		ret = mtq_stop(axes_list[axes_idx]);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -126,7 +127,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 
 		update_mtq_idx(&axes_idx, &pol_idx);
 
-		LOG_INF("===[Loop Test %d Finish (err_cnt: %d)]===",
+		LOG_INF("===[Loop Test %d Finish (total err: %d))]===",
 				 i, *err_cnt);
 	}
 
