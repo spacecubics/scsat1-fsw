@@ -29,28 +29,28 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	int ret;
 	int all_ret = 0;
 
-	LOG_INF("===[RW Count Test Start]===");
+	LOG_INF("===[RW Count Test Start (total err: %d)]===", *err_cnt);
 	LOG_INF("%s count: %d", rw_pos_name[pos], rw_get_count(pos));
 
-	LOG_INF("===[Temp Test Start]===");
+	LOG_INF("===[Temp Test Start (total err: %d)]===", *err_cnt);
 	ret = temp_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
-	LOG_INF("===[CV Test Start]===");
+	LOG_INF("===[CV Test Start (total err: %d)]===", *err_cnt);
 	ret = cv_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
-	LOG_INF("===[IMU Test Start]===");
+	LOG_INF("===[IMU Test Start (total err: %d)]===", *err_cnt);
 	ret = imu_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
-	LOG_INF("===[GNSS Test Start]===");
+	LOG_INF("===[GNSS Test Start (total err: %d)]===", *err_cnt);
 	ret = gnss_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
@@ -90,9 +90,9 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 	}
 
 	for (int i=1; i<=loop_count; i++) {
-		LOG_INF("===[Loop Test %d Start]===", i);
+		LOG_INF("===[Loop Test %d Start (total err: %d)]===", i, *err_cnt);
 
-		LOG_INF("===[RW Start]===");
+		LOG_INF("===[RW Start (total err: %d)]===", *err_cnt);
 		ret = rw_start(pos_list[rw_idx]);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -104,7 +104,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 			all_ret = -1;
 		}
 
-		LOG_INF("===[Change potention]===");
+		LOG_INF("===[Change potention (total err: %d)]===", *err_cnt);
 		ret = rw_change_speed(pos_list[rw_idx], RW_HALF_POTENTION);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -116,7 +116,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 			all_ret = -1;
 		}
 
-		LOG_INF("===[RW Sttop]===");
+		LOG_INF("===[RW Stop (total err: %d)]===", *err_cnt);
 		rw_stop(pos_list[rw_idx]);
 
 		update_rw_idx(&rw_idx);
