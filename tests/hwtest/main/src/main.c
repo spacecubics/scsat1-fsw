@@ -27,6 +27,7 @@ LOG_MODULE_REGISTER(main);
 K_THREAD_STACK_DEFINE(cmd_thread_stack, 2048);
 static struct k_thread cmd_thread;
 static struct k_event exec_event;
+extern struct k_event loop_event;
 
 static void cmd_handler(void * p1, void * p2, void * p3)
 {
@@ -57,6 +58,7 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 		ret = mtq_test(&err_cnt);
 	} else if (strcmp(cmd, "loop") == 0) {
 		ret = loop_test(atoi(arg), &err_cnt);
+		k_event_clear(&loop_event, LOOP_STOP_EVENT);
 	} else {
 		goto end;
 	}
@@ -116,6 +118,12 @@ int main(void)
 	return 0;
 }
 
+static int stop_cmd(const struct shell *sh, size_t argc, char **argv)
+{
+	k_event_set(&loop_event, LOOP_STOP_EVENT);
+	return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(info, NULL, "MAIN Board Information", start_cmd_thread),
 	SHELL_CMD(init, NULL, "MAIN Board Initialization", start_cmd_thread),
@@ -129,3 +137,4 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_SUBCMD_SET_END
 );
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
+SHELL_CMD_REGISTER(stop, NULL, "SC-Sat1 HW test stop", stop_cmd);

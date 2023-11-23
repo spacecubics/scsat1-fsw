@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <zephyr/kernel.h>
+#include "loop_test.h"
 #include "pwrctrl.h"
 #include "temp_test.h"
 #include "cv_test.h"
@@ -15,6 +16,8 @@
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(loop_test);
+
+struct k_event loop_event;
 
 static void update_rw_idx(uint8_t *rw_idx)
 {
@@ -74,6 +77,15 @@ static int verify_status(enum rw_pos pos, uint32_t sec, uint32_t *err_cnt)
 	return all_ret;
 }
 
+static bool is_loop_stop(void)
+{
+	if (k_event_wait(&loop_event, LOOP_STOP_EVENT, false, K_NO_WAIT) != 0) {
+		return true;
+	}
+
+	return false;
+}
+
 int loop_test(int32_t loop_count, uint32_t *err_cnt)
 {
 	int ret;
@@ -90,6 +102,10 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 	}
 
 	for (int i=1; i<=loop_count; i++) {
+		if (is_loop_stop()) {
+			break;
+		}
+
 		LOG_INF("===[Loop Test %d Start (total err: %d)]===", i, *err_cnt);
 
 		LOG_INF("===[RW Start (total err: %d)]===", *err_cnt);
