@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
+#include "wdog.h"
 #include "sysmon.h"
 #include "temp_test.h"
 #include "cv_test.h"
@@ -105,6 +106,8 @@ end:
 int main(void)
 {
 	printk("This is for HW test program for %s\n", CONFIG_BOARD);
+
+	start_kick_wdt_thread();
 
 	sc_main_print_fpga_ids();
 

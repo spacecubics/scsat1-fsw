@@ -314,6 +314,14 @@ static inline void sc_adcs_bhm_timer_disable(void)
 				 SC_ADCS_SYSMON_GPTMR_HITEN);
 }
 
+void sc_adcs_kick_wdt_timer(void)
+{
+	uint32_t reg;
+
+	reg = sys_read32(SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_WDOG_CTRL_OFFSET);
+	sys_write32(reg, SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_WDOG_CTRL_OFFSET);
+}
+
 void sc_adcs_print_fpga_ids(void)
 {
 	LOG_INF("* IP Version        : %08x",
