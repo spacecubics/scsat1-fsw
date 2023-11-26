@@ -99,8 +99,10 @@ int rw_start(enum rw_pos pos)
 	LOG_INF("Start the Reaction Wheel measurement (%s)", rw_pos_name[pos]);
 	rw_start_measurment(pos);
 
+	/* TODO: Temporarily inhibit the rotation of the RW
 	LOG_INF("Power on the Motor Driver on %s", rw_pos_name[pos]);
 	sc_adcs_motor_enable(rw_pwr_en[pos]);
+	*/
 end:
 	return ret;
 }
@@ -110,8 +112,10 @@ void rw_stop(enum rw_pos pos)
 	LOG_INF("Stop the Reaction Wheel measurement (%s)", rw_pos_name[pos]);
 	rw_stop_measurment(pos);
 
+	/* TODO: Temporarily inhibit the rotation of the RW
 	LOG_INF("Power off the Motor Driver on %s", rw_pos_name[pos]);
 	sc_adcs_motor_disable(rw_pwr_en[pos]);
+	*/
 }
 
 int rw_change_speed(enum rw_pos pos, uint16_t pot)
