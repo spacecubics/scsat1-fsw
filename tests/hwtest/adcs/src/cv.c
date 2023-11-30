@@ -27,12 +27,12 @@ static const struct device *get_adcs_cv_device(enum adcs_cv_pos pos)
 	const struct device *i2c0 = DEVICE_DT_GET(DT_NODELABEL(i2c0));
 
 	switch (pos) {
-	case ADCS_VDD_3VS_IMU_SHUNT:
-	case ADCS_VDD_3VS_IMU_BUS:
-	case ADCS_VDD_3VS_GPS_SHUNT:
-	case ADCS_VDD_3VS_GPS_BUS:
-	case ADCS_VDD_3VS_DRV_SHUNT:
-	case ADCS_VDD_3VS_DRV_BUS:
+	case ADCS_VDD_3V3_IMU_SHUNT:
+	case ADCS_VDD_3V3_IMU_BUS:
+	case ADCS_VDD_3V3_GPS_SHUNT:
+	case ADCS_VDD_3V3_GPS_BUS:
+	case ADCS_VDD_3V3_DRV_SHUNT:
+	case ADCS_VDD_3V3_DRV_BUS:
 		if (device_is_ready(i2c0)) {
 			return i2c0;
 		}
@@ -81,22 +81,22 @@ static int get_adcs_register_addr(enum adcs_cv_pos pos, uint16_t *addr)
 	int ret = 0;
 
 	switch (pos) {
-	case ADCS_VDD_3VS_IMU_SHUNT:
+	case ADCS_VDD_3V3_IMU_SHUNT:
 		*addr = CV_CH1_SHUNT_REG;
 		break;
-	case ADCS_VDD_3VS_IMU_BUS:
+	case ADCS_VDD_3V3_IMU_BUS:
 		*addr = CV_CH1_BUS_REG;
 		break;
-	case ADCS_VDD_3VS_GPS_SHUNT:
+	case ADCS_VDD_3V3_GPS_SHUNT:
 		*addr = CV_CH2_SHUNT_REG;
 		break;
-	case ADCS_VDD_3VS_GPS_BUS:
+	case ADCS_VDD_3V3_GPS_BUS:
 		*addr = CV_CH2_BUS_REG;
 		break;
-	case ADCS_VDD_3VS_DRV_SHUNT:
+	case ADCS_VDD_3V3_DRV_SHUNT:
 		*addr = CV_CH3_SHUNT_REG;
 		break;
-	case ADCS_VDD_3VS_DRV_BUS:
+	case ADCS_VDD_3V3_DRV_BUS:
 		*addr = CV_CH3_BUS_REG;
 		break;
 	default:
@@ -155,14 +155,14 @@ static int convert_cv(enum adcs_cv_pos pos, uint16_t raw, uint32_t *cv)
 	int ret = 0;
 
 	switch (pos) {
-	case ADCS_VDD_3VS_IMU_SHUNT:
-	case ADCS_VDD_3VS_GPS_SHUNT:
-	case ADCS_VDD_3VS_DRV_SHUNT:
+	case ADCS_VDD_3V3_IMU_SHUNT:
+	case ADCS_VDD_3V3_GPS_SHUNT:
+	case ADCS_VDD_3V3_DRV_SHUNT:
 		*cv = convert_cv_shunt(raw);
 		break;
-	case ADCS_VDD_3VS_IMU_BUS:
-	case ADCS_VDD_3VS_GPS_BUS:
-	case ADCS_VDD_3VS_DRV_BUS:
+	case ADCS_VDD_3V3_IMU_BUS:
+	case ADCS_VDD_3V3_GPS_BUS:
+	case ADCS_VDD_3V3_DRV_BUS:
 		*cv = convert_cv_bus(raw);
 		break;
 	default:

@@ -22,13 +22,13 @@ static int cv_obc_test(uint32_t *err_cnt)
 		OBC_1V8_SHUNT,
 		OBC_1V8_BUS,
 		OBC_3V3_SHUNT,
-		OBC_3VS_BUS,
+		OBC_3V3_BUS,
 		OBC_3V3_SYSA_SHUNT,
-		OBC_3VS_SYSA_BUS,
+		OBC_3V3_SYSA_BUS,
 		OBC_3V3_SYSB_SHUNT,
-		OBC_3VS_SYSB_BUS,
+		OBC_3V3_SYSB_BUS,
 		OBC_3V3_IO_SHUNT,
-		OBC_3VS_IO_BUS,
+		OBC_3V3_IO_BUS,
 	};
 	const char obc_pos_name[][32] = {
 		"OBC_1V0 Shunt",
@@ -36,13 +36,13 @@ static int cv_obc_test(uint32_t *err_cnt)
 		"OBC_1V8 Shunt",
 		"OBC_1V8 Bus",
 		"OBC_3V3 Shunt",
-		"OBC_3VS Bus",
+		"OBC_3V3 Bus",
 		"OBC_3V3_SYSA Shunt",
-		"OBC_3VS_SYSA Bus",
+		"OBC_3V3_SYSA Bus",
 		"OBC_3V3_SYSB Shunt",
-		"OBC_3VS_SYSB Bus",
+		"OBC_3V3_SYSB Bus",
 		"OBC_3V3_IO Shunt",
-		"OBC_3VS_IO Bus",
+		"OBC_3V3_IO Bus",
 	};
 	const char obc_unit_name[][5] = {
 		"[uv]",
@@ -109,20 +109,20 @@ static int cv_adcs_test(uint32_t *err_cnt)
 	int all_ret = 0;
 	uint32_t cv;
 	enum adcs_cv_pos adcs_pos_list[] = {
-		ADCS_VDD_3VS_IMU_SHUNT,
-		ADCS_VDD_3VS_IMU_BUS,
-		ADCS_VDD_3VS_GPS_SHUNT,
-		ADCS_VDD_3VS_GPS_BUS,
-		ADCS_VDD_3VS_DRV_SHUNT,
-		ADCS_VDD_3VS_DRV_BUS,
+		ADCS_VDD_3V3_IMU_SHUNT,
+		ADCS_VDD_3V3_IMU_BUS,
+		ADCS_VDD_3V3_GPS_SHUNT,
+		ADCS_VDD_3V3_GPS_BUS,
+		ADCS_VDD_3V3_DRV_SHUNT,
+		ADCS_VDD_3V3_DRV_BUS,
 	};
 	const char adcs_pos_name[][32] = {
-		"ADCS_VDD_3VS_IMU Shunt",
-		"ADCS_VDD_3VS_IMU Bus",
-		"ADCS_VDD_3VS_GPS Shunt",
-		"ADCS_VDD_3VS_GPS Bus",
-		"ADCS_VDD_3VS_DRV Shunt",
-		"ADCS_VDD_3VS_DRV Bus",
+		"ADCS_VDD_3V3_IMU Shunt",
+		"ADCS_VDD_3V3_IMU Bus",
+		"ADCS_VDD_3V3_GPS Shunt",
+		"ADCS_VDD_3V3_GPS Bus",
+		"ADCS_VDD_3V3_DRV Shunt",
+		"ADCS_VDD_3V3_DRV Bus",
 	};
 	const char adcs_unit_name[][5] = {
 		"[uv]",

@@ -133,10 +133,10 @@ static int convert_obc_cv(enum obc_cv_pos pos, uint32_t raw, uint32_t *cv)
 		break;
 	case OBC_1V0_BUS:
 	case OBC_1V8_BUS:
-	case OBC_3VS_BUS:
-	case OBC_3VS_SYSA_BUS:
-	case OBC_3VS_SYSB_BUS:
-	case OBC_3VS_IO_BUS:
+	case OBC_3V3_BUS:
+	case OBC_3V3_SYSA_BUS:
+	case OBC_3V3_SYSB_BUS:
+	case OBC_3V3_IO_BUS:
 		*cv = convert_cv_bus(raw);
 		break;
 	default:
@@ -193,25 +193,25 @@ static int get_obc_cv_register_addr(enum obc_cv_pos pos, uint32_t *addr)
 	case OBC_3V3_SHUNT:
 		*addr += SC_MAIN_SYSMON_3V3_SNTVR_OFFSET;
 		break;
-	case OBC_3VS_BUS:
+	case OBC_3V3_BUS:
 		*addr += SC_MAIN_SYSMON_3V3_BUSVR_OFFSET;
 		break;
 	case OBC_3V3_SYSA_SHUNT:
 		*addr += SC_MAIN_SYSMON_3V3SYSA_SNTVR_OFFSET;
 		break;
-	case OBC_3VS_SYSA_BUS:
+	case OBC_3V3_SYSA_BUS:
 		*addr += SC_MAIN_SYSMON_3V3SYSA_BUSVR_OFFSET;
 		break;
 	case OBC_3V3_SYSB_SHUNT:
 		*addr += SC_MAIN_SYSMON_3V3SYSB_SNTVR_OFFSET;
 		break;
-	case OBC_3VS_SYSB_BUS:
+	case OBC_3V3_SYSB_BUS:
 		*addr += SC_MAIN_SYSMON_3V3SYSB_BUSVR_OFFSET;
 		break;
 	case OBC_3V3_IO_SHUNT:
 		*addr += SC_MAIN_SYSMON_3V3IO_SNTVR_OFFSET;
 		break;
-	case OBC_3VS_IO_BUS:
+	case OBC_3V3_IO_BUS:
 		*addr += SC_MAIN_SYSMON_3V3IO_BUSVR_OFFSET;
 		break;
 	default:
