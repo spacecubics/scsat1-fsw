@@ -22,13 +22,13 @@ static int cv_obc_test(uint32_t *err_cnt)
 		OBC_1V8_SHUNT,
 		OBC_1V8_BUS,
 		OBC_3V3_SHUNT,
-		OBC_3VS_BUS,
+		OBC_3V3_BUS,
 		OBC_3V3_SYSA_SHUNT,
-		OBC_3VS_SYSA_BUS,
+		OBC_3V3_SYSA_BUS,
 		OBC_3V3_SYSB_SHUNT,
-		OBC_3VS_SYSB_BUS,
+		OBC_3V3_SYSB_BUS,
 		OBC_3V3_IO_SHUNT,
-		OBC_3VS_IO_BUS,
+		OBC_3V3_IO_BUS,
 	};
 	const char obc_pos_name[][20] = {
 		"OBC_1V0 Shunt",
@@ -36,13 +36,13 @@ static int cv_obc_test(uint32_t *err_cnt)
 		"OBC_1V8 Shunt",
 		"OBC_1V8 Bus",
 		"OBC_3V3 Shunt",
-		"OBC_3VS Bus",
+		"OBC_3V3 Bus",
 		"OBC_3V3_SYSA Shunt",
-		"OBC_3VS_SYSA Bus",
+		"OBC_3V3_SYSA Bus",
 		"OBC_3V3_SYSB Shunt",
-		"OBC_3VS_SYSB Bus",
+		"OBC_3V3_SYSB Bus",
 		"OBC_3V3_IO Shunt",
-		"OBC_3VS_IO Bus",
+		"OBC_3V3_IO Bus",
 	};
 	const char obc_unit_name[][5] = {
 		"[uv]",
@@ -121,8 +121,8 @@ static int cv_ioboard_test(uint32_t *err_cnt)
 		"IO_PDU_04_3V3 Bus",
 		"IO_VDD_3V3_SYS Shunt",
 		"IO_VDD_3V3_SYS Bus",
-		"IO_VDD_3VS Shunt",
-		"IO_VDD_3VS Bus",
+		"IO_VDD_3V3 Shunt",
+		"IO_VDD_3V3 Bus",
 	};
 	const char io_unit_name[][5] = {
 		"[uv]",

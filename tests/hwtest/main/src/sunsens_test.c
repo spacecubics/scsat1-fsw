@@ -29,16 +29,16 @@ int sunsens_test(uint32_t *err_cnt)
 	for (int i=0; i<ARRAY_SIZE(pos_list); i++) {
 		ret = get_sunsens_temp(SUNSENS_POS_Y_MINUS, &temp);
 		if (ret < 0) {
-			LOG_ERR("%s Temtemperature: Failed", pos_name[i]);
+			LOG_ERR("%s Temperature: Failed", pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
 			continue;
 		}
-		LOG_INF("%s Temtemperature: %f [deg]", pos_name[i], temp);
+		LOG_INF("%s Temperature: %f [deg]", pos_name[i], temp);
 
 		ret = get_sunsens_data(SUNSENS_POS_Y_MINUS, &sun_data);
 		if (ret < 0) {
-			LOG_ERR("%s Temtemperature: Failed", pos_name[i]);
+			LOG_ERR("%s Sun Sensor: Failed", pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
 			continue;
