@@ -1,0 +1,21 @@
+#+title: SC-Sat1 HW test Tools
+
+ This tool is for SC-Sat1 HW test
+
+* Setting up a Python Environment
+   #+begin_example
+     pip install matplotlib
+   #+end_example
+
+* How to run
+
+   Please specify the name of each console log file for xxx.log.
+
+   #+begin_example
+       python parse_main.py ./xxxx.log
+       python parse_adcs.py ./xxxx.log
+       python parse_eps.py ./xxxx.log
+       python parse_srs3.py ./xxxx.log
+   #+end_example
+
+   This instruction generates a pdf file include graphs, and csv files under xxx_csv directory.
