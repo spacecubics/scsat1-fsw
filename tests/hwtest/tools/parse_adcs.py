@@ -17,32 +17,32 @@ TARGET_LIST = [
     "ADCS Board 1 Temperature:[deg]",
     "ADCS Board 2 Temperature:[deg]",
     "ADCS RW Temperature:[deg]",
-    "OBC_1V0 Shunt:[mv]",
+    "OBC_1V0 Shunt:[mA]",
     "OBC_1V0 Bus:[v]",
-    "OBC_1V8 Shunt:[mv]",
+    "OBC_1V8 Shunt:[mA]",
     "OBC_1V8 Bus:[v]",
-    "OBC_3V3 Shunt:[mv]",
+    "OBC_3V3 Shunt:[mA]",
     "OBC_3V3 Bus:[v]",
-    "OBC_3V3_SYSA Shunt:[mv]",
+    "OBC_3V3_SYSA Shunt:[mA]",
     "OBC_3V3_SYSA Bus:[v]",
-    "OBC_3V3_SYSB Shunt:[mv]",
+    "OBC_3V3_SYSB Shunt:[mA]",
     "OBC_3V3_SYSB Bus:[v]",
-    "OBC_3V3_IO Shunt:[mv]",
+    "OBC_3V3_IO Shunt:[mA]",
     "OBC_3V3_IO Bus:[v]",
     "OBC_XADC VCCINT:[v]",
     "OBC_XADC VCCAUX:[v]",
     "OBC_XADC VCCBRAM:[v]",
-    "ADCS_VDD_3V3_IMU Shunt:[mv]",
+    "ADCS_VDD_3V3_IMU Shunt:[mA]",
     "ADCS_VDD_3V3_IMU Bus:[v]",
-    "ADCS_VDD_3V3_GPS Shunt:[mv]",
+    "ADCS_VDD_3V3_GPS Shunt:[mA]",
     "ADCS_VDD_3V3_GPS Bus:[v]",
-    "ADCS_VDD_3V3_DRV Shunt:[mv]",
+    "ADCS_VDD_3V3_DRV Shunt:[mA]",
     "ADCS_VDD_3V3_DRV Bus:[v]",
-    "ADCS_VDD_12V_DRVX Shunt:[mv]",
+    "ADCS_VDD_12V_DRVX Shunt:[mA]",
     "ADCS_VDD_12V_DRVX Bus:[v]",
-    "ADCS_VDD_12V_DRVY Shunt:[mv]",
+    "ADCS_VDD_12V_DRVY Shunt:[mA]",
     "ADCS_VDD_12V_DRVY Bus:[v]",
-    "ADCS_VDD_12V_DRVZ Shunt:[mv]",
+    "ADCS_VDD_12V_DRVZ Shunt:[mA]",
     "ADCS_VDD_12V_DRVZ Bus:[v]",
     "RW X count:[cnt]",
     "RW Y count:[cnt]",
@@ -69,6 +69,38 @@ GNSS_IDX_LIST = [
 
 x_data = {}
 y_data = {}
+
+
+def get_shunt_ohm(key):
+
+    ohm = 0
+
+    if key == "OBC_1V0 Shunt":
+        ohm = 0.01
+    elif key == "OBC_1V8 Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3 Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3_SYSA Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3_SYSB Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3_IO Shunt":
+        ohm = 0.01
+    elif key == "ADCS_VDD_3V3_IMU Shunt":
+        ohm = 0.1
+    elif key == "ADCS_VDD_3V3_GPS Shunt":
+        ohm = 0.1
+    elif key == "ADCS_VDD_3V3_DRV Shunt":
+        ohm = 0.1
+    elif key == "ADCS_VDD_12V_DRVX Shunt":
+        ohm = 1
+    elif key == "ADCS_VDD_12V_DRVY Shunt":
+        ohm = 1
+    elif key == "ADCS_VDD_12V_DRVZ Shunt":
+        ohm = 1
+
+    return ohm
 
 
 def extract_gnss(line, target, idx):
@@ -100,7 +132,8 @@ def extract(line, target, key):
         if '.' in val[1]:
             y_data[target].append(float(val[1]))
         elif 'Shunt' in key:
-            y_data[target].append(float(int(val[1])/1000))
+            ohm = get_shunt_ohm(key)
+            y_data[target].append(float(int(val[1])/1000/ohm))
         elif 'Bus' in key:
             y_data[target].append(float(int(val[1])/1000))
         else:

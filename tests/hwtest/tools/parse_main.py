@@ -26,26 +26,26 @@ TARGET_LIST = [
     "Magnetometer X+ Temperature:[deg]",
     "Magnetometer X- Temperature:[deg]",
     "Payload Board Temperature:[deg]",
-    "OBC_1V0 Shunt:[mv]",
+    "OBC_1V0 Shunt:[mA]",
     "OBC_1V0 Bus:[v]",
-    "OBC_1V8 Shunt:[mv]",
+    "OBC_1V8 Shunt:[mA]",
     "OBC_1V8 Bus:[v]",
-    "OBC_3V3 Shunt:[mv]",
+    "OBC_3V3 Shunt:[mA]",
     "OBC_3V3 Bus:[v]",
-    "OBC_3V3_SYSA Shunt:[mv]",
+    "OBC_3V3_SYSA Shunt:[mA]",
     "OBC_3V3_SYSA Bus:[v]",
-    "OBC_3V3_SYSB Shunt:[mv]",
+    "OBC_3V3_SYSB Shunt:[mA]",
     "OBC_3V3_SYSB Bus:[v]",
-    "OBC_3V3_IO Shunt:[mv]",
+    "OBC_3V3_IO Shunt:[mA]",
     "OBC_3V3_IO Bus:[v]",
     "OBC_XADC VCCINT:[v]",
     "OBC_XADC VCCAUX:[v]",
     "OBC_XADC VCCBRAM:[v]",
-    "IO_PDU_04_3V3 Shunt:[mv]",
+    "IO_PDU_04_3V3 Shunt:[mA]",
     "IO_PDU_04_3V3 Bus:[v]",
-    "IO_VDD_3V3_SYS Shunt:[mv]",
+    "IO_VDD_3V3_SYS Shunt:[mA]",
     "IO_VDD_3V3_SYS Bus:[v]",
-    "IO_VDD_3V3 Shunt:[mv]",
+    "IO_VDD_3V3 Shunt:[mA]",
     "Uptime of EPS:[s]",
     "Uptime of SRS-3:[s]",
     "Uptime of ADCS Board:[s]",
@@ -59,6 +59,32 @@ TARGET_LIST = [
 
 x_data = {}
 y_data = {}
+
+
+def get_shunt_ohm(key):
+
+    ohm = 0
+
+    if key == "OBC_1V0 Shunt":
+        ohm = 0.01
+    elif key == "OBC_1V8 Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3 Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3_SYSA Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3_SYSB Shunt":
+        ohm = 0.01
+    elif key == "OBC_3V3_IO Shunt":
+        ohm = 0.01
+    elif key == "IO_PDU_04_3V3 Shunt":
+        ohm = 0.01
+    elif key == "IO_VDD_3V3_SYS Shunt":
+        ohm = 0.1
+    elif key == "IO_VDD_3V3 Shunt":
+        ohm = 0.1
+
+    return ohm
 
 
 def extract(line, target, key):
@@ -77,7 +103,8 @@ def extract(line, target, key):
         if '.' in val[1]:
             y_data[target].append(float(val[1]))
         elif 'Shunt' in key:
-            y_data[target].append(float(int(val[1])/1000))
+            ohm = get_shunt_ohm(key)
+            y_data[target].append(float(int(val[1])/1000/ohm))
         elif 'Bus' in key:
             y_data[target].append(float(int(val[1])/1000))
         else:
