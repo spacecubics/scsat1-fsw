@@ -130,17 +130,17 @@ static int get_rw_register_addr(enum adcs_cv_pos pos, uint16_t *addr)
 	return ret;
 }
 
-static uint32_t convert_cv_shunt(uint32_t raw)
+static int32_t convert_cv_shunt(int16_t raw)
 {
 	return ((raw >> 3) * 40);
 }
 
-static uint32_t convert_cv_bus(uint32_t raw)
+static int32_t convert_cv_bus(int16_t raw)
 {
 	return ((raw >> 3) * 8);
 }
 
-static float convert_rw_cv_shunt(uint16_t raw)
+static float convert_rw_cv_shunt(int16_t raw)
 {
 	return (raw * 5) / 1000;
 }
@@ -150,7 +150,7 @@ static float convert_rw_cv_bus(uint16_t raw)
 	return (raw * 3.125) / 1000;
 }
 
-static int convert_cv(enum adcs_cv_pos pos, uint16_t raw, uint32_t *cv)
+static int convert_cv(enum adcs_cv_pos pos, int16_t raw, int32_t *cv)
 {
 	int ret = 0;
 
@@ -181,7 +181,7 @@ static int convert_rw_cv(enum rw_cv_pos pos, uint16_t raw, float *cv)
 	case ADCS_VDD_12V_DRVX_SHUNT:
 	case ADCS_VDD_12V_DRVY_SHUNT:
 	case ADCS_VDD_12V_DRVZ_SHUNT:
-		*cv = convert_rw_cv_shunt(raw);
+		*cv = convert_rw_cv_shunt((int16_t)raw);
 		break;
 	case ADCS_VDD_12V_DRVX_BUS:
 	case ADCS_VDD_12V_DRVY_BUS:
@@ -201,7 +201,7 @@ int get_adcs_cv(enum adcs_cv_pos pos, uint32_t *cv)
 	int ret;
 	uint8_t data[2];
 	uint16_t reg;
-	uint16_t raw;
+	int16_t raw;
 
 	const struct device *dev = get_adcs_cv_device(pos);
 	if (dev == NULL) {

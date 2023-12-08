@@ -99,12 +99,12 @@ static float convert_xadc_temp(uint32_t raw)
 	return conv_tmp;
 }
 
-static uint32_t convert_cv_shunt(uint32_t raw)
+static uint32_t convert_cv_shunt(int16_t raw)
 {
 	return ((raw >> 3) * 40);
 }
 
-static uint32_t convert_cv_bus(uint32_t raw)
+static uint32_t convert_cv_bus(int16_t raw)
 {
 	return ((raw >> 3) * 8);
 }
@@ -118,9 +118,10 @@ static float convert_cv_xadc(uint32_t raw)
 	return conv_cv / 4096 * 3;
 }
 
-static int convert_obc_cv(enum obc_cv_pos pos, uint32_t raw, uint32_t *cv)
+static int convert_obc_cv(enum obc_cv_pos pos, uint32_t raw, int32_t *cv)
 {
 	int ret = 0;
+	int16_t rawval = raw & 0x0000FFFF;
 
 	switch (pos) {
 	case OBC_1V0_SHUNT:
@@ -129,7 +130,7 @@ static int convert_obc_cv(enum obc_cv_pos pos, uint32_t raw, uint32_t *cv)
 	case OBC_3V3_SYSA_SHUNT:
 	case OBC_3V3_SYSB_SHUNT:
 	case OBC_3V3_IO_SHUNT:
-		*cv = convert_cv_shunt(raw);
+		*cv = convert_cv_shunt(rawval);
 		break;
 	case OBC_1V0_BUS:
 	case OBC_1V8_BUS:
@@ -137,7 +138,7 @@ static int convert_obc_cv(enum obc_cv_pos pos, uint32_t raw, uint32_t *cv)
 	case OBC_3V3_SYSA_BUS:
 	case OBC_3V3_SYSB_BUS:
 	case OBC_3V3_IO_BUS:
-		*cv = convert_cv_bus(raw);
+		*cv = convert_cv_bus(rawval);
 		break;
 	default:
 		ret = -ENODEV;
@@ -370,7 +371,7 @@ end:
 	return ret;
 }
 
-int sc_main_bhm_get_obc_cv(enum obc_cv_pos pos, uint32_t *cv)
+int sc_main_bhm_get_obc_cv(enum obc_cv_pos pos, int32_t *cv)
 {
 	int ret;
 	uint32_t addr;
