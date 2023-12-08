@@ -12,16 +12,6 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main_init);
 
-
-#include <stdint.h>
-
-#define DRV2_PWR     BIT(5)
-#define DRV1_PWR     BIT(4)
-#define DSTRX_IO_PWR BIT(3)
-#define PDU_O3_PWR   BIT(2)
-#define PDU_O2_PWR   BIT(1)
-#define PDU_O1_PWR   BIT(0)
-
 int main_init(uint32_t *err_cnt)
 {
 	int ret;
