@@ -73,17 +73,17 @@ static int get_register_addr(enum io_cv_pos pos, uint16_t *addr)
 	return ret;
 }
 
-static uint32_t convert_cv_shunt(uint32_t raw)
+static int32_t convert_cv_shunt(int16_t raw)
 {
 	return ((raw >> 3) * 40);
 }
 
-static uint32_t convert_cv_bus(uint32_t raw)
+static int32_t convert_cv_bus(int16_t raw)
 {
 	return ((raw >> 3) * 8);
 }
 
-static int convert_cv(enum io_cv_pos pos, uint16_t raw, uint32_t *cv)
+static int convert_cv(enum io_cv_pos pos, uint16_t raw, int32_t *cv)
 {
 	int ret = 0;
 
