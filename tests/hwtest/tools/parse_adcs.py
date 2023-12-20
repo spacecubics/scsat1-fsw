@@ -129,13 +129,19 @@ def extract(line, target, key):
         if len(val) == 1 or val[1] == 'Failed':
             return
         x_data[target].append(datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
-        if '.' in val[1]:
-            y_data[target].append(float(val[1]))
-        elif 'Shunt' in key:
+        if 'Shunt' in key:
             ohm = get_shunt_ohm(key)
-            y_data[target].append(float(int(val[1])/1000/ohm))
+            if '.' in val[1]:
+                y_data[target].append(float(float(val[1])/1000/ohm))
+            else:
+                y_data[target].append(float(int(val[1])/1000/ohm))
         elif 'Bus' in key:
-            y_data[target].append(float(int(val[1])/1000))
+            if '.' in val[1]:
+                y_data[target].append(float(float(val[1])/1000))
+            else:
+                y_data[target].append(float(int(val[1])/1000))
+        elif '.' in val[1]:
+            y_data[target].append(float(val[1]))
         else:
             y_data[target].append(int(val[1]))
 
