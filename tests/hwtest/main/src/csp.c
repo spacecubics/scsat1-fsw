@@ -17,6 +17,8 @@ LOG_MODULE_REGISTER(csp);
 static csp_iface_t *can_iface1 = NULL;
 static csp_iface_t *can_iface2 = NULL;
 
+void server();
+
 static void *router_task(void *param) {
 
 	/* Here there be routing */
@@ -27,15 +29,66 @@ static void *router_task(void *param) {
 	return NULL;
 }
 
+static void *server_task(void *p1, void *p2, void *p3) {
+
+	ARG_UNUSED(p1);
+	ARG_UNUSED(p2);
+	ARG_UNUSED(p3);
+
+	server();
+
+	return NULL;
+}
+
 K_THREAD_DEFINE(router_id, ROUTER_STACK_SIZE,
 				router_task, NULL, NULL, NULL,
 				ROUTER_PRIO, 0, K_TICKS_FOREVER);
+K_THREAD_DEFINE(server_id, SERVER_STACK_SIZE,
+				server_task, NULL, NULL, NULL,
+				SERVER_PRIO, 0, K_TICKS_FOREVER);
 
 static void router_start(void) {
 	k_thread_start(router_id);
 }
 
+static void server_start(void) {
+	k_thread_start(server_id);
+}
+
 extern csp_conf_t csp_conf;
+
+void server(void) {
+
+	LOG_INF("Server task started");
+
+	csp_socket_t sock = {0};
+
+	csp_bind(&sock, CSP_ANY);
+
+	csp_listen(&sock, 10);
+
+	while (true) {
+
+		csp_conn_t *conn;
+		if ((conn = csp_accept(&sock, 10000)) == NULL) {
+			continue;
+		}
+
+		csp_packet_t *packet;
+		while ((packet = csp_read(conn, 50)) != NULL) {
+			switch (csp_conn_dport(conn)) {
+			default:
+				csp_service_handler(packet);
+				break;
+			}
+		}
+
+		csp_close(conn);
+	}
+
+	return;
+
+}
 
 int csp_enable(void)
 {
@@ -86,6 +139,8 @@ int csp_enable(void)
 	csp_rtable_print();
 
 	router_start();
+
+	server_start();
 end:
 	return ret;
 }
