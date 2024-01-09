@@ -137,7 +137,7 @@ def extract(line, target, key):
                 y_data[target].append(float(int(val[1])/1000/ohm))
         elif 'Bus' in key:
             if '.' in val[1]:
-                y_data[target].append(float(float(val[1])/1000))
+                y_data[target].append(float(float(val[1])))
             else:
                 y_data[target].append(float(int(val[1])/1000))
         elif '.' in val[1]:
