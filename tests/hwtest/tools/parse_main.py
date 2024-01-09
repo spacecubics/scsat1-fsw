@@ -78,7 +78,7 @@ def get_shunt_ohm(key):
     elif key == "OBC_3V3_IO Shunt":
         ohm = 0.01
     elif key == "IO_PDU_04_3V3 Shunt":
-        ohm = 0.01
+        ohm = 0.1
     elif key == "IO_VDD_3V3_SYS Shunt":
         ohm = 0.1
     elif key == "IO_VDD_3V3 Shunt":
