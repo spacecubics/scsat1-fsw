@@ -112,8 +112,11 @@ def extract_gnss(line, target, idx):
     date = dat[0].replace('[', '')
     dat = line.split(',')
     if len(dat) >= idx:
-        x_data[target].append(datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
-        y_data[target].append(float(dat[idx]))
+        try:
+            y_data[target].append(float(dat[idx]))
+            x_data[target].append(datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+        except:
+            print(line)
 
 
 def extract(line, target, key):
