@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+
+description: Space Cubics DSTRX-3 (S-band Transceiver)
+
+compatible: "sc,dstrx3"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true

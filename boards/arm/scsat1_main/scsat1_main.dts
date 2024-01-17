@@ -162,6 +162,12 @@
 			reg = <0x50030000 0x10000>;
 			max-out-channel = <6>;
 		};
+
+		dstrx: dstrx@50300000 {
+			compatible = "sc,dstrx3";
+			reg = <0x50300000 0x10000>;
+			interrupts = <21 0>;
+		};
 	};
 };
 
