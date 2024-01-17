@@ -9,3 +9,17 @@ include: base.yaml
 properties:
   reg:
     required: true
+
+  tx-power:
+    type: int
+    description: |
+      Default TX power mode value for DSTRX-3.
+      Range is 0 to 15. Details is defined in ICD.
+    required: true
+
+  bit-rate:
+    type: int
+    description: |
+      Default bit rate value for DSTRX-3.
+      Range is 0 to 3. Details is defined in ICD.
+    required: true

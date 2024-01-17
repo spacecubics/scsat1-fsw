@@ -167,6 +167,8 @@
 			compatible = "sc,dstrx3";
 			reg = <0x50300000 0x10000>;
 			interrupts = <21 0>;
+			tx-power = <15>;
+			bit-rate = <3>;
 		};
 	};
 };
