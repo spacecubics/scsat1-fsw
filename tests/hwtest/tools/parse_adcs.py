@@ -174,7 +174,7 @@ def write_pdf():
             pyplot.gca().xaxis.set_major_formatter(DateFormatter("%H:%M"))
             pyplot.gcf().autofmt_xdate()
 
-            if 'Tem' not in target:
+            if 'Tem' not in target and 'count' not in target:
                 y_min, y_max = pyplot.gca().get_ylim()
                 pyplot.gca().set_ylim(0, y_max * 1.1)
 
