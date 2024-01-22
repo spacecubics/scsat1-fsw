@@ -31,6 +31,11 @@ int main_init(uint32_t *err_cnt)
 
 	k_sleep(K_SECONDS(1));
 
+	sc_main_power_enable(DSTRX_IO_PWR);
+	LOG_INF("Power on the DSTRX-3 IO");
+
+	k_sleep(K_SECONDS(1));
+
 	sc_main_power_enable(PDU_O1_PWR);
 	LOG_INF("Power on the ADCS Board");
 
