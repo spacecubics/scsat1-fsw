@@ -416,7 +416,7 @@ static void sc_can_set_acceptance_filter(const struct sc_can_cfg *config, int fi
 	uint32_t mask_reg = 0;
 	uint32_t value_reg = 0;
 	bool extended = filter->flags & CAN_FILTER_IDE;
-	bool rtr = filter->flags & CAN_FILTER_RTR;
+	bool rtr = IS_ENABLED(CONFIG_CAN_ACCEPT_RTR);
 
 	if (filter->flags & CAN_FILTER_IDE) {
 		mask_reg = (SCCAN_AFID_EX1(filter->mask) | SCCAN_AFSRTR(1) | SCCAN_AFIDE(extended) |
@@ -926,7 +926,7 @@ static int sc_can_send(const struct device *dev, const struct can_frame *frame, 
 		goto nolock;
 	}
 
-	if ((frame->flags & ~(CAN_FRAME_IDE | CAN_FRAME_RTR)) != 0) {
+	if ((frame->flags & ~(CAN_FRAME_IDE)) != 0) {
 		LOG_ERR("unsupported CAN frame flags 0x%02x", frame->flags);
 		ret = -ENOTSUP;
 		goto nolock;
