@@ -166,13 +166,11 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 typedef void (*irq_init_func_t)(const struct device *dev);
 
 struct sc_can_cfg {
+	const struct can_driver_config common;
 	uint32_t reg_addr;
 	irq_init_func_t irq_init;
 	uint32_t clock_frequency;
-	uint32_t bus_speed;
 	uint8_t sjw;
-	uint16_t sample_point;
-	uint32_t max_bitrate;
 	uint8_t tx_fifo_depth;
 	uint8_t max_filter;
 };
@@ -188,13 +186,8 @@ struct sc_can_rx_filters {
 	void *rx_cb_arg;
 };
 
-
-struct sc_can_state_change_cb_data {
-	can_state_change_callback_t sc_cb;
-	void *sc_cb_arg;
-};
-
 struct sc_can_data {
+	struct can_driver_data common;
 	/*
 	 * These mutex protects:
 	 *  - Enabling/Disabling operations for CAN at the same time
@@ -214,7 +207,6 @@ struct sc_can_data {
 	uint8_t tx_head;
 	uint8_t tx_tail;
 	struct sc_can_rx_filters *rx_filters;
-	struct sc_can_state_change_cb_data state_change_cb_data;
 	enum can_state state;
 };
 
@@ -608,8 +600,8 @@ static int sc_can_get_state(const struct device *dev, enum can_state *state,
 static void sc_can_state_change(const struct device *dev)
 {
 	struct sc_can_data *data = dev->data;
-	const can_state_change_callback_t cb = data->state_change_cb_data.sc_cb;
-	void *user_data = data->state_change_cb_data.sc_cb_arg;
+	const can_state_change_callback_t cb = data->common.state_change_cb;
+	void *user_data = data->common.state_change_cb_user_data;
 	struct can_bus_err_cnt err_cnt;
 	enum can_state new_state;
 
@@ -888,8 +880,8 @@ static void sc_can_set_state_change_callback(const struct device *dev,
 {
 	struct sc_can_data *data = dev->data;
 
-	data->state_change_cb_data.sc_cb = cb;
-	data->state_change_cb_data.sc_cb_arg = user_data;
+	data->common.state_change_cb = cb;
+	data->common.state_change_cb_user_data = user_data;
 }
 
 #ifndef CONFIG_CAN_AUTO_BUS_OFF_RECOVERY
@@ -1060,7 +1052,7 @@ static int sc_can_init(const struct device *dev)
 
 	/* Set timing according to dts default setting */
 	timing.sjw = config->sjw;
-	ret = can_calc_timing(dev, &timing, config->bus_speed, config->sample_point);
+	ret = can_calc_timing(dev, &timing, config->common.bus_speed, config->common.sample_point);
 	if (ret == -EINVAL) {
 		LOG_ERR("Can't find timing for given param");
 		return -EIO;
@@ -1102,15 +1094,6 @@ static int sc_can_get_max_filters(const struct device *dev, bool ide)
 	return config->max_filter;
 }
 
-static int sc_can_get_max_bitrate(const struct device *dev, uint32_t *max_bitrate)
-{
-	const struct sc_can_cfg *config = dev->config;
-
-	*max_bitrate = config->max_bitrate;
-
-	return 0;
-}
-
 static const struct can_driver_api sc_can_driver_api = {
 	.get_capabilities = sc_can_get_capabilities,
 	.start = sc_can_start,
@@ -1127,7 +1110,6 @@ static const struct can_driver_api sc_can_driver_api = {
 	.set_state_change_callback = sc_can_set_state_change_callback,
 	.get_core_clock = sc_can_get_core_clock,
 	.get_max_filters = sc_can_get_max_filters,
-	.get_max_bitrate = sc_can_get_max_bitrate,
 	/*
 	 * ISO 11898-1:
 	 *   Nominal length of time segments (in absence of synchronization)
@@ -1173,13 +1155,11 @@ static const struct can_driver_api sc_can_driver_api = {
 	static struct sc_can_tx_cb_data tx_cb_data_list_##n[DT_INST_PROP(n, tx_fifo_depth)];       \
 	static struct sc_can_rx_filters rx_filters_##n[DT_INST_PROP(n, max_filter)];          \
 	static const struct sc_can_cfg sc_can_cfg_##n = {                                          \
+		.common = CAN_DT_DRIVER_CONFIG_INST_GET(n, 1000000),       \
 		.reg_addr = DT_INST_REG_ADDR(n),                                                   \
 		.irq_init = sc_can_##n##_irq_init,                                                 \
 		.clock_frequency = DT_INST_PROP(n, clock_frequency),                               \
-		.bus_speed = DT_INST_PROP(n, bus_speed),                                           \
 		.sjw = DT_INST_PROP(n, sjw),                                                       \
-		.sample_point = DT_INST_PROP(n, sample_point),                                     \
-		.max_bitrate = DT_INST_CAN_TRANSCEIVER_MAX_BITRATE(n, 1000000),                    \
 		.tx_fifo_depth = DT_INST_PROP(n, tx_fifo_depth),                                   \
 		.max_filter = DT_INST_PROP(n, max_filter),                                         \
 	};                                                                                         \
@@ -1191,7 +1171,6 @@ static const struct can_driver_api sc_can_driver_api = {
 		.tx_tail = 0,                                                                      \
 		.rx_filters = rx_filters_##n,                                            \
 		.state = CAN_STATE_STOPPED,                                                        \
-		.state_change_cb_data.sc_cb = NULL,                                                \
 	};                                                                                         \
 	CAN_DEVICE_DT_INST_DEFINE(n, sc_can_init, NULL, &sc_can_data_##n, &sc_can_cfg_##n,         \
 				  POST_KERNEL, CONFIG_CAN_INIT_PRIORITY, &sc_can_driver_api);      \
