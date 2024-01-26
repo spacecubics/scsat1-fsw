@@ -12,6 +12,6 @@ manifest:
           - picolibc
 
     - name: libcsp
-      url: https://github.com/yashi/libcsp
-      revision: zephyr
+      url: https://github.com/libcsp/libcsp.git
+      revision: develop
       path: modules/lib/libcsp
