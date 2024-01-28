@@ -15,6 +15,7 @@
 #include "csp_test.h"
 #include "sunsens_test.h"
 #include "mtq_test.h"
+#include "dstrx3_test.h"
 #include "main_init.h"
 #include "loop_test.h"
 
@@ -56,6 +57,8 @@ static void cmd_handler(void * p1, void * p2, void * p3)
 		ret = sunsens_test(&err_cnt);
 	} else if (strcmp(cmd, "mtq") == 0) {
 		ret = mtq_test(&err_cnt);
+	} else if (strcmp(cmd, "dstrx3") == 0) {
+		ret = dstrx3_test(&err_cnt);
 	} else if (strcmp(cmd, "loop") == 0) {
 		ret = loop_test(atoi(arg), &err_cnt);
 		k_event_clear(&loop_event, LOOP_STOP_EVENT);
@@ -133,6 +136,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(mtq, NULL, "Magnetorquer test command", start_cmd_thread),
 	SHELL_CMD(csp, NULL, "CSP test command", start_cmd_thread),
 	SHELL_CMD(sun, NULL, "Sun Sensor test command", start_cmd_thread),
+	SHELL_CMD(dstrx3, NULL, "DSTRX-3 test command", start_cmd_thread),
 	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread),
 	SHELL_SUBCMD_SET_END
 );

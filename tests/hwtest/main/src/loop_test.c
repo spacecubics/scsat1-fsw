@@ -12,6 +12,7 @@
 #include "csp_test.h"
 #include "sunsens_test.h"
 #include "mgnm_test.h"
+#include "dstrx3_test.h"
 #include "mtq.h"
 
 #include <zephyr/logging/log.h>
@@ -72,6 +73,14 @@ static int one_loop(uint32_t *err_cnt)
 
 	LOG_INF("===[Magnetometer Test Start (total err: %d)]===", *err_cnt);
 	ret = mgnm_test(err_cnt);
+	if (ret < 0) {
+		all_ret = -1;
+	}
+
+	k_sleep(K_MSEC(100));
+
+	LOG_INF("===[DSTRX-3 Test Start (total err: %d)]===", *err_cnt);
+	ret = dstrx3_test(err_cnt);
 	if (ret < 0) {
 		all_ret = -1;
 	}
