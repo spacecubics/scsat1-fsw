@@ -129,7 +129,7 @@ int sc_dstrx3_get_hk_telemetry(const struct device *dev, struct sc_dstrx3_hk *hk
 	LOG_DBG("RSSI             : %d", hk->rssi);
 	LOG_DBG("RCV_FREQ         : %d", hk->rcv_freq);
 	LOG_DBG("TEMPERATURE      : %d", hk->temperature);
-	LOG_DBG("VOLTAGE          : %f [v] (raw: %d)", (float)((hk->voltage / 256) * 2.5),
+	LOG_DBG("VOLTAGE          : %f [v] (raw: %d)", (double)(hk->voltage / 256.0f * 2.5f),
 		hk->voltage);
 	LOG_DBG("TX_PWR           : %d", hk->tx_power);
 	LOG_DBG("CARRIER_LOCK     : %d", hk->carrier_lock);
