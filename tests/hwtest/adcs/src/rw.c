@@ -147,21 +147,21 @@ void rw_print_cv(enum rw_pos pos)
 	switch (pos) {
 	case RW_POS_X:
 		get_rw_cv(ADCS_VDD_12V_DRVX_SHUNT, &cv);
-		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], cv);
+		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], (double)cv);
 		get_rw_cv(ADCS_VDD_12V_DRVX_BUS, &cv);
-		LOG_INF("%s X Bus %.4f [v]", rw_pos_name[pos], cv);
+		LOG_INF("%s X Bus %.4f [v]", rw_pos_name[pos], (double)cv);
 		break;
 	case RW_POS_Y:
 		get_rw_cv(ADCS_VDD_12V_DRVY_SHUNT, &cv);
-		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], cv);
+		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], (double)cv);
 		get_rw_cv(ADCS_VDD_12V_DRVY_BUS, &cv);
-		LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], cv);
+		LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], (double)cv);
 		break;
 	case RW_POS_Z:
 		get_rw_cv(ADCS_VDD_12V_DRVZ_SHUNT, &cv);
-		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], cv);
+		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], (double)cv);
 		get_rw_cv(ADCS_VDD_12V_DRVZ_BUS, &cv);
-		LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], cv);
+		LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], (double)cv);
 		break;
 	default:
 		break;

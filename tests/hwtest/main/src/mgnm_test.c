@@ -37,7 +37,7 @@ int mgnm_test(uint32_t *err_cnt)
 		}
 
 		LOG_INF("Magnetometer %s Temperature: %.1f [deg]",
-				 pos_name[i], temp);
+				 pos_name[i], (double)temp);
 	}
 
 	/* Magnet Field */

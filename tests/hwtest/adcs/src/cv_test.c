@@ -97,7 +97,7 @@ static int cv_xadc_test(uint32_t *err_cnt)
 			all_ret = -1;
 			continue;
 		}
-		LOG_INF("%s: %.4f [v]", xadc_pos_name[i], cv);
+		LOG_INF("%s: %.4f [v]", xadc_pos_name[i], (double)cv);
 	}
 
 	return all_ret;
@@ -186,7 +186,7 @@ static int cv_rw_test(uint32_t *err_cnt)
 			all_ret = -1;
 			continue;
 		}
-		LOG_INF("%s: %.4f %s", rw_pos_name[i], cv, rw_unit_name[i]);
+		LOG_INF("%s: %.4f %s", rw_pos_name[i], (double)cv, rw_unit_name[i]);
 	}
 
 	return ret;

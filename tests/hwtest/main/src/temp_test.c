@@ -36,7 +36,7 @@ static int temp_obc_test(uint32_t *err_cnt)
 			all_ret = -1;
 			continue;
 		}
-		LOG_INF("%s Temperature: %.4f [deg]", obc_pos_name[i], temp);
+		LOG_INF("%s Temperature: %.4f [deg]", obc_pos_name[i], (double)temp);
 	}
 
 	return all_ret;
@@ -52,7 +52,7 @@ static int temp_xadc_test(uint32_t *err_cnt)
 		LOG_ERR("OBC XADC Temperature: Failed");
 		(*err_cnt)++;
 	} else {
-		LOG_INF("OBC XADC Temperature: %.4f [deg]", temp);
+		LOG_INF("OBC XADC Temperature: %.4f [deg]", (double)temp);
 	}
 
 	return ret;
@@ -88,7 +88,7 @@ static int temp_ioboard_test(uint32_t *err_cnt)
 			all_ret = -1;
 			continue;
 		}
-		LOG_INF("%s Temperature: %.4f [deg]", io_pos_name[i], temp);
+		LOG_INF("%s Temperature: %.4f [deg]", io_pos_name[i], (double)temp);
 	}
 
 	return all_ret;

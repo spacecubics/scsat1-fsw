@@ -115,8 +115,8 @@ int mtq_start(enum mtq_axes axes, enum mtq_polarity pol, float duty)
 	struct mtq_config cfg;
 	pwm_flags_t flags = PWM_POLARITY_NORMAL;
 
-	if (duty <= 0.0 || duty > 1.0) {
-		LOG_ERR("Invalid argument. duty: %.1f", duty);
+	if (duty <= 0.0f || duty > 1.0f) {
+		LOG_ERR("Invalid argument. duty: %.1f", (double)duty);
 		ret = -EINVAL;
 		goto end;
 	}
