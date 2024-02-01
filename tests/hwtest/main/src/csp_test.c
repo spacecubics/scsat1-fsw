@@ -41,7 +41,7 @@ static int csp_get_pyld_status_cmd(float *temp, uint16_t *count)
 		goto cleanup;
 	}
 
-	*temp = (int8_t)packet->data[1] + (float)packet->data[0] * 0.0625;
+	*temp = (int8_t)packet->data[1] + (float)packet->data[0] * 0.0625f;
 	*count = (packet->data[3] << 8) + packet->data[2];
 cleanup:
 	csp_buffer_free(packet);
@@ -98,7 +98,7 @@ int csp_test(uint32_t *err_cnt)
 		(*err_cnt)++;
 		all_ret = -1;
 	} else {
-		LOG_INF("Payload Board Temperature: %.1f [deg]", temp);
+		LOG_INF("Payload Board Temperature: %.1f [deg]", (double)temp);
 		LOG_INF("Payload Board JPEG Count: %d", count);
 	}
 

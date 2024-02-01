@@ -103,7 +103,7 @@ int get_ioboard_temp(enum io_temp_pos pos, float *temp)
 	}
 
 	data[1] = data[1] >> 4;
-	*temp = (int8_t)data[0] + (float)data[1] * 0.0625;
+	*temp = (int8_t)data[0] + (float)data[1] * 0.0625f;
 end:
 	return ret;
 }

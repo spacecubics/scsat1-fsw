@@ -30,7 +30,7 @@ int dstrx3_test(uint32_t *err_cnt)
 		(2105.350 + (hk.rcv_freq * 100)), hk.rcv_freq);
 	LOG_INF("DSTRX-3 HK TEMPERATURE      : %d [deg]", hk.temperature);
 	LOG_INF("DSTRX-3 HK VOLTAGE          : %.04f [v] (raw: %d)",
-		(float)((hk.voltage / 256) * 2.5), hk.voltage);
+		(double)((hk.voltage / 256.0f) * 2.5f), hk.voltage);
 	LOG_INF("DSTRX-3 HK TX_PWR           : %.04f [dBm] (raw: %d)",
 		((0.2473 * hk.tx_power) + 0.99), hk.tx_power);
 	LOG_INF("DSTRX-3 HK CARRIER_LOCK     : %d", hk.carrier_lock);

@@ -83,7 +83,7 @@ int get_adcs_temp(enum adcs_temp_pos pos, float *temp)
 	}
 
 	data[1] = data[1] >> 4;
-	*temp = (int8_t)data[0] + (float)data[1] * 0.0625;
+	*temp = (int8_t)data[0] + (float)data[1] * 0.0625f;
 
 end:
 	return ret;

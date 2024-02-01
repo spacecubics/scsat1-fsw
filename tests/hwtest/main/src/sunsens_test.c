@@ -34,7 +34,7 @@ int sunsens_test(uint32_t *err_cnt)
 			all_ret = -1;
 			continue;
 		}
-		LOG_INF("%s Temperature: %f [deg]", pos_name[i], temp);
+		LOG_INF("%s Temperature: %f [deg]", pos_name[i], (double)temp);
 
 		ret = get_sunsens_data(pos_list[i], &sun_data);
 		if (ret < 0) {
