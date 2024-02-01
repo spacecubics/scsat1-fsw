@@ -66,3 +66,5 @@ jobs:
           west build -d build-boot bootloader
           west build -d build-main main
           west build -d build-adcs adcs
+          west build -d build-hwtest-main tests/hwtest/main
+          west build -d build-hwtest-adcs tests/hwtest/adcs
