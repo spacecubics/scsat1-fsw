@@ -10,8 +10,8 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(cv);
 
-#define CV_ADCS_ADDR  (0x42)
-#define CV_RW_ADDR    (0x40)
+#define CV_ADCS_ADDR (0x42)
+#define CV_RW_ADDR   (0x40)
 
 #define CV_CH1_SHUNT_REG (0x01)
 #define CV_CH1_BUS_REG   (0x02)
@@ -217,8 +217,8 @@ int get_adcs_cv(enum adcs_cv_pos pos, uint32_t *cv)
 
 	ret = i2c_burst_read(dev, CV_ADCS_ADDR, reg, data, ARRAY_SIZE(data));
 	if (ret < 0) {
-		LOG_ERR("Failed to i2c_burst_read for Current/Voltage Monitor (pos: %d) (%d)",
-				 pos, ret);
+		LOG_ERR("Failed to i2c_burst_read for Current/Voltage Monitor (pos: %d) (%d)", pos,
+			ret);
 		goto end;
 	}
 	raw = data[0] << 8 | data[1];
@@ -250,7 +250,7 @@ int get_rw_cv(enum rw_cv_pos pos, float *cv)
 	ret = i2c_burst_read(dev, CV_RW_ADDR, reg, data, ARRAY_SIZE(data));
 	if (ret < 0) {
 		LOG_ERR("Failed to i2c_burst_read for RW Current/Voltage Monitor (pos: %d) (%d)",
-				 pos, ret);
+			pos, ret);
 		goto end;
 	}
 	raw = (data[0] << 8) | data[1];

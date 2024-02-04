@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2023 Space Cubics, LLC.↲
- *↲
- * SPDX-License-Identifier: Apache-2.0↲
+ * Copyright (c) 2023 Space Cubics, LLC.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #pragma once
@@ -13,8 +13,7 @@ enum sunsens_pos {
 	SUNSENS_POS_Y_MINUS,
 };
 
-struct sunsens_data
-{
+struct sunsens_data {
 	uint16_t a;
 	uint16_t b;
 	uint16_t c;

@@ -61,7 +61,7 @@ int wait_for_measurement_complete(const struct device *dev, uint8_t mask_bit)
 	uint8_t data;
 
 	/* Wait for the measurement to be complete */
-	for (i=0; i<MGNM_RETRY_COUNT; i++) {
+	for (i = 0; i < MGNM_RETRY_COUNT; i++) {
 		ret = i2c_burst_read(dev, MGNM_SLAVE_ADDR, MGNM_STATUS_REG, &data, 1);
 		if (ret < 0) {
 			LOG_ERR("Failed to i2c_burst_read for Status Register: %d", ret);
@@ -165,7 +165,7 @@ int get_mgnm_magnet(enum mgnm_pos pos, struct magnet_field *magnet)
 		goto end;
 	}
 
-	for (int i=0; i<3; i++) {
+	for (int i = 0; i < 3; i++) {
 		ret = i2c_burst_read(dev, MGNM_SLAVE_ADDR, out0_regs[i], &data, 1);
 		if (ret < 0) {
 			LOG_ERR("Failed to i2c_burst_read for Magnet Filed 0(%d): %d", i, ret);
@@ -223,7 +223,7 @@ int print_mgnm_field(void)
 	enum mgnm_pos pos_list[] = {MGNM_POS_X_PLUS, MGNM_POS_X_MINUS};
 
 	struct magnet_field magnet;
-	for (int i=0; i<ARRAY_SIZE(pos_list); i++) {
+	for (int i = 0; i < ARRAY_SIZE(pos_list); i++) {
 		ret = start_mgnm_magnet_measurement(pos_list[i]);
 		if (ret < 0) {
 			LOG_ERR("Magnetometer %s X/Y/Z: Failed", pos_name[i]);
@@ -236,11 +236,8 @@ int print_mgnm_field(void)
 			break;
 		}
 
-		LOG_INF("Magnetometer %s X: 0x%08x, Y: 0x%08x, Z: 0x%08x",
-				 pos_name[i],
-				magnet.x_out,
-				magnet.y_out,
-				magnet.z_out);
+		LOG_INF("Magnetometer %s X: 0x%08x, Y: 0x%08x, Z: 0x%08x", pos_name[i],
+			magnet.x_out, magnet.y_out, magnet.z_out);
 	}
 
 	return ret;

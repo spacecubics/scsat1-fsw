@@ -15,7 +15,7 @@ static int print_mgnm(uint32_t sec)
 {
 	int ret;
 
-	for (int i=0; i<sec; i++) {
+	for (int i = 0; i < sec; i++) {
 		k_sleep(K_SECONDS(1));
 		ret = print_mgnm_field();
 		if (ret < 0) {
@@ -42,8 +42,8 @@ int mtq_test(uint32_t *err_cnt)
 		MTQ_POL_NON,
 	};
 
-	for (int i=0; i<ARRAY_SIZE(axes_list); i++) {
-		for (int j=0; j<ARRAY_SIZE(pol_list); j++) {
+	for (int i = 0; i < ARRAY_SIZE(axes_list); i++) {
+		for (int j = 0; j < ARRAY_SIZE(pol_list); j++) {
 			ret = mtq_start(axes_list[i], pol_list[j], duty);
 			if (ret < 0) {
 				(*err_cnt)++;

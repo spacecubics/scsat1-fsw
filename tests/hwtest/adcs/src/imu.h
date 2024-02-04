@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2023 Space Cubics, LLC.↲
- *↲
- * SPDX-License-Identifier: Apache-2.0↲
+ * Copyright (c) 2023 Space Cubics, LLC.
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #pragma once
@@ -20,8 +20,7 @@ struct imu_acc {
 	uint32_t z;
 };
 
-struct imu_data
-{
+struct imu_data {
 	uint8_t id;
 	uint32_t timestamp;
 	uint32_t temp;

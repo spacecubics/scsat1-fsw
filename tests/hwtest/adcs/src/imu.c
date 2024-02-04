@@ -76,8 +76,8 @@ int get_imu_data_std(struct imu_data *data)
 	uint8_t rxbuf[IMU_STD_DATA_SIZE];
 	struct spi_buf tx_buf[1];
 	struct spi_buf rx_buf[1];
-	struct spi_buf_set tx_set = { .buffers = tx_buf, .count = 1 };
-	struct spi_buf_set rx_set = { .buffers = rx_buf, .count = 1 };
+	struct spi_buf_set tx_set = {.buffers = tx_buf, .count = 1};
+	struct spi_buf_set rx_set = {.buffers = rx_buf, .count = 1};
 
 	txbuf[0] = IMU_IMU_DATA_STD_REG | IMU_SPI_READ;
 	tx_buf[0].buf = txbuf;
@@ -107,8 +107,8 @@ int get_imu_data_ext(struct imu_data *data)
 	uint8_t rxbuf[IMU_EXT_DATA_SIZE];
 	struct spi_buf tx_buf[1];
 	struct spi_buf rx_buf[1];
-	struct spi_buf_set tx_set = { .buffers = tx_buf, .count = 1 };
-	struct spi_buf_set rx_set = { .buffers = rx_buf, .count = 1 };
+	struct spi_buf_set tx_set = {.buffers = tx_buf, .count = 1};
+	struct spi_buf_set rx_set = {.buffers = rx_buf, .count = 1};
 
 	txbuf[0] = IMU_IMU_DATA_EXT_REG | IMU_SPI_READ;
 	tx_buf[0].buf = txbuf;

@@ -67,7 +67,7 @@ static int verify_status(enum rw_pos pos, uint32_t sec, uint32_t *err_cnt)
 	int ret;
 	int all_ret = 0;
 
-	for (int j=0; j<5; j++) {
+	for (int j = 0; j < 5; j++) {
 		ret = one_loop(pos, err_cnt);
 		if (ret < 0) {
 			all_ret = -1;
@@ -101,7 +101,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		loop_count = INT32_MAX;
 	}
 
-	for (int i=1; i<=loop_count; i++) {
+	for (int i = 1; i <= loop_count; i++) {
 		if (is_loop_stop()) {
 			break;
 		}
@@ -137,8 +137,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 
 		update_rw_idx(&rw_idx);
 
-		LOG_INF("===[Loop Test %d Finish (err_cnt: %d)]===",
-				 i, *err_cnt);
+		LOG_INF("===[Loop Test %d Finish (err_cnt: %d)]===", i, *err_cnt);
 	}
 
 	return all_ret;

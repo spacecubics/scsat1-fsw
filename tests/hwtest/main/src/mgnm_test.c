@@ -19,7 +19,7 @@ int mgnm_test(uint32_t *err_cnt)
 	enum mgnm_pos pos_list[] = {MGNM_POS_X_PLUS, MGNM_POS_X_MINUS};
 
 	/* Temperature */
-	for (i=0; i<ARRAY_SIZE(pos_list); i++) {
+	for (i = 0; i < ARRAY_SIZE(pos_list); i++) {
 		ret = start_mgnm_temp_measurement(pos_list[i]);
 		if (ret < 0) {
 			LOG_ERR("Magnetometer %s Temperature: Failed", pos_name[i]);
@@ -36,13 +36,12 @@ int mgnm_test(uint32_t *err_cnt)
 			continue;
 		}
 
-		LOG_INF("Magnetometer %s Temperature: %.1f [deg]",
-				 pos_name[i], (double)temp);
+		LOG_INF("Magnetometer %s Temperature: %.1f [deg]", pos_name[i], (double)temp);
 	}
 
 	/* Magnet Field */
 	struct magnet_field magnet;
-	for (i=0; i<ARRAY_SIZE(pos_list); i++) {
+	for (i = 0; i < ARRAY_SIZE(pos_list); i++) {
 		ret = start_mgnm_magnet_measurement(pos_list[i]);
 		if (ret < 0) {
 			LOG_ERR("Magnetometer %s X/Y/Z: Failed", pos_name[i]);
@@ -59,11 +58,8 @@ int mgnm_test(uint32_t *err_cnt)
 			continue;
 		}
 
-		LOG_INF("Magnetometer %s X: 0x%08x, Y: 0x%08x, Z: 0x%08x",
-				 pos_name[i],
-				 magnet.x_out,
-				 magnet.y_out,
-				 magnet.z_out);
+		LOG_INF("Magnetometer %s X: 0x%08x, Y: 0x%08x, Z: 0x%08x", pos_name[i],
+			magnet.x_out, magnet.y_out, magnet.z_out);
 	}
 
 	return ret;

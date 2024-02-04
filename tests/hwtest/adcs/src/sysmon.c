@@ -20,36 +20,52 @@ LOG_MODULE_REGISTER(sysmon);
 #define SC_ADCS_SYSREG_DNA1_OFFSET      (0xFF10)
 #define SC_ADCS_SYSREG_DNA2_OFFSET      (0xFF14)
 
-#define SC_ADCS_SYSMON_WDOG_CTRL_OFFSET         (0x0000) /* Watchdog Control Register */
-#define SC_ADCS_SYSMON_XADC_TEMP_OFFSET         (0x1000) /* XADC Temperature Status */
-#define SC_ADCS_SYSMON_XADC_VCCINT_OFFSET       (0x1010) /* XADC VCCINT Status */
-#define SC_ADCS_SYSMON_XADC_VCCAUX_OFFSET       (0x1020) /* XADC VCCAUX Status */
-#define SC_ADCS_SYSMON_XADC_VCCBRAM_OFFSET      (0x1060) /* XADC VCCBRAM Status */
-#define SC_ADCS_SYSMON_BHM_INICTLR_OFFSET       (0x2000) /* BHM Initialization Access Control Register */
-#define SC_ADCS_SYSMON_BHM_ACCCTLR_OFFSET       (0x2004) /* BHM Access Control Register */
-#define SC_ADCS_SYSMON_BHM_ISR_OFFSET           (0x2010) /* BHM Interrupt Status Register */
-#define SC_ADCS_SYSMON_BHM_1V0_SNTVR_OFFSET     (0x2020) /* BHM VDD_1V0 Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_1V0_BUSVR_OFFSET     (0x2024) /* BHM VDD_1V0 Bus Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_1V8_SNTVR_OFFSET     (0x2028) /* BHM VDD_1V8 Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_1V8_BUSVR_OFFSET     (0x202C) /* BHM VDD_1V8 Bus Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3_SNTVR_OFFSET     (0x2030) /* BHM VDD_3V3 Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3_BUSVR_OFFSET     (0x2034) /* BHM VDD_3V3 Bus Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3SYSA_SNTVR_OFFSET (0x2038) /* BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3SYSA_BUSVR_OFFSET (0x203C) /* BHM VDD_3V3_SYS_A Bus Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3SYSB_SNTVR_OFFSET (0x2040) /* BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3SYSB_BUSVR_OFFSET (0x2044) /* BHM VDD_3V3_SYS_B Bus Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3IO_SNTVR_OFFSET   (0x2048) /* BHM VDD_3V3_IO Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3IO_BUSVR_OFFSET   (0x204C) /* BHM VDD_3V3_IO Bus Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_TEMP1R_OFFSET        (0x2050) /* BHM Temperature1 Monitor Register */
-#define SC_ADCS_SYSMON_BHM_TEMP2R_OFFSET        (0x2054) /* BHM Temperature2 Monitor Register */
-#define SC_ADCS_SYSMON_BHM_TEMP3R_OFFSET        (0x2058) /* BHM Temperature3 Monitor Register */
+#define SC_ADCS_SYSMON_WDOG_CTRL_OFFSET    (0x0000) /* Watchdog Control Register */
+#define SC_ADCS_SYSMON_XADC_TEMP_OFFSET    (0x1000) /* XADC Temperature Status */
+#define SC_ADCS_SYSMON_XADC_VCCINT_OFFSET  (0x1010) /* XADC VCCINT Status */
+#define SC_ADCS_SYSMON_XADC_VCCAUX_OFFSET  (0x1020) /* XADC VCCAUX Status */
+#define SC_ADCS_SYSMON_XADC_VCCBRAM_OFFSET (0x1060) /* XADC VCCBRAM Status */
+#define SC_ADCS_SYSMON_BHM_INICTLR_OFFSET  (0x2000) /* BHM Initialization Access Control Register  \
+						     */
+#define SC_ADCS_SYSMON_BHM_ACCCTLR_OFFSET  (0x2004) /* BHM Access Control Register */
+#define SC_ADCS_SYSMON_BHM_ISR_OFFSET      (0x2010) /* BHM Interrupt Status Register */
+#define SC_ADCS_SYSMON_BHM_1V0_SNTVR_OFFSET                                                        \
+	(0x2020) /* BHM VDD_1V0 Shunt Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_1V0_BUSVR_OFFSET (0x2024) /* BHM VDD_1V0 Bus Voltage Monitor Register   \
+						      */
+#define SC_ADCS_SYSMON_BHM_1V8_SNTVR_OFFSET                                                        \
+	(0x2028) /* BHM VDD_1V8 Shunt Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_1V8_BUSVR_OFFSET (0x202C) /* BHM VDD_1V8 Bus Voltage Monitor Register   \
+						      */
+#define SC_ADCS_SYSMON_BHM_3V3_SNTVR_OFFSET                                                        \
+	(0x2030) /* BHM VDD_3V3 Shunt Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_3V3_BUSVR_OFFSET (0x2034) /* BHM VDD_3V3 Bus Voltage Monitor Register   \
+						      */
+#define SC_ADCS_SYSMON_BHM_3V3SYSA_SNTVR_OFFSET                                                    \
+	(0x2038) /* BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_3V3SYSA_BUSVR_OFFSET                                                    \
+	(0x203C) /* BHM VDD_3V3_SYS_A Bus Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_3V3SYSB_SNTVR_OFFSET                                                    \
+	(0x2040) /* BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_3V3SYSB_BUSVR_OFFSET                                                    \
+	(0x2044) /* BHM VDD_3V3_SYS_B Bus Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_3V3IO_SNTVR_OFFSET                                                      \
+	(0x2048) /* BHM VDD_3V3_IO Shunt Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_3V3IO_BUSVR_OFFSET                                                      \
+	(0x204C)                                  /* BHM VDD_3V3_IO Bus Voltage Monitor Register */
+#define SC_ADCS_SYSMON_BHM_TEMP1R_OFFSET (0x2050) /* BHM Temperature1 Monitor Register */
+#define SC_ADCS_SYSMON_BHM_TEMP2R_OFFSET (0x2054) /* BHM Temperature2 Monitor Register */
+#define SC_ADCS_SYSMON_BHM_TEMP3R_OFFSET (0x2058) /* BHM Temperature3 Monitor Register */
 
-#define SC_ADCS_GPTMR_TECR_OFFSET    (0x0004) /* Timer Enable Control Register */
-#define SC_ADCS_GPTMR_HITCR_OFFSET   (0x0200) /* Hardware Interrupt Timer Control Register */
-#define SC_ADCS_GPTMR_HITPR_OFFSET   (0x0204) /* Hardware Interrupt Timer Prescaler Register */
-#define SC_ADCS_GPTMR_HITOCR1_OFFSET (0x0210) /* Hardware Interrupt Timer Output Compare Register 1 */
-#define SC_ADCS_GPTMR_HITOCR2_OFFSET (0x0214) /* Hardware Interrupt Timer Output Compare Register 2 */
-#define SC_ADCS_GPTMR_HITOCR3_OFFSET (0x0218) /* Hardware Interrupt Timer Output Compare Register 3 */
+#define SC_ADCS_GPTMR_TECR_OFFSET  (0x0004) /* Timer Enable Control Register */
+#define SC_ADCS_GPTMR_HITCR_OFFSET (0x0200) /* Hardware Interrupt Timer Control Register */
+#define SC_ADCS_GPTMR_HITPR_OFFSET (0x0204) /* Hardware Interrupt Timer Prescaler Register */
+#define SC_ADCS_GPTMR_HITOCR1_OFFSET                                                               \
+	(0x0210) /* Hardware Interrupt Timer Output Compare Register 1 */
+#define SC_ADCS_GPTMR_HITOCR2_OFFSET                                                               \
+	(0x0214) /* Hardware Interrupt Timer Output Compare Register 2 */
+#define SC_ADCS_GPTMR_HITOCR3_OFFSET                                                               \
+	(0x0218) /* Hardware Interrupt Timer Output Compare Register 3 */
 
 /* BHM Initialization Access Control Register */
 #define SC_ADCS_SYSMON_BHM_INIT_REQ     BIT(16)
@@ -58,9 +74,9 @@ LOG_MODULE_REGISTER(sysmon);
 #define SC_ADCS_SYSMON_BHM_TEMP1_INITEN BIT(2)
 #define SC_ADCS_SYSMON_BHM_CVM2_INITEN  BIT(1)
 #define SC_ADCS_SYSMON_BHM_CVM1_INITEN  BIT(0)
-#define SC_ADCS_SYSMON_BHM_INIT_ALL \
-	(SC_ADCS_SYSMON_BHM_INIT_REQ | SC_ADCS_SYSMON_BHM_TEMP3_INITEN |\
-	 SC_ADCS_SYSMON_BHM_TEMP2_INITEN | SC_ADCS_SYSMON_BHM_TEMP1_INITEN |\
+#define SC_ADCS_SYSMON_BHM_INIT_ALL                                                                \
+	(SC_ADCS_SYSMON_BHM_INIT_REQ | SC_ADCS_SYSMON_BHM_TEMP3_INITEN |                           \
+	 SC_ADCS_SYSMON_BHM_TEMP2_INITEN | SC_ADCS_SYSMON_BHM_TEMP1_INITEN |                       \
 	 SC_ADCS_SYSMON_BHM_CVM2_INITEN | SC_ADCS_SYSMON_BHM_CVM1_INITEN)
 
 /* BHM Access Control Register */
@@ -69,9 +85,9 @@ LOG_MODULE_REGISTER(sysmon);
 #define SC_ADCS_SYSMON_BHM_TEMP1_MONIEN BIT(2)
 #define SC_ADCS_SYSMON_BHM_CVM2_MONIEN  BIT(1)
 #define SC_ADCS_SYSMON_BHM_CVM1_MONIEN  BIT(0)
-#define SC_ADCS_SYSMON_BHM_MONIEN_ALL \
-	(SC_ADCS_SYSMON_BHM_TEMP3_MONIEN | SC_ADCS_SYSMON_BHM_TEMP2_MONIEN |\
-	 SC_ADCS_SYSMON_BHM_TEMP1_MONIEN | SC_ADCS_SYSMON_BHM_CVM2_MONIEN |\
+#define SC_ADCS_SYSMON_BHM_MONIEN_ALL                                                              \
+	(SC_ADCS_SYSMON_BHM_TEMP3_MONIEN | SC_ADCS_SYSMON_BHM_TEMP2_MONIEN |                       \
+	 SC_ADCS_SYSMON_BHM_TEMP1_MONIEN | SC_ADCS_SYSMON_BHM_CVM2_MONIEN |                        \
 	 SC_ADCS_SYSMON_BHM_CVM1_MONIEN)
 
 /* BHM Interrupt Status Register */
@@ -257,7 +273,8 @@ static int wait_for_bhm_complete(uint32_t target_bit)
 	for (i = 0; i < SYSMON_NUM_OF_RETRY; i++) {
 		reg = sys_read32(SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_BHM_ISR_OFFSET);
 		if ((reg & target_bit) == target_bit) {
-			sys_write32(target_bit, SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_BHM_ISR_OFFSET);
+			sys_write32(target_bit,
+				    SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_BHM_ISR_OFFSET);
 			break;
 		}
 		k_sleep(K_MSEC(1));
@@ -273,7 +290,7 @@ static int wait_for_bhm_complete(uint32_t target_bit)
 static int sc_adcs_bhm_init(void)
 {
 	sys_set_bits(SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_BHM_INICTLR_OFFSET,
-				 SC_ADCS_SYSMON_BHM_INIT_ALL);
+		     SC_ADCS_SYSMON_BHM_INIT_ALL);
 
 	return wait_for_bhm_complete(SC_ADCS_SYSMON_BHM_INIT_ACCEND);
 }
@@ -283,7 +300,7 @@ static void sc_adcs_bhm_set_timer(void)
 	/*
 	 * This value is using the recommended value from the FPGA technical
 	 * reference manual.
-	*/
+	 */
 	sys_write32(0x00280000, SC_ADCS_GPT_BASE_ADDR + SC_ADCS_GPTMR_HITCR_OFFSET);
 	sys_write32(0x095F, SC_ADCS_GPT_BASE_ADDR + SC_ADCS_GPTMR_HITPR_OFFSET);
 	sys_write32(0x0050, SC_ADCS_GPT_BASE_ADDR + SC_ADCS_GPTMR_HITOCR1_OFFSET);
@@ -294,25 +311,24 @@ static void sc_adcs_bhm_set_timer(void)
 static inline void sc_adcs_bhm_monitor_enable(void)
 {
 	sys_set_bits(SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_BHM_ACCCTLR_OFFSET,
-				 SC_ADCS_SYSMON_BHM_MONIEN_ALL);
+		     SC_ADCS_SYSMON_BHM_MONIEN_ALL);
 }
 
 static inline void sc_adcs_bhm_monitor_disable(void)
 {
 	sys_clear_bits(SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_BHM_ACCCTLR_OFFSET,
-				 SC_ADCS_SYSMON_BHM_MONIEN_ALL);
+		       SC_ADCS_SYSMON_BHM_MONIEN_ALL);
 }
 
 static inline void sc_adcs_bhm_timer_enable(void)
 {
-	sys_set_bits(SC_ADCS_GPT_BASE_ADDR + SC_ADCS_GPTMR_TECR_OFFSET,
-				 SC_ADCS_SYSMON_GPTMR_HITEN);
+	sys_set_bits(SC_ADCS_GPT_BASE_ADDR + SC_ADCS_GPTMR_TECR_OFFSET, SC_ADCS_SYSMON_GPTMR_HITEN);
 }
 
 static inline void sc_adcs_bhm_timer_disable(void)
 {
 	sys_clear_bits(SC_ADCS_GPT_BASE_ADDR + SC_ADCS_GPTMR_TECR_OFFSET,
-				 SC_ADCS_SYSMON_GPTMR_HITEN);
+		       SC_ADCS_SYSMON_GPTMR_HITEN);
 }
 
 void sc_adcs_kick_wdt_timer(void)
@@ -326,13 +342,13 @@ void sc_adcs_kick_wdt_timer(void)
 void sc_adcs_print_fpga_ids(void)
 {
 	LOG_INF("* IP Version        : %08x",
-			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_VER_OFFSET));
+		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_VER_OFFSET));
 	LOG_INF("* Build Information : %08x",
-			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_BUILDINFO_OFFSET));
+		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_BUILDINFO_OFFSET));
 	LOG_INF("* Device DNA 1      : %08x",
-			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA1_OFFSET));
+		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA1_OFFSET));
 	LOG_INF("* Device DNA 2      : %08x",
-			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA2_OFFSET));
+		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA2_OFFSET));
 }
 
 int sc_adcs_bhm_enable(void)

@@ -26,7 +26,7 @@ int sunsens_test(uint32_t *err_cnt)
 		"Sun Sensor Y-",
 	};
 
-	for (int i=0; i<ARRAY_SIZE(pos_list); i++) {
+	for (int i = 0; i < ARRAY_SIZE(pos_list); i++) {
 		ret = get_sunsens_temp(pos_list[i], &temp);
 		if (ret < 0) {
 			LOG_ERR("%s Temperature: Failed", pos_name[i]);
@@ -43,12 +43,8 @@ int sunsens_test(uint32_t *err_cnt)
 			all_ret = -1;
 			continue;
 		}
-		LOG_INF("%s Sun Sensor: [A: 0x%04x, B: 0x%04x, C: 0x%04x, D: 0x%04x]",
-				 pos_name[i],
-				 sun_data.a,
-				 sun_data.b,
-				 sun_data.c,
-				 sun_data.d);
+		LOG_INF("%s Sun Sensor: [A: 0x%04x, B: 0x%04x, C: 0x%04x, D: 0x%04x]", pos_name[i],
+			sun_data.a, sun_data.b, sun_data.c, sun_data.d);
 	}
 
 	return all_ret;
