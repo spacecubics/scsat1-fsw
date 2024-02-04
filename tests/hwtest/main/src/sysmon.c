@@ -44,11 +44,12 @@ LOG_MODULE_REGISTER(sysmon);
 	(0x2044) /* BHM VDD_3V3_SYS_B Bus Voltage Monitor Register */
 #define SC_MAIN_SYSMON_3V3IO_SNTVR_OFFSET                                                          \
 	(0x2048) /* BHM VDD_3V3_IO Shunt Voltage Monitor Register */
-#define SC_MAIN_SYSMON_3V3IO_BUSVR_OFFSET (0x204C) /* BHM VDD_3V3_IO Bus Voltage Monitor Register  \
-						    */
-#define SC_MAIN_SYSMON_TEMP1R_OFFSET      (0x2050) /* BHM Temperature1 Monitor Register */
-#define SC_MAIN_SYSMON_TEMP2R_OFFSET      (0x2054) /* BHM Temperature2 Monitor Register */
-#define SC_MAIN_SYSMON_TEMP3R_OFFSET      (0x2058) /* BHM Temperature3 Monitor Register */
+#define SC_MAIN_SYSMON_3V3IO_BUSVR_OFFSET                                                          \
+	(0x204C)                              /* BHM VDD_3V3_IO Bus Voltage Monitor Register       \
+					       */
+#define SC_MAIN_SYSMON_TEMP1R_OFFSET (0x2050) /* BHM Temperature1 Monitor Register */
+#define SC_MAIN_SYSMON_TEMP2R_OFFSET (0x2054) /* BHM Temperature2 Monitor Register */
+#define SC_MAIN_SYSMON_TEMP3R_OFFSET (0x2058) /* BHM Temperature3 Monitor Register */
 
 #define SC_MAIN_GPTMR_TECR_OFFSET  (0x0004) /* Timer Enable Control Register */
 #define SC_MAIN_GPTMR_HITCR_OFFSET (0x0200) /* Hardware Interrupt Timer Control Register */

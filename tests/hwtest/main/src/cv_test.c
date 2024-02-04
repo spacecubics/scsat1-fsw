@@ -5,15 +5,20 @@
  */
 
 #include <zephyr/kernel.h>
+#include "common.h"
 #include "cv.h"
 #include "sysmon.h"
+#include "cv_test.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(cv_test);
 
-static int cv_obc_test(uint32_t *err_cnt)
+#define CV_INVALID_FLOAT (0.0f)
+#define CV_INVALID_UINT  (0U)
+
+static int cv_obc_test(struct main_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
-	int ret = 0;
+	int ret;
 	int all_ret = 0;
 	uint32_t cv;
 	enum obc_cv_pos obc_pos_list[] = {
@@ -34,20 +39,23 @@ static int cv_obc_test(uint32_t *err_cnt)
 	for (int i = 0; i < ARRAY_SIZE(obc_pos_list); i++) {
 		ret = sc_main_bhm_get_obc_cv(obc_pos_list[i], &cv);
 		if (ret < 0) {
-			LOG_ERR("%s: Failed", obc_pos_name[i]);
+			cv_ret->obc_cv[i].data = CV_INVALID_UINT;
+			HWTEST_LOG_ERR(log, "%s: Failed", obc_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			cv_ret->obc_cv[i].data = cv;
+			HWTEST_LOG_INF(log, "%s: %d %s", obc_pos_name[i], cv, obc_unit_name[i]);
 		}
-		LOG_INF("%s: %d %s", obc_pos_name[i], cv, obc_unit_name[i]);
+		cv_ret->obc_cv[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-static int cv_xadc_test(uint32_t *err_cnt)
+static int cv_xadc_test(struct main_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
-	int ret = 0;
+	int ret;
 	int all_ret = 0;
 	float cv;
 	enum xadc_cv_pos xadc_pos_list[] = {
@@ -64,20 +72,23 @@ static int cv_xadc_test(uint32_t *err_cnt)
 	for (int i = 0; i < ARRAY_SIZE(xadc_pos_list); i++) {
 		ret = sc_main_bhm_get_xadc_cv(xadc_pos_list[i], &cv);
 		if (ret < 0) {
-			LOG_ERR("%s: Failed", xadc_pos_name[i]);
+			cv_ret->xadc_cv[i].data = CV_INVALID_FLOAT;
+			HWTEST_LOG_ERR(log, "%s: Failed", xadc_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			cv_ret->xadc_cv[i].data = cv;
+			HWTEST_LOG_INF(log, "%s: %.4f [v]", xadc_pos_name[i], (double)cv);
 		}
-		LOG_INF("%s: %.4f [v]", xadc_pos_name[i], (double)cv);
+		cv_ret->xadc_cv[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-static int cv_ioboard_test(uint32_t *err_cnt)
+static int cv_ioboard_test(struct main_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
-	int ret = 0;
+	int ret;
 	int all_ret = 0;
 	uint32_t cv;
 	enum io_cv_pos io_pos_list[] = {
@@ -95,33 +106,36 @@ static int cv_ioboard_test(uint32_t *err_cnt)
 	for (int i = 0; i < ARRAY_SIZE(io_pos_list); i++) {
 		ret = get_ioboard_cv(io_pos_list[i], &cv);
 		if (ret < 0) {
-			LOG_ERR("%s: Failed", io_pos_name[i]);
+			cv_ret->ioboard_cv[i].data = CV_INVALID_UINT;
+			HWTEST_LOG_ERR(log, "%s: Failed", io_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			cv_ret->ioboard_cv[i].data = cv;
+			HWTEST_LOG_INF(log, "%s: %d %s", io_pos_name[i], cv, io_unit_name[i]);
 		}
-		LOG_INF("%s: %d %s", io_pos_name[i], cv, io_unit_name[i]);
+		cv_ret->ioboard_cv[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-int cv_test(uint32_t *err_cnt)
+int cv_test(struct main_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
-	int ret = 0;
+	int ret;
 	int all_ret = 0;
 
-	ret = cv_obc_test(err_cnt);
+	ret = cv_obc_test(cv_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
-	ret = cv_xadc_test(err_cnt);
+	ret = cv_xadc_test(cv_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
-	ret = cv_ioboard_test(err_cnt);
+	ret = cv_ioboard_test(cv_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret = -1;
 	}

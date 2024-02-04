@@ -6,6 +6,14 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "syshk.h"
 
-int mgnm_test(uint32_t *err_cnt);
+#define MGNM_POS_NUM  (2U)
+#define MGNM_DATA_NUM (3U)
+
+struct mgnm_test_ret {
+	struct syshk_float_data temp[MGNM_POS_NUM];
+	struct syshk_u32_data out[MGNM_POS_NUM][MGNM_DATA_NUM];
+};
+
+int mgnm_test(struct mgnm_test_ret *mgnm_ret, uint32_t *err_cnt, bool log);

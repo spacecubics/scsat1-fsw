@@ -58,6 +58,7 @@ int get_sunsens_temp(enum sunsens_pos pos, float *temp)
 	ret = i2c_write(dev, &cmd, 1, SUNSENS_SLAVE_ADDR);
 	if (ret < 0) {
 		LOG_ERR("Failed to i2c_write for sampling temperature. (%d)", ret);
+		goto end;
 	}
 
 	k_sleep(K_MSEC(30));
@@ -89,7 +90,6 @@ int get_sunsens_data(enum sunsens_pos pos, struct sunsens_data *sun_data)
 	ret = i2c_write(dev, &cmd, 1, SUNSENS_SLAVE_ADDR);
 	if (ret < 0) {
 		LOG_ERR("Failed to i2c_write for sampling Sun Data. (%d)", ret);
-		ret = -ENODEV;
 		goto end;
 	}
 
