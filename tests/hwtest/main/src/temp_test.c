@@ -5,13 +5,18 @@
  */
 
 #include <zephyr/sys/util.h>
+#include "common.h"
 #include "temp.h"
+#include "temp_test.h"
 #include "sysmon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(temp_test);
 
-static int temp_obc_test(uint32_t *err_cnt)
+#define TEMP_INVLAID_FLOAT (0.0f)
+#define TEMP_INVALI_UINT   (0U)
+
+static int temp_obc_test(struct main_temp_test_result *temp_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
 	int all_ret = 0;
@@ -31,34 +36,41 @@ static int temp_obc_test(uint32_t *err_cnt)
 	for (i = 0; i < ARRAY_SIZE(obc_pos_list); i++) {
 		ret = sc_main_bhm_get_obc_temp(obc_pos_list[i], &temp);
 		if (ret < 0) {
-			LOG_ERR("%s Temperature: Failed", obc_pos_name[i]);
+			temp_ret->obc_temp[i].data = TEMP_INVLAID_FLOAT;
+			HWTEST_LOG_ERR(log, "%s Temperature: Failed", obc_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			temp_ret->obc_temp[i].data = temp;
+			HWTEST_LOG_INF(log, "%s Temperature: %.4f [deg]", obc_pos_name[i],
+				       (double)temp);
 		}
-		LOG_INF("%s Temperature: %.4f [deg]", obc_pos_name[i], (double)temp);
+		temp_ret->obc_temp[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-static int temp_xadc_test(uint32_t *err_cnt)
+static int temp_xadc_test(struct main_temp_test_result *temp_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
 	float temp;
 
 	ret = sc_main_bhm_get_xadc_temp(&temp);
 	if (ret < 0) {
-		LOG_ERR("OBC XADC Temperature: Failed");
+		temp_ret->xadc_temp.data = TEMP_INVLAID_FLOAT;
+		HWTEST_LOG_ERR(log, "OBC XADC Temperature: Failed");
 		(*err_cnt)++;
 	} else {
-		LOG_INF("OBC XADC Temperature: %.4f [deg]", (double)temp);
+		temp_ret->xadc_temp.data = temp;
+		HWTEST_LOG_INF(log, "OBC XADC Temperature: %.4f [deg]", (double)temp);
 	}
+	temp_ret->xadc_temp.status = ret;
 
 	return ret;
 }
 
-static int temp_ioboard_test(uint32_t *err_cnt)
+static int temp_ioboard_test(struct main_temp_test_result *temp_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
 	int all_ret = 0;
@@ -74,33 +86,37 @@ static int temp_ioboard_test(uint32_t *err_cnt)
 	for (int i = 0; i < ARRAY_SIZE(io_pos_list); i++) {
 		ret = get_ioboard_temp(io_pos_list[i], &temp);
 		if (ret < 0) {
-			LOG_ERR("%s Temperature: Failed", io_pos_name[i]);
+			temp_ret->ioboard_temp[i].data = TEMP_INVLAID_FLOAT;
+			HWTEST_LOG_ERR(log, "%s Temperature: Failed", io_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			temp_ret->ioboard_temp[i].data = temp;
+			HWTEST_LOG_INF(log, "%s Temperature: %.4f [deg]", io_pos_name[i],
+				       (double)temp);
 		}
-		LOG_INF("%s Temperature: %.4f [deg]", io_pos_name[i], (double)temp);
+		temp_ret->ioboard_temp[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-int temp_test(uint32_t *err_cnt)
+int temp_test(struct main_temp_test_result *temp_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
 	int all_ret = 0;
 
-	ret = temp_obc_test(err_cnt);
+	ret = temp_obc_test(temp_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
-	ret = temp_xadc_test(err_cnt);
+	ret = temp_xadc_test(temp_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
-	ret = temp_ioboard_test(err_cnt);
+	ret = temp_ioboard_test(temp_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret = -1;
 	}

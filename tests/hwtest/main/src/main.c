@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
+#include "common.h"
 #include "wdog.h"
 #include "sysmon.h"
 #include "temp_test.h"
@@ -18,6 +19,7 @@
 #include "dstrx3_test.h"
 #include "main_init.h"
 #include "loop_test.h"
+#include "syshk_test.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main);
@@ -36,6 +38,12 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	uint32_t err_cnt = 0;
 	char *cmd = (char *)p1;
 	char *arg = (char *)p2;
+	struct main_temp_test_result temp_ret;
+	struct main_cv_test_result cv_ret;
+	struct csp_test_result csp_ret;
+	struct sunsens_test_ret sunsens_ret;
+	struct mgnm_test_ret mgnm_ret;
+	struct dstrx3_test_ret dstrx3_ret;
 
 	k_event_set(&exec_event, CMD_EXEC_EVENT);
 
@@ -46,21 +54,24 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	} else if (strcmp(cmd, "init") == 0) {
 		ret = main_init(&err_cnt);
 	} else if (strcmp(cmd, "temp") == 0) {
-		ret = temp_test(&err_cnt);
+		ret = temp_test(&temp_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "cv") == 0) {
-		ret = cv_test(&err_cnt);
+		ret = cv_test(&cv_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "mgnm") == 0) {
-		ret = mgnm_test(&err_cnt);
+		ret = mgnm_test(&mgnm_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "csp") == 0) {
-		ret = csp_test(&err_cnt);
+		ret = csp_test(&csp_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "sun") == 0) {
-		ret = sunsens_test(&err_cnt);
+		ret = sunsens_test(&sunsens_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "mtq") == 0) {
 		ret = mtq_test(&err_cnt);
 	} else if (strcmp(cmd, "dstrx3") == 0) {
-		ret = dstrx3_test(&err_cnt);
+		ret = dstrx3_test(&dstrx3_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "loop") == 0) {
 		ret = loop_test(atoi(arg), &err_cnt);
+		k_event_clear(&loop_event, LOOP_STOP_EVENT);
+	} else if (strcmp(cmd, "syshk") == 0) {
+		ret = syshk_test(atoi(arg), &err_cnt);
 		k_event_clear(&loop_event, LOOP_STOP_EVENT);
 	} else {
 		goto end;
@@ -136,6 +147,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(csp, NULL, "CSP test command", start_cmd_thread),
 	SHELL_CMD(sun, NULL, "Sun Sensor test command", start_cmd_thread),
 	SHELL_CMD(dstrx3, NULL, "DSTRX-3 test command", start_cmd_thread),
-	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread), SHELL_SUBCMD_SET_END);
+	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread),
+	SHELL_CMD(syshk, NULL, "System HK test command", start_cmd_thread), SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
 SHELL_CMD_REGISTER(stop, NULL, "SC-Sat1 HW test stop", stop_cmd);
