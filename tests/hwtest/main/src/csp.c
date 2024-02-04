@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2023 Space Cubics, LLC.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -11,15 +16,16 @@ LOG_MODULE_REGISTER(csp);
 
 #define ROUTER_STACK_SIZE 256
 #define SERVER_STACK_SIZE 1024
-#define ROUTER_PRIO 0
-#define SERVER_PRIO 0
+#define ROUTER_PRIO       0
+#define SERVER_PRIO       0
 
 static csp_iface_t *can_iface1 = NULL;
 static csp_iface_t *can_iface2 = NULL;
 
 void server();
 
-static void *router_task(void *param) {
+static void *router_task(void *param)
+{
 
 	/* Here there be routing */
 	while (true) {
@@ -29,7 +35,8 @@ static void *router_task(void *param) {
 	return NULL;
 }
 
-static void *server_task(void *p1, void *p2, void *p3) {
+static void *server_task(void *p1, void *p2, void *p3)
+{
 
 	ARG_UNUSED(p1);
 	ARG_UNUSED(p2);
@@ -40,24 +47,25 @@ static void *server_task(void *p1, void *p2, void *p3) {
 	return NULL;
 }
 
-K_THREAD_DEFINE(router_id, ROUTER_STACK_SIZE,
-				router_task, NULL, NULL, NULL,
-				ROUTER_PRIO, 0, K_TICKS_FOREVER);
-K_THREAD_DEFINE(server_id, SERVER_STACK_SIZE,
-				server_task, NULL, NULL, NULL,
-				SERVER_PRIO, 0, K_TICKS_FOREVER);
+K_THREAD_DEFINE(router_id, ROUTER_STACK_SIZE, router_task, NULL, NULL, NULL, ROUTER_PRIO, 0,
+		K_TICKS_FOREVER);
+K_THREAD_DEFINE(server_id, SERVER_STACK_SIZE, server_task, NULL, NULL, NULL, SERVER_PRIO, 0,
+		K_TICKS_FOREVER);
 
-static void router_start(void) {
+static void router_start(void)
+{
 	k_thread_start(router_id);
 }
 
-static void server_start(void) {
+static void server_start(void)
+{
 	k_thread_start(server_id);
 }
 
 extern csp_conf_t csp_conf;
 
-void server(void) {
+void server(void)
+{
 
 	LOG_INF("Server task started");
 
@@ -87,7 +95,6 @@ void server(void) {
 	}
 
 	return;
-
 }
 
 int csp_enable(void)
@@ -108,16 +115,16 @@ int csp_enable(void)
 
 	csp_init();
 
-	ret = csp_can_open_and_add_interface(can1, ifname1, CSP_ID_MAIN, bitrate,
-						   filter_addr, filter_mask, &can_iface1);
+	ret = csp_can_open_and_add_interface(can1, ifname1, CSP_ID_MAIN, bitrate, filter_addr,
+					     filter_mask, &can_iface1);
 	if (ret != CSP_ERR_NONE) {
 		LOG_ERR("failed to add CAN interface [%s], error: %d\n", ifname1, ret);
 		goto end;
 	}
 	can_iface1->is_default = 1;
 
-	ret = csp_can_open_and_add_interface(can2, ifname2, CSP_ID_MAIN, bitrate,
-						   filter_addr, filter_mask, &can_iface2);
+	ret = csp_can_open_and_add_interface(can2, ifname2, CSP_ID_MAIN, bitrate, filter_addr,
+					     filter_mask, &can_iface2);
 	if (ret != CSP_ERR_NONE) {
 		LOG_ERR("failed to add CAN interface [%s], error: %d\n", ifname1, ret);
 		goto end;

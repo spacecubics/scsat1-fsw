@@ -30,12 +30,12 @@ static struct k_thread cmd_thread;
 static struct k_event exec_event;
 extern struct k_event loop_event;
 
-static void cmd_handler(void * p1, void * p2, void * p3)
+static void cmd_handler(void *p1, void *p2, void *p3)
 {
 	int ret = 0;
 	uint32_t err_cnt = 0;
-	char *cmd = (char*)p1;
-	char *arg = (char*)p2;
+	char *cmd = (char *)p1;
+	char *arg = (char *)p2;
 
 	k_event_set(&exec_event, CMD_EXEC_EVENT);
 
@@ -96,10 +96,9 @@ static int start_cmd_thread(const struct shell *sh, size_t argc, char **argv)
 	}
 
 	cmd_tid = k_thread_create(&cmd_thread, cmd_thread_stack,
-					 K_THREAD_STACK_SIZEOF(cmd_thread_stack),
-					 (k_thread_entry_t)cmd_handler,
-					 argv[0], argv[1], NULL,
-					 CMD_HANDLER_PRIO, 0, K_NO_WAIT);
+				  K_THREAD_STACK_SIZEOF(cmd_thread_stack),
+				  (k_thread_entry_t)cmd_handler, argv[0], argv[1], NULL,
+				  CMD_HANDLER_PRIO, 0, K_NO_WAIT);
 	if (!cmd_tid) {
 		shell_error(sh, "Failed to create command thread");
 		ret = ENOSPC;
@@ -127,8 +126,8 @@ static int stop_cmd(const struct shell *sh, size_t argc, char **argv)
 	return 0;
 }
 
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
-	SHELL_CMD(info, NULL, "MAIN Board Information", start_cmd_thread),
+SHELL_STATIC_SUBCMD_SET_CREATE(
+	sub_hwtest, SHELL_CMD(info, NULL, "MAIN Board Information", start_cmd_thread),
 	SHELL_CMD(init, NULL, "MAIN Board Initialization", start_cmd_thread),
 	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
 	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
@@ -137,8 +136,6 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_hwtest,
 	SHELL_CMD(csp, NULL, "CSP test command", start_cmd_thread),
 	SHELL_CMD(sun, NULL, "Sun Sensor test command", start_cmd_thread),
 	SHELL_CMD(dstrx3, NULL, "DSTRX-3 test command", start_cmd_thread),
-	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread),
-	SHELL_SUBCMD_SET_END
-);
+	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread), SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
 SHELL_CMD_REGISTER(stop, NULL, "SC-Sat1 HW test stop", stop_cmd);

@@ -133,26 +133,24 @@ int mtq_start(enum mtq_axes axes, enum mtq_polarity pol, float duty)
 		goto end;
 	}
 
-	LOG_INF("CH: %d Period: %d Pulse: %d", cfg.in1.channel, cfg.in1.period_cycles, cfg.in1.pulse_cycles);
-	ret = pwm_set_cycles(pwm, cfg.in1.channel, cfg.in1.period_cycles,
-						 cfg.in1.pulse_cycles, flags);
+	LOG_INF("CH: %d Period: %d Pulse: %d", cfg.in1.channel, cfg.in1.period_cycles,
+		cfg.in1.pulse_cycles);
+	ret = pwm_set_cycles(pwm, cfg.in1.channel, cfg.in1.period_cycles, cfg.in1.pulse_cycles,
+			     flags);
 	if (ret < 0) {
-		LOG_ERR("Faile to start the PWM %s IN1. (%d)",
-				 mtq_axes_name[axes], ret);
+		LOG_ERR("Faile to start the PWM %s IN1. (%d)", mtq_axes_name[axes], ret);
 	} else {
-		LOG_INF("Start PWM %s IN1 to %s",
-				 mtq_axes_name[axes], mtq_pol_name[pol]);
+		LOG_INF("Start PWM %s IN1 to %s", mtq_axes_name[axes], mtq_pol_name[pol]);
 	}
 
-	LOG_INF("CH: %d Period: %d Pulse: %d", cfg.in2.channel, cfg.in2.period_cycles, cfg.in2.pulse_cycles);
-	ret = pwm_set_cycles(pwm, cfg.in2.channel, cfg.in2.period_cycles,
-						 cfg.in2.pulse_cycles, flags);
+	LOG_INF("CH: %d Period: %d Pulse: %d", cfg.in2.channel, cfg.in2.period_cycles,
+		cfg.in2.pulse_cycles);
+	ret = pwm_set_cycles(pwm, cfg.in2.channel, cfg.in2.period_cycles, cfg.in2.pulse_cycles,
+			     flags);
 	if (ret < 0) {
-		LOG_ERR("Faile to start the PWM %s IN2. (%d)",
-				 mtq_axes_name[axes], ret);
+		LOG_ERR("Faile to start the PWM %s IN2. (%d)", mtq_axes_name[axes], ret);
 	} else {
-		LOG_INF("Start PWM %s IN2 to %s",
-				 mtq_axes_name[axes], mtq_pol_name[pol]);
+		LOG_INF("Start PWM %s IN2 to %s", mtq_axes_name[axes], mtq_pol_name[pol]);
 	}
 end:
 	return ret;

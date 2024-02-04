@@ -97,8 +97,7 @@ int get_ioboard_temp(enum io_temp_pos pos, float *temp)
 
 	ret = i2c_burst_read(dev, addr, IO_TEMP_REG, data, ARRAY_SIZE(data));
 	if (ret < 0) {
-		LOG_ERR("Failed to i2c_burst_read for Temperature Sensor (pos: %d) (%d)",
-			    pos, ret);
+		LOG_ERR("Failed to i2c_burst_read for Temperature Sensor (pos: %d) (%d)", pos, ret);
 		goto end;
 	}
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2023 Space Cubics, LLC.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -16,21 +21,21 @@ static int csp_get_pyld_status_cmd(float *temp, uint16_t *count)
 {
 	int ret = 0;
 
-	csp_conn_t *conn = csp_connect(CSP_PRIO_NORM, CSP_ID_PYLD,
-					 MY_SERVER_PORT, CSP_TIMEOUT_MSEC, CSP_O_NONE);
+	csp_conn_t *conn = csp_connect(CSP_PRIO_NORM, CSP_ID_PYLD, MY_SERVER_PORT, CSP_TIMEOUT_MSEC,
+				       CSP_O_NONE);
 	if (conn == NULL) {
 		LOG_ERR("CSP Connection failed");
 		ret = -ETIMEDOUT;
 		goto end;
 	}
 
-	csp_packet_t * packet = csp_buffer_get(0);
+	csp_packet_t *packet = csp_buffer_get(0);
 	if (packet == NULL) {
 		LOG_ERR("Failed to get CSP buffer");
 		ret = -ENOBUFS;
 		goto end;
 	}
-	 packet->length = 0;
+	packet->length = 0;
 
 	csp_send(conn, packet);
 
@@ -71,7 +76,7 @@ int csp_test(uint32_t *err_cnt)
 		"Payload Board",
 	};
 
-	for (int i=0; i<ARRAY_SIZE(csp_id_list); i++) {
+	for (int i = 0; i < ARRAY_SIZE(csp_id_list); i++) {
 		ret = csp_ping(csp_id_list[i], CSP_TIMEOUT_MSEC, 1, CSP_O_NONE);
 		if (ret < 0) {
 			LOG_ERR("Ping to %s: Failed", csp_name_list[i]);

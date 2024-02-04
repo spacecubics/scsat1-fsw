@@ -11,7 +11,7 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(cv);
 
-#define CV_ADDR  (0x42)
+#define CV_ADDR (0x42)
 
 #define CV_CH1_SHUNT_REG (0x01)
 #define CV_CH1_BUS_REG   (0x02)
@@ -135,8 +135,8 @@ int get_ioboard_cv(enum io_cv_pos pos, uint32_t *cv)
 
 	ret = i2c_burst_read(dev, CV_ADDR, reg, data, ARRAY_SIZE(data));
 	if (ret < 0) {
-		LOG_ERR("Failed to i2c_burst_read for Current/Voltage Monitor (pos: %d) (%d)",
-				 pos, ret);
+		LOG_ERR("Failed to i2c_burst_read for Current/Voltage Monitor (pos: %d) (%d)", pos,
+			ret);
 		goto end;
 	}
 	raw = data[0] << 8 | data[1];

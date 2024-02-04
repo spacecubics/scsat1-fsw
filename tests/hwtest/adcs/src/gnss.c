@@ -11,11 +11,11 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(gnss);
 
-#define GNSS_WAKE_RETRY_COUNT (200U)
+#define GNSS_WAKE_RETRY_COUNT  (200U)
 #define GNSS_HWMON_RETRY_COUNT (2000U)
-#define GNSS_PROMPT "[COM1]"
-#define GNSS_ONCE_CMD "log hwmonitora once\n"
-#define GNSS_RESP_MAX_SIZE (300U)
+#define GNSS_PROMPT            "[COM1]"
+#define GNSS_ONCE_CMD          "log hwmonitora once\n"
+#define GNSS_RESP_MAX_SIZE     (300U)
 
 const struct device *gnss = DEVICE_DT_GET(DT_NODELABEL(gnss_uart));
 
@@ -45,7 +45,7 @@ static int gnss_wait_data(void)
 	uint16_t usec_count = 0;
 	uint16_t msec_count = 0;
 
-	for (i=0; i<GNSS_HWMON_RETRY_COUNT; i++) {
+	for (i = 0; i < GNSS_HWMON_RETRY_COUNT; i++) {
 		if (read_size >= GNSS_RESP_MAX_SIZE) {
 			break;
 		} else if (lf_count == 3) {
@@ -78,8 +78,7 @@ static int gnss_wait_data(void)
 	} else {
 		gnss_data[read_size] = '\0';
 		LOG_INF("%s", gnss_data);
-		LOG_INF("All GNSS data received: usec: %d, msec: %d",
-				 usec_count, msec_count);
+		LOG_INF("All GNSS data received: usec: %d, msec: %d", usec_count, msec_count);
 	}
 
 	return ret;
@@ -89,10 +88,10 @@ int gnss_enable(void)
 {
 	int ret;
 	int i;
-	uint8_t prompt[strlen(GNSS_PROMPT)+1];
+	uint8_t prompt[strlen(GNSS_PROMPT) + 1];
 
 	LOG_INF("Wait for wake up the GNSS about 10 seconds");
-	for (i=0; i<GNSS_WAKE_RETRY_COUNT; i++) {
+	for (i = 0; i < GNSS_WAKE_RETRY_COUNT; i++) {
 		ret = uart_fifo_read(gnss, prompt, sizeof(prompt));
 		if (ret == 0) {
 			k_sleep(K_MSEC(100));

@@ -24,9 +24,8 @@ static void *kick_watchdog_timer(void *p1, void *p2, void *p3)
 	return NULL;
 }
 
-K_THREAD_DEFINE(kick_wdt_id, WDT_THREAD_STACK_SIZE,
-				 kick_watchdog_timer, NULL, NULL, NULL,
-				 WDT_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
+K_THREAD_DEFINE(kick_wdt_id, WDT_THREAD_STACK_SIZE, kick_watchdog_timer, NULL, NULL, NULL,
+		WDT_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
 
 void start_kick_wdt_thread(void)
 {

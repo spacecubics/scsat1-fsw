@@ -27,7 +27,7 @@ static int temp_obc_test(uint32_t *err_cnt)
 		"OBC 3",
 	};
 
-	for (int i=0; i<ARRAY_SIZE(obc_pos_list); i++) {
+	for (int i = 0; i < ARRAY_SIZE(obc_pos_list); i++) {
 		ret = sc_adcs_bhm_get_obc_temp(obc_pos_list[i], &temp);
 		if (ret < 0) {
 			LOG_ERR("%s Temperature: Failed", obc_pos_name[i]);
@@ -73,7 +73,7 @@ static int temp_adcs_test(uint32_t *err_cnt)
 		ADCS_TEMP_POS_RW,
 	};
 
-	for (int i=0; i<ARRAY_SIZE(adcs_pos_list); i++) {
+	for (int i = 0; i < ARRAY_SIZE(adcs_pos_list); i++) {
 		ret = get_adcs_temp(adcs_pos_list[i], &temp);
 		if (ret < 0) {
 			LOG_ERR("%s Temperature: Failed", adcs_pos_name[i]);

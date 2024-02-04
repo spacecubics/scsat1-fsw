@@ -12,7 +12,7 @@ LOG_MODULE_REGISTER(rw_test);
 
 static void print_rw_status(enum rw_pos pos, uint32_t sec)
 {
-	for (int j=0; j<5; j++) {
+	for (int j = 0; j < 5; j++) {
 		k_sleep(K_SECONDS(1));
 		rw_print_cv(pos);
 		LOG_INF("%s count: %d", rw_pos_name[pos], rw_get_count(pos));
@@ -29,7 +29,7 @@ int rw_test(uint32_t *err_cnt)
 		RW_POS_Z,
 	};
 
-	for (int i=0; i<ARRAY_SIZE(pos_list); i++) {
+	for (int i = 0; i < ARRAY_SIZE(pos_list); i++) {
 		ret = rw_start(pos_list[i]);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -39,8 +39,8 @@ int rw_test(uint32_t *err_cnt)
 
 		print_rw_status(pos_list[i], 5);
 
-		LOG_INF("Change Potention: 0x%02x on %s",
-			    RW_HALF_POTENTION, rw_pos_name[pos_list[i]]);
+		LOG_INF("Change Potention: 0x%02x on %s", RW_HALF_POTENTION,
+			rw_pos_name[pos_list[i]]);
 		ret = rw_change_speed(pos_list[i], RW_HALF_POTENTION);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -49,9 +49,9 @@ int rw_test(uint32_t *err_cnt)
 		}
 
 		print_rw_status(pos_list[i], 5);
-stop:
+	stop:
 		rw_stop(pos_list[i]);
-end:
+	end:
 	}
 
 	return all_ret;

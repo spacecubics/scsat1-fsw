@@ -121,13 +121,12 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		loop_count = INT32_MAX;
 	}
 
-	for (int i=1; i<=loop_count; i++) {
+	for (int i = 1; i <= loop_count; i++) {
 		if (is_loop_stop()) {
 			break;
 		}
 
-		LOG_INF("===[Loop Test %d Start (total err: %d)]===",
-				 i, *err_cnt);
+		LOG_INF("===[Loop Test %d Start (total err: %d)]===", i, *err_cnt);
 
 		LOG_INF("===[MTQ Start (total err: %d)]===", *err_cnt);
 		ret = mtq_start(axes_list[axes_idx], pol_list[pol_idx], duty);
@@ -136,7 +135,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 			all_ret = -1;
 		}
 
-		for (int j=0; j<5; j++) {
+		for (int j = 0; j < 5; j++) {
 			ret = one_loop(err_cnt);
 			if (ret < 0) {
 				all_ret = -1;
@@ -152,8 +151,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 
 		update_mtq_idx(&axes_idx, &pol_idx);
 
-		LOG_INF("===[Loop Test %d Finish (total err: %d))]===",
-				 i, *err_cnt);
+		LOG_INF("===[Loop Test %d Finish (total err: %d))]===", i, *err_cnt);
 	}
 
 	return all_ret;
