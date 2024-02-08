@@ -18,8 +18,7 @@
 #define SCADCS_PCR_KEYCODE (0x5A5A << 16)
 
 /* IMU Reset Control Register */
-#define SCADCS_IMU_RESET         (0U)
-#define SCADCS_IMU_RESET_RELEASE BIT(0)
+#define SCADCS_IMU_RESET_BIT BIT(0)
 
 void sc_adcs_power_enable(uint8_t target_bit)
 {
@@ -34,13 +33,13 @@ void sc_adcs_power_disable(uint8_t target_bit)
 
 void sc_adcs_imu_reset(void)
 {
-	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET);
+	sys_clear_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET_BIT);
 	k_sleep(K_USEC(1));
 }
 
 void sc_adcs_imu_reset_release(void)
 {
-	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET_RELEASE);
+	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET_BIT);
 	k_sleep(K_MSEC(300));
 }
 
