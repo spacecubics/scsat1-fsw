@@ -20,6 +20,8 @@ void sc_main_power_enable(uint8_t target_bit)
 
 void sc_main_power_disable(uint8_t target_bit)
 {
-	sys_clear_bits(SCMAIN_SYSREG_BASE_ADDR + SCMAIN_PCR_OFFSET,
-		       SCMAIN_PCR_KEYCODE | target_bit);
+	uint32_t val = sys_read32(SCMAIN_SYSREG_BASE_ADDR + SCMAIN_PCR_OFFSET);
+
+	val = SCMAIN_PCR_KEYCODE | (val & ~target_bit);
+	sys_write32(val, SCMAIN_SYSREG_BASE_ADDR + SCMAIN_PCR_OFFSET);
 }
