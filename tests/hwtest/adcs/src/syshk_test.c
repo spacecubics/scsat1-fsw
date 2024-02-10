@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Space Cubics, LLC.
+ * Copyright (c) 2024 Space Cubics, LLC.
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,18 +7,22 @@
 #include <stdlib.h>
 #include <zephyr/kernel.h>
 #include "common.h"
-#include "loop_test.h"
 #include "pwrctrl.h"
 #include "temp_test.h"
 #include "cv_test.h"
 #include "imu_test.h"
 #include "gnss_test.h"
-#include "rw.h"
+#include "rw_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(loop_test);
+LOG_MODULE_REGISTER(syshk_test);
 
-struct k_event loop_event;
+extern struct k_event loop_event;
+
+struct all_test_result {
+	uint32_t loop_count;
+	uint32_t err_cnt;
+};
 
 static void update_rw_idx(uint8_t *rw_idx)
 {
@@ -32,37 +36,48 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 {
 	int ret;
 	int all_ret = 0;
+	struct rw_count_data rw_data;
 	struct adcs_temp_test_result temp_ret;
 	struct adcs_cv_test_result cv_ret;
 	struct imu_test_result imu_ret;
 	struct gnss_test_result gnss_ret;
 
 	LOG_INF("===[RW Count Test Start (total err: %d)]===", *err_cnt);
-	LOG_INF("%s count: %d", rw_pos_name[pos], rw_get_count(pos));
+	rw_get_counts(&rw_data);
+
+	send_syshk(RW, &rw_data, sizeof(rw_data));
 
 	LOG_INF("===[Temp Test Start (total err: %d)]===", *err_cnt);
-	ret = temp_test(&temp_ret, err_cnt, LOG_ENABLE);
+	ret = temp_test(&temp_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
+
+	send_syshk(TEMP, &temp_ret, sizeof(temp_ret));
 
 	LOG_INF("===[CV Test Start (total err: %d)]===", *err_cnt);
-	ret = cv_test(&cv_ret, err_cnt, LOG_ENABLE);
+	ret = cv_test(&cv_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
+
+	send_syshk(CURRENT_VOLTAGE, &cv_ret, sizeof(cv_ret));
 
 	LOG_INF("===[IMU Test Start (total err: %d)]===", *err_cnt);
-	ret = imu_test(&imu_ret, err_cnt, LOG_ENABLE);
+	ret = imu_test(&imu_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
 
+	send_syshk(IMU, &imu_ret, sizeof(imu_ret));
+
 	LOG_INF("===[GNSS Test Start (total err: %d)]===", *err_cnt);
-	ret = gnss_test(&gnss_ret, err_cnt, LOG_ENABLE);
+	ret = gnss_test(&gnss_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
+
+	send_syshk(GNSS, &gnss_ret, sizeof(gnss_ret));
 
 	return all_ret;
 }
@@ -91,7 +106,7 @@ static bool is_loop_stop(void)
 	return false;
 }
 
-int loop_test(int32_t loop_count, uint32_t *err_cnt)
+int syshk_test(int32_t loop_count, uint32_t *err_cnt)
 {
 	int ret;
 	int all_ret = 0;
@@ -101,6 +116,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		RW_POS_Z,
 	};
 	uint8_t rw_idx = 0;
+	struct all_test_result test_ret;
 
 	if (loop_count < 0) {
 		loop_count = INT32_MAX;
@@ -111,9 +127,6 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 			break;
 		}
 
-		LOG_INF("===[Loop Test %d Start (total err: %d)]===", i, *err_cnt);
-
-		LOG_INF("===[RW Start (total err: %d)]===", *err_cnt);
 		ret = rw_start(pos_list[rw_idx]);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -125,7 +138,6 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 			all_ret = -1;
 		}
 
-		LOG_INF("===[Change potention (total err: %d)]===", *err_cnt);
 		ret = rw_change_speed(pos_list[rw_idx], RW_HALF_POTENTION);
 		if (ret < 0) {
 			(*err_cnt)++;
@@ -137,12 +149,13 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 			all_ret = -1;
 		}
 
-		LOG_INF("===[RW Stop (total err: %d)]===", *err_cnt);
 		rw_stop(pos_list[rw_idx]);
 
-		update_rw_idx(&rw_idx);
+		test_ret.loop_count = i;
+		test_ret.err_cnt = *err_cnt;
+		send_syshk(ALL_TEST_RESULT, &test_ret, sizeof(test_ret));
 
-		LOG_INF("===[Loop Test %d Finish (err_cnt: %d)]===", i, *err_cnt);
+		update_rw_idx(&rw_idx);
 	}
 
 	return all_ret;

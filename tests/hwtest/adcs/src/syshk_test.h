@@ -8,4 +8,4 @@
 
 #include <stdint.h>
 
-int loop_test(int32_t loop_count, uint32_t *err_cnt);
+int syshk_test(int32_t loop_count, uint32_t *err_cnt);

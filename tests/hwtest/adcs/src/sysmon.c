@@ -25,22 +25,26 @@ LOG_MODULE_REGISTER(sysmon);
 #define SC_ADCS_SYSMON_XADC_VCCINT_OFFSET  (0x1010) /* XADC VCCINT Status */
 #define SC_ADCS_SYSMON_XADC_VCCAUX_OFFSET  (0x1020) /* XADC VCCAUX Status */
 #define SC_ADCS_SYSMON_XADC_VCCBRAM_OFFSET (0x1060) /* XADC VCCBRAM Status */
-#define SC_ADCS_SYSMON_BHM_INICTLR_OFFSET  (0x2000) /* BHM Initialization Access Control Register  \
-						     */
-#define SC_ADCS_SYSMON_BHM_ACCCTLR_OFFSET  (0x2004) /* BHM Access Control Register */
-#define SC_ADCS_SYSMON_BHM_ISR_OFFSET      (0x2010) /* BHM Interrupt Status Register */
+#define SC_ADCS_SYSMON_BHM_INICTLR_OFFSET                                                          \
+	(0x2000)                                   /* BHM Initialization Access Control Register   \
+						    */
+#define SC_ADCS_SYSMON_BHM_ACCCTLR_OFFSET (0x2004) /* BHM Access Control Register */
+#define SC_ADCS_SYSMON_BHM_ISR_OFFSET     (0x2010) /* BHM Interrupt Status Register */
 #define SC_ADCS_SYSMON_BHM_1V0_SNTVR_OFFSET                                                        \
 	(0x2020) /* BHM VDD_1V0 Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_1V0_BUSVR_OFFSET (0x2024) /* BHM VDD_1V0 Bus Voltage Monitor Register   \
-						      */
+#define SC_ADCS_SYSMON_BHM_1V0_BUSVR_OFFSET                                                        \
+	(0x2024) /* BHM VDD_1V0 Bus Voltage Monitor Register                                       \
+		  */
 #define SC_ADCS_SYSMON_BHM_1V8_SNTVR_OFFSET                                                        \
 	(0x2028) /* BHM VDD_1V8 Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_1V8_BUSVR_OFFSET (0x202C) /* BHM VDD_1V8 Bus Voltage Monitor Register   \
-						      */
+#define SC_ADCS_SYSMON_BHM_1V8_BUSVR_OFFSET                                                        \
+	(0x202C) /* BHM VDD_1V8 Bus Voltage Monitor Register                                       \
+		  */
 #define SC_ADCS_SYSMON_BHM_3V3_SNTVR_OFFSET                                                        \
 	(0x2030) /* BHM VDD_3V3 Shunt Voltage Monitor Register */
-#define SC_ADCS_SYSMON_BHM_3V3_BUSVR_OFFSET (0x2034) /* BHM VDD_3V3 Bus Voltage Monitor Register   \
-						      */
+#define SC_ADCS_SYSMON_BHM_3V3_BUSVR_OFFSET                                                        \
+	(0x2034) /* BHM VDD_3V3 Bus Voltage Monitor Register                                       \
+		  */
 #define SC_ADCS_SYSMON_BHM_3V3SYSA_SNTVR_OFFSET                                                    \
 	(0x2038) /* BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register */
 #define SC_ADCS_SYSMON_BHM_3V3SYSA_BUSVR_OFFSET                                                    \

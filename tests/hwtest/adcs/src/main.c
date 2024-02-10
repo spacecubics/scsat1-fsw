@@ -8,6 +8,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
+#include "common.h"
 #include "wdog.h"
 #include "sysmon.h"
 #include "temp_test.h"
@@ -17,6 +18,7 @@
 #include "rw_test.h"
 #include "adcs_init.h"
 #include "loop_test.h"
+#include "syshk_test.h"
 
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
@@ -34,6 +36,10 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	uint32_t err_cnt = 0;
 	char *cmd = (char *)p1;
 	char *arg = (char *)p2;
+	struct adcs_temp_test_result temp_ret;
+	struct adcs_cv_test_result cv_ret;
+	struct imu_test_result imu_ret;
+	struct gnss_test_result gnss_ret;
 
 	k_event_set(&exec_event, CMD_EXEC_EVENT);
 
@@ -44,17 +50,20 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	} else if (strcmp(cmd, "init") == 0) {
 		ret = adcs_init(&err_cnt);
 	} else if (strcmp(cmd, "temp") == 0) {
-		ret = temp_test(&err_cnt);
+		ret = temp_test(&temp_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "cv") == 0) {
-		ret = cv_test(&err_cnt);
+		ret = cv_test(&cv_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "imu") == 0) {
-		ret = imu_test(&err_cnt);
+		ret = imu_test(&imu_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "gnss") == 0) {
-		ret = gnss_test(&err_cnt);
+		ret = gnss_test(&gnss_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "rw") == 0) {
 		ret = rw_test(&err_cnt);
 	} else if (strcmp(cmd, "loop") == 0) {
 		ret = loop_test(atoi(arg), &err_cnt);
+		k_event_clear(&loop_event, LOOP_STOP_EVENT);
+	} else if (strcmp(cmd, "syshk") == 0) {
+		ret = syshk_test(atoi(arg), &err_cnt);
 		k_event_clear(&loop_event, LOOP_STOP_EVENT);
 	} else {
 		goto end;
@@ -128,6 +137,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(imu, NULL, "IMU test command", start_cmd_thread),
 	SHELL_CMD(gnss, NULL, "GNSS test command", start_cmd_thread),
 	SHELL_CMD(rw, NULL, "Reaction Wheel test command", start_cmd_thread),
-	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread), SHELL_SUBCMD_SET_END);
+	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread),
+	SHELL_CMD(syshk, NULL, "System HK test command", start_cmd_thread), SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
 SHELL_CMD_REGISTER(stop, NULL, "SC-Sat1 HW test stop", stop_cmd);

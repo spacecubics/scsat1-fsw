@@ -6,6 +6,13 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "rw.h"
+
+struct rw_count_data {
+	int32_t x_count;
+	int32_t y_count;
+	int32_t z_count;
+};
 
 int rw_test(uint32_t *err_cnt);
+void rw_get_counts(struct rw_count_data *data);

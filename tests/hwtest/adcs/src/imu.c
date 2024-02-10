@@ -123,7 +123,6 @@ int get_imu_data_ext(struct imu_data *data)
 	}
 
 	imu_decode_imu_data_ext(rxbuf, data);
-	imu_decode_imu_data_std(rxbuf, data);
 	if (data->id != IMU_MEMPHIS3_ID) {
 		LOG_ERR("Invalid ID: 0x%02x", data->id);
 		ret = -1;
