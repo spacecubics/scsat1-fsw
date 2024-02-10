@@ -6,6 +6,12 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <stdbool.h>
+#include "imu.h"
 
-int imu_test(uint32_t *err_cnt);
+struct imu_test_result {
+	int8_t status;
+	struct imu_data data;
+} __attribute__((__packed__));
+
+int imu_test(struct imu_test_result *imu_ret, uint32_t *err_cnt, bool log);

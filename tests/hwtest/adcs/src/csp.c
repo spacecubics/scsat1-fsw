@@ -9,6 +9,7 @@
 #include <csp/csp.h>
 #include <csp/drivers/can_zephyr.h>
 #include <zephyr/device.h>
+#include "common.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(csp);
@@ -17,8 +18,6 @@ LOG_MODULE_REGISTER(csp);
 #define SERVER_STACK_SIZE (1024U)
 #define ROUTER_PRIO       (0U)
 #define SERVER_PRIO       (0U)
-
-#define CSP_ID_ADCS (2U)
 
 static csp_iface_t *can_iface = NULL;
 

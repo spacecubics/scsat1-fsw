@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "imu.h"
+#include "imu_test.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(imu_test);
@@ -22,18 +22,22 @@ static void imu_print_imu_data(struct imu_data *data)
 	LOG_INF("AZ  : 0x%08x", data->acc.z);
 }
 
-int imu_test(uint32_t *err_cnt)
+int imu_test(struct imu_test_result *imu_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
-	int all_ret = 0;
 	struct imu_data data;
 
 	ret = get_imu_data_ext(&data);
 	if (ret < 0) {
-		all_ret = -1;
+		memset(&imu_ret->data, 0, sizeof(imu_ret->data));
 		(*err_cnt)++;
+	} else {
+		memcpy(&imu_ret->data, &data, sizeof(imu_ret->data));
+		if (log) {
+			imu_print_imu_data(&data);
+		}
 	}
-	imu_print_imu_data(&data);
+	imu_ret->status = ret;
 
-	return all_ret;
+	return ret;
 }

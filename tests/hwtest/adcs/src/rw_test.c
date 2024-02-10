@@ -5,7 +5,7 @@
  */
 
 #include <zephyr/kernel.h>
-#include "rw.h"
+#include "rw_test.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(rw_test);
@@ -55,4 +55,11 @@ int rw_test(uint32_t *err_cnt)
 	}
 
 	return all_ret;
+}
+
+void rw_get_counts(struct rw_count_data *data)
+{
+	data->x_count = rw_get_count(RW_POS_X);
+	data->y_count = rw_get_count(RW_POS_Y);
+	data->z_count = rw_get_count(RW_POS_Z);
 }

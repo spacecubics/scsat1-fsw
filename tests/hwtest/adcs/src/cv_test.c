@@ -5,13 +5,18 @@
  */
 
 #include <zephyr/kernel.h>
+#include "common.h"
 #include "cv.h"
+#include "cv_test.h"
 #include "sysmon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(cv_test);
 
-static int cv_obc_test(uint32_t *err_cnt)
+#define CV_INVALID_FLOAT (0.0f)
+#define CV_INVALID_UINT  (0U)
+
+static int cv_obc_test(struct adcs_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
 	int all_ret = 0;
@@ -34,20 +39,23 @@ static int cv_obc_test(uint32_t *err_cnt)
 	for (int i = 0; i < ARRAY_SIZE(obc_pos_list); i++) {
 		ret = sc_adcs_bhm_get_obc_cv(obc_pos_list[i], &cv);
 		if (ret < 0) {
-			LOG_ERR("%s: Failed", obc_pos_name[i]);
+			cv_ret->obc_cv[i].data = CV_INVALID_UINT;
+			HWTEST_LOG_ERR(log, "%s: Failed", obc_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			cv_ret->obc_cv[i].data = cv;
+			HWTEST_LOG_INF(log, "%s: %d %s", obc_pos_name[i], cv, obc_unit_name[i]);
 		}
-		LOG_INF("%s: %d %s", obc_pos_name[i], cv, obc_unit_name[i]);
+		cv_ret->obc_cv[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-static int cv_xadc_test(uint32_t *err_cnt)
+static int cv_xadc_test(struct adcs_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
-	int ret = 0;
+	int ret;
 	int all_ret = 0;
 	float cv;
 	enum xadc_cv_pos xadc_pos_list[] = {
@@ -64,20 +72,23 @@ static int cv_xadc_test(uint32_t *err_cnt)
 	for (int i = 0; i < ARRAY_SIZE(xadc_pos_list); i++) {
 		ret = sc_adcs_bhm_get_xadc_cv(xadc_pos_list[i], &cv);
 		if (ret < 0) {
-			LOG_ERR("%s: Failed", xadc_pos_name[i]);
+			cv_ret->xadc_cv[i].data = CV_INVALID_FLOAT;
+			HWTEST_LOG_ERR(log, "%s: Failed", xadc_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			cv_ret->xadc_cv[i].data = cv;
+			HWTEST_LOG_INF(log, "%s: %.4f [v]", xadc_pos_name[i], (double)cv);
 		}
-		LOG_INF("%s: %.4f [v]", xadc_pos_name[i], (double)cv);
+		cv_ret->xadc_cv[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-static int cv_adcs_test(uint32_t *err_cnt)
+static int cv_adcs_test(struct adcs_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
-	int ret = 0;
+	int ret;
 	int all_ret = 0;
 	uint32_t cv;
 	enum adcs_cv_pos adcs_pos_list[] = {
@@ -92,22 +103,24 @@ static int cv_adcs_test(uint32_t *err_cnt)
 		"[uv]", "[mv]", "[uv]", "[mv]", "[uv]", "[mv]",
 	};
 
-	/* ADCS Board */
 	for (int i = 0; i < ARRAY_SIZE(adcs_pos_list); i++) {
 		ret = get_adcs_cv(adcs_pos_list[i], &cv);
 		if (ret < 0) {
-			LOG_ERR("%s: Failed", adcs_pos_name[i]);
+			cv_ret->adcs_cv[i].data = CV_INVALID_UINT;
+			HWTEST_LOG_ERR(log, "%s: Failed", adcs_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			cv_ret->adcs_cv[i].data = cv;
+			HWTEST_LOG_INF(log, "%s: %d %s", adcs_pos_name[i], cv, adcs_unit_name[i]);
 		}
-		LOG_INF("%s: %d %s", adcs_pos_name[i], cv, adcs_unit_name[i]);
+		cv_ret->adcs_cv[i].status = ret;
 	}
 
 	return all_ret;
 }
 
-static int cv_rw_test(uint32_t *err_cnt)
+static int cv_rw_test(struct adcs_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
 	int all_ret = 0;
@@ -127,38 +140,42 @@ static int cv_rw_test(uint32_t *err_cnt)
 	for (int i = 0; i < ARRAY_SIZE(rw_pos_list); i++) {
 		ret = get_rw_cv(rw_pos_list[i], &cv);
 		if (ret < 0) {
-			LOG_ERR("%s: Failed", rw_pos_name[i]);
+			cv_ret->rw_cv[i].data = CV_INVALID_FLOAT;
+			HWTEST_LOG_ERR(log, "%s: Failed", rw_pos_name[i]);
 			(*err_cnt)++;
 			all_ret = -1;
-			continue;
+		} else {
+			cv_ret->rw_cv[i].data = cv;
+			HWTEST_LOG_INF(log, "%s: %.4f %s", rw_pos_name[i], (double)cv,
+				       rw_unit_name[i]);
 		}
-		LOG_INF("%s: %.4f %s", rw_pos_name[i], (double)cv, rw_unit_name[i]);
+		cv_ret->rw_cv[i].status = ret;
 	}
 
-	return ret;
+	return all_ret;
 }
 
-int cv_test(uint32_t *err_cnt)
+int cv_test(struct adcs_cv_test_result *cv_ret, uint32_t *err_cnt, bool log)
 {
 	int ret;
 	int all_ret = 0;
 
-	ret = cv_obc_test(err_cnt);
+	ret = cv_obc_test(cv_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret--;
 	}
 
-	ret = cv_xadc_test(err_cnt);
+	ret = cv_xadc_test(cv_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret--;
 	}
 
-	ret = cv_adcs_test(err_cnt);
+	ret = cv_adcs_test(cv_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret--;
 	}
 
-	ret = cv_rw_test(err_cnt);
+	ret = cv_rw_test(cv_ret, err_cnt, log);
 	if (ret < 0) {
 		all_ret--;
 	}
