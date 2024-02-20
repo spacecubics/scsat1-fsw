@@ -6,7 +6,8 @@
 
 #pragma once
 
-#define CSP_ID_MAIN (1U)
+#define CSP_ID_MAIN1 (1U)
+#define CSP_ID_MAIN2 (11U)
 #define CSP_ID_ADCS (2U)
 #define CSP_ID_PYLD (3U)
 #define CSP_ID_EPS  (4U)
