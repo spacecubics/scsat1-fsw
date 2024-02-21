@@ -24,7 +24,7 @@ static const char rw_pos_name[][5] = {
 	"RW Z",
 };
 
-int rw_start(enum rw_pos pos);
+int rw_start(enum rw_pos pos, uint8_t pot);
 void rw_stop(enum rw_pos pos);
 int rw_change_speed(enum rw_pos pos, uint16_t pot);
 void rw_start_measurment(enum rw_pos pos);

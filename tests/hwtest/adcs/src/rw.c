@@ -85,13 +85,13 @@ static int set_potention_meter(const struct device *dev, uint8_t pot)
 	return ret;
 }
 
-int rw_start(enum rw_pos pos)
+int rw_start(enum rw_pos pos, uint8_t pot)
 {
 	int ret;
 	const struct device *i2c = get_rw_device(pos);
 
-	LOG_INF("Set Potention: 0x%02x on %s", RW_MAX_POTENTION, rw_pos_name[pos]);
-	ret = set_potention_meter(i2c, RW_MAX_POTENTION);
+	LOG_INF("Set Potention: 0x%02x on %s", pot, rw_pos_name[pos]);
+	ret = set_potention_meter(i2c, pot);
 	if (ret < 0) {
 		goto end;
 	}

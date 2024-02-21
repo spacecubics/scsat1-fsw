@@ -114,7 +114,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		LOG_INF("===[Loop Test %d Start (total err: %d)]===", i, *err_cnt);
 
 		LOG_INF("===[RW Start (total err: %d)]===", *err_cnt);
-		ret = rw_start(pos_list[rw_idx]);
+		ret = rw_start(pos_list[rw_idx], RW_HALF_POTENTION);
 		if (ret < 0) {
 			(*err_cnt)++;
 			all_ret = -1;
@@ -126,7 +126,7 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		}
 
 		LOG_INF("===[Change potention (total err: %d)]===", *err_cnt);
-		ret = rw_change_speed(pos_list[rw_idx], RW_HALF_POTENTION);
+		ret = rw_change_speed(pos_list[rw_idx], 0x20);
 		if (ret < 0) {
 			(*err_cnt)++;
 			all_ret = -1;
