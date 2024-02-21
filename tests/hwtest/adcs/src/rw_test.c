@@ -30,7 +30,7 @@ int rw_test(uint32_t *err_cnt)
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(pos_list); i++) {
-		ret = rw_start(pos_list[i]);
+		ret = rw_start(pos_list[i], RW_HALF_POTENTION);
 		if (ret < 0) {
 			(*err_cnt)++;
 			all_ret = -1;
@@ -39,9 +39,9 @@ int rw_test(uint32_t *err_cnt)
 
 		print_rw_status(pos_list[i], 5);
 
-		LOG_INF("Change Potention: 0x%02x on %s", RW_HALF_POTENTION,
+		LOG_INF("Change Potention: 0x%02x on %s", 0x20,
 			rw_pos_name[pos_list[i]]);
-		ret = rw_change_speed(pos_list[i], RW_HALF_POTENTION);
+		ret = rw_change_speed(pos_list[i], 0x20);
 		if (ret < 0) {
 			(*err_cnt)++;
 			all_ret = -1;
