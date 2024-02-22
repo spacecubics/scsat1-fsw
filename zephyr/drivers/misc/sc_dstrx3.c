@@ -148,7 +148,7 @@ void sc_dstrx3_set_tx_param(const struct device *dev, enum sc_dstrx3_tx_power tx
 	const struct sc_dstrx3_cfg *cfg = dev->config;
 	uint32_t val = SC_DSTRX3_CM_PWR_MODE(tx_power) | SC_DSTRX3_CM_BIT_RATE(bit_rate);
 
-	sys_write32(cfg->base + SC_DSTRX3_CMTX_OFFSET, val);
+	sys_write32(val, cfg->base + SC_DSTRX3_CMTX_OFFSET);
 	LOG_DBG("CMTX: 0x%08x", sys_read32(cfg->base + SC_DSTRX3_CMTX_OFFSET));
 }
 
