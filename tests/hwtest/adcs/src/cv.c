@@ -142,7 +142,7 @@ static int32_t convert_cv_bus(int16_t raw)
 
 static float convert_rw_cv_shunt(int16_t raw)
 {
-	return (float)((raw * 5) / 1000);
+	return (float)((int16_t)raw * 5) / 1000;
 }
 
 static float convert_rw_cv_bus(uint16_t raw)

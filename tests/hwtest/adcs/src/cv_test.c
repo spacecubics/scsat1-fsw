@@ -187,9 +187,15 @@ static int cv_rw_test(uint32_t *err_cnt)
 			continue;
 		}
 		LOG_INF("%s: %.4f %s", rw_pos_name[i], (double)cv, rw_unit_name[i]);
+		if (i == 1 || i == 3 || i == 5) {
+			if (cv < 12.0) {
+				(*err_cnt)++;
+				all_ret = -1;
+			}
+		}
 	}
 
-	return ret;
+	return all_ret;
 }
 
 int cv_test(uint32_t *err_cnt)

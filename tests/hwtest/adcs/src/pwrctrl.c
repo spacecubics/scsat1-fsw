@@ -29,14 +29,18 @@ void sc_adcs_power_enable(uint8_t target_bit)
 
 void sc_adcs_power_disable(uint8_t target_bit)
 {
-	sys_clear_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_PCR_OFFSET,
+/*	sys_clear_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_PCR_OFFSET,
 				 SCADCS_PCR_KEYCODE | target_bit);
+*/	
+	uint32_t temp = sys_read32(SCADCS_SYSREG_BASE_ADDR + SCADCS_PCR_OFFSET);
+	temp = temp & ~target_bit;
+	sys_write32(0x5a5a0000 | temp, SCADCS_SYSREG_BASE_ADDR + SCADCS_PCR_OFFSET);
 }
 
 void sc_adcs_imu_reset(void)
 {
-	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET,
-				 SCADCS_IMU_RESET);
+	sys_clear_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET,
+				 SCADCS_IMU_RESET_RELEASE);
 	k_sleep(K_USEC(1));
 }
 
@@ -50,7 +54,7 @@ void sc_adcs_imu_reset_release(void)
 void sc_adcs_motor_enable(uint8_t target_bit)
 {
 	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_MDCR_OFFSET,
-				 target_bit);
+				 0x0700 | target_bit);
 }
 
 void sc_adcs_motor_disable(uint8_t target_bit)

@@ -90,11 +90,13 @@ int rw_start(enum rw_pos pos)
 	int ret;
 	const struct device *i2c = get_rw_device(pos);
 
+/*
 	LOG_INF("Set Potention: 0x%02x on %s", RW_MAX_POTENTION, rw_pos_name[pos]);
 	ret = set_potention_meter(i2c, RW_MAX_POTENTION);
 	if (ret < 0) {
 		goto end;
 	}
+*/
 
 	LOG_INF("Start the Reaction Wheel measurement (%s)", rw_pos_name[pos]);
 	rw_start_measurment(pos);
@@ -144,20 +146,20 @@ void rw_print_cv(enum rw_pos pos)
 	case RW_POS_X:
 		get_rw_cv(ADCS_VDD_12V_DRVX_SHUNT, &cv);
 		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], (double)cv);
-		get_rw_cv(ADCS_VDD_12V_DRVX_BUS, &cv);
-		LOG_INF("%s X Bus %.4f [v]", rw_pos_name[pos], (double)cv);
+		//get_rw_cv(ADCS_VDD_12V_DRVX_BUS, &cv);
+		//LOG_INF("%s X Bus %.4f [v]", rw_pos_name[pos], cv);
 		break;
 	case RW_POS_Y:
 		get_rw_cv(ADCS_VDD_12V_DRVY_SHUNT, &cv);
 		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], (double)cv);
-		get_rw_cv(ADCS_VDD_12V_DRVY_BUS, &cv);
-		LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], (double)cv);
+		//get_rw_cv(ADCS_VDD_12V_DRVY_BUS, &cv);
+		//LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], cv);
 		break;
 	case RW_POS_Z:
 		get_rw_cv(ADCS_VDD_12V_DRVZ_SHUNT, &cv);
 		LOG_INF("%s Shunt: %.4f [mv]", rw_pos_name[pos], (double)cv);
-		get_rw_cv(ADCS_VDD_12V_DRVZ_BUS, &cv);
-		LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], (double)cv);
+		//get_rw_cv(ADCS_VDD_12V_DRVZ_BUS, &cv);
+		//LOG_INF("%s Bus %.4f [v]", rw_pos_name[pos], cv);
 		break;
 	default:
 		break;

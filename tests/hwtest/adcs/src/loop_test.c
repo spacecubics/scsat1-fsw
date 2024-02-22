@@ -67,7 +67,7 @@ static int verify_status(enum rw_pos pos, uint32_t sec, uint32_t *err_cnt)
 	int ret;
 	int all_ret = 0;
 
-	for (int j=0; j<5; j++) {
+	for (int j=0; j<10; j++) {
 		ret = one_loop(pos, err_cnt);
 		if (ret < 0) {
 			all_ret = -1;
@@ -107,6 +107,11 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		}
 
 		LOG_INF("===[Loop Test %d Start (total err: %d)]===", i, *err_cnt);
+
+		LOG_INF("===[CV Test Start (total err: %d)]===", *err_cnt);
+		ret = cv_test(err_cnt);
+		k_sleep(K_SECONDS(1));
+		continue;
 
 		LOG_INF("===[RW Start (total err: %d)]===", *err_cnt);
 		ret = rw_start(pos_list[rw_idx]);
