@@ -1,0 +1,21 @@
+mainmenu "SC-Sat1 Main Board"
+
+menu "Application"
+
+config SCOBC_A1_BOOT_CFG_MEM_ADDR
+	hex "The address of the config memory where the bootloader loads the Flight software"
+	default 0x00800000
+	help
+	  Address of the Config memory where the bootloader loads the Flight software.
+
+config SCOBC_A1_BOOT_CFG_COPY_SIZE_KB
+	int "The size (in Kbytes) that the bootloader copies from config memory to HRMEM"
+	default 256
+	help
+	  The size (in bytes) that the bootloader copies from config memory to HRMEM.
+
+endmenu
+
+menu "Zephyr"
+source "Kconfig.zephyr"
+endmenu
