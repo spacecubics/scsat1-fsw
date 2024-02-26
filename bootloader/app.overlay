@@ -1,14 +1,13 @@
 #include <freq.h>
 #include <mem.h>
 
-/delete-node/ &uartlite0;
+/delete-node/ &hrmem;
 
 / {
 	soc {
-		uartlite0: uartlite@4f010000 {
-			compatible = "xlnx,xps-uartlite-1.00.a";
-			interrupts = <0 0>;
-			reg = <0x4f010000 0x10000>;
+		hrmem: memory@0 {
+			compatible = "sc,hrmem";
+			reg = <0x00000000 DT_SIZE_K(32)>;
 		};
 	};
 };
