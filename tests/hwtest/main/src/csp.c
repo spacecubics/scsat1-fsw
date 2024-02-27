@@ -14,7 +14,7 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(csp);
 
-#define ROUTER_STACK_SIZE 1024
+#define ROUTER_STACK_SIZE 256
 #define SERVER_STACK_SIZE 1024
 #define ROUTER_PRIO       0
 #define SERVER_PRIO       0
@@ -26,6 +26,7 @@ void server();
 
 static void *router_task(void *param)
 {
+
 	/* Here there be routing */
 	while (true) {
 		csp_route_work();
@@ -99,14 +100,14 @@ void server(void)
 int csp_enable(void)
 {
 	int ret;
-	const char *rtable = "2 CAN2,3 CAN2,10 CAN1";
+	const char *rtable = "2 CAN2,3 CAN2";
 	const char *ifname1 = "CAN1";
 	const char *ifname2 = "CAN2";
 	const struct device *can1 = DEVICE_DT_GET(DT_NODELABEL(can0));
 	const struct device *can2 = DEVICE_DT_GET(DT_NODELABEL(can1));
 	uint32_t bitrate = 1000000;
-	uint16_t filter_addr = 0;
-	uint16_t filter_mask = 0;
+	uint16_t filter_addr = CSP_ID_MAIN;
+	uint16_t filter_mask = 0x1F;
 
 	LOG_INF("Initialising CSP");
 
@@ -114,22 +115,20 @@ int csp_enable(void)
 
 	csp_init();
 
-	ret = csp_can_open_and_add_interface(can1, ifname1, CSP_ID_MAIN1, bitrate, filter_addr,
+	ret = csp_can_open_and_add_interface(can1, ifname1, CSP_ID_MAIN, bitrate, filter_addr,
 					     filter_mask, &can_iface1);
 	if (ret != CSP_ERR_NONE) {
 		LOG_ERR("failed to add CAN interface [%s], error: %d\n", ifname1, ret);
 		goto end;
 	}
-	can_iface1->netmask = 5;
 	can_iface1->is_default = 1;
 
-	ret = csp_can_open_and_add_interface(can2, ifname2, CSP_ID_MAIN2, bitrate, filter_addr,
+	ret = csp_can_open_and_add_interface(can2, ifname2, CSP_ID_MAIN, bitrate, filter_addr,
 					     filter_mask, &can_iface2);
 	if (ret != CSP_ERR_NONE) {
 		LOG_ERR("failed to add CAN interface [%s], error: %d\n", ifname1, ret);
 		goto end;
 	}
-	can_iface2->netmask = 5;
 
 	ret = csp_rtable_load(rtable);
 	if (ret < 1) {
