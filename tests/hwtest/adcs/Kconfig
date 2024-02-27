@@ -2,6 +2,12 @@ mainmenu "SC-Sat1 ADCS Board"
 
 menu "Application"
 
+config SCSAT1_ADCS_AUTO_RUN_HWTEST
+	bool "Enable auto run for HW test"
+	default n
+	help
+	  Enable auto run for HW test.
+
 endmenu
 
 menu "Zephyr"

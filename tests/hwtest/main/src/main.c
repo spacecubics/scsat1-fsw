@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 #include <zephyr/kernel.h>
-#include <zephyr/shell/shell.h>
+#include <zephyr/shell/shell_uart.h>
 #include "common.h"
 #include "wdog.h"
 #include "sysmon.h"
@@ -129,6 +129,14 @@ int main(void)
 	sc_main_print_fpga_ids();
 
 	k_event_init(&exec_event);
+
+	if (IS_ENABLED(CONFIG_SCSAT1_MAIN_AUTO_RUN_HWTEST)) {
+		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest init");
+
+		k_sleep(K_SECONDS(150));
+
+		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest loop -1");
+	}
 
 	return 0;
 }
