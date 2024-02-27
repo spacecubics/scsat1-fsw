@@ -55,3 +55,41 @@ int main_init(uint32_t *err_cnt)
 
 	return all_ret;
 }
+
+int main_off(uint32_t *err_cnt)
+{
+	int ret;
+	int all_ret = 0;
+
+	ret = sc_main_bhm_disable();
+	if (ret < 0) {
+		LOG_ERR("Failed to disable the BHM. (%d)", ret);
+		(*err_cnt)++;
+		all_ret = -1;
+	} else {
+		LOG_INF("Disable the BHM");
+	}
+
+	sc_main_power_disable(DRV2_PWR | DRV1_PWR);
+	LOG_INF("Power off the DRV1/DRV2");
+
+	k_sleep(K_SECONDS(1));
+
+	sc_main_power_disable(DSTRX_IO_PWR);
+	LOG_INF("Power off the DSTRX-3 IO");
+
+	k_sleep(K_SECONDS(1));
+
+	sc_main_power_disable(PDU_O1_PWR);
+	LOG_INF("Power off the ADCS Board");
+
+	k_sleep(K_SECONDS(1));
+
+	sc_main_power_disable(PDU_O2_PWR);
+	LOG_INF("Power off the Payload Board");
+
+	csp_disable();
+	LOG_INF("Disable the CSP");
+
+	return all_ret;
+}

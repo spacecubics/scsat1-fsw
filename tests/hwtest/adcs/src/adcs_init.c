@@ -62,3 +62,40 @@ int adcs_init(uint32_t *err_cnt)
 
 	return all_ret;
 }
+
+int adcs_off(uint32_t *err_cnt)
+{
+	int ret;
+	int all_ret = 0;
+
+	ret = sc_adcs_bhm_disable();
+	if (ret < 0) {
+		LOG_ERR("Failed to disble the BHM. (%d)", ret);
+		(*err_cnt)++;
+		all_ret = -1;
+	} else {
+		LOG_INF("Disable the BHM");
+	}
+
+	sc_adcs_power_disable(DRV_PWR);
+	LOG_INF("Power off the DRV");
+
+	k_sleep(K_SECONDS(1));
+
+	sc_adcs_power_disable(IMU_PWR);
+	imu_disable();
+	LOG_INF("Power off the IMU");
+
+	k_sleep(K_SECONDS(1));
+
+	sc_adcs_power_disable(GPS_PWR);
+	gnss_disable();
+	LOG_INF("Power off the GNSS");
+
+	k_sleep(K_SECONDS(1));
+
+	csp_disable();
+	LOG_INF("Disable the CSP");
+
+	return all_ret;
+}
