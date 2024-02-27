@@ -49,6 +49,8 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 		sc_adcs_print_fpga_ids();
 	} else if (strcmp(cmd, "init") == 0) {
 		ret = adcs_init(&err_cnt);
+	} else if (strcmp(cmd, "off") == 0) {
+		ret = adcs_off(&err_cnt);
 	} else if (strcmp(cmd, "temp") == 0) {
 		ret = temp_test(&temp_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "cv") == 0) {
@@ -132,6 +134,7 @@ int main(void)
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_hwtest, SHELL_CMD(info, NULL, "ADCS Board Information", start_cmd_thread),
 	SHELL_CMD(init, NULL, "ADCS Board Initialization", start_cmd_thread),
+	SHELL_CMD(off, NULL, "Turn off the each power and CAN", start_cmd_thread),
 	SHELL_CMD(temp, NULL, "Temperature test command", start_cmd_thread),
 	SHELL_CMD(cv, NULL, "Current/Voltage test command", start_cmd_thread),
 	SHELL_CMD(imu, NULL, "IMU test command", start_cmd_thread),

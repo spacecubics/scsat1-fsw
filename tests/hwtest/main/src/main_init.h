@@ -9,3 +9,4 @@
 #include <stdint.h>
 
 int main_init(uint32_t *err_cnt);
+int main_off(uint32_t *err_cnt);
