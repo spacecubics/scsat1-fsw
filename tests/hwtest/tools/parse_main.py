@@ -55,6 +55,19 @@ TARGET_LIST = [
     "Ping to ADCS Board:[ms]",
     "Ping to Payload Board:[ms]",
     "Payload Board JPEG Count:[cnt]",
+    "DSTRX-3 HK FREE_COUNTER     :[cnt]",
+    "DSTRX-3 HK WDT_COUNTER      :[cnt]",
+    "DSTRX-3 HK RSSI             :[dBm]",
+    "DSTRX-3 HK RCV_FREQ         :[Hz]",
+    "DSTRX-3 HK TEMPERATURE      :[deg]",
+    "DSTRX-3 HK VOLTAGE          :[v]",
+    "DSTRX-3 HK TX_PWR           :[dBm]",
+    "DSTRX-3 HK CARRIER_LOCK     :[bool]",
+    "DSTRX-3 HK SUB_CARRIER_LOCK :[bool]",
+    "DSTRX-3 HK TX_PWR_SET       :[dBm]",
+    "DSTRX-3 HK BIT_RATE_SET     :[bps]",
+    "DSTRX-3 HK PROG_NO          :[num]",
+    "DSTRX-3 HK CHK_SUM          :[num]",
 ]
 
 x_data = {}
