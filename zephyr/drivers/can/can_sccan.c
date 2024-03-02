@@ -170,7 +170,6 @@ struct sc_can_cfg {
 	uint32_t reg_addr;
 	irq_init_func_t irq_init;
 	uint32_t clock_frequency;
-	uint8_t sjw;
 	uint8_t tx_fifo_depth;
 	uint8_t max_filter;
 };
@@ -1051,7 +1050,6 @@ static int sc_can_init(const struct device *dev)
 	uint32_t v;
 
 	/* Set timing according to dts default setting */
-	timing.sjw = config->sjw;
 	ret = can_calc_timing(dev, &timing, config->common.bus_speed, config->common.sample_point);
 	if (ret == -EINVAL) {
 		LOG_ERR("Can't find timing for given param");
@@ -1159,7 +1157,6 @@ static const struct can_driver_api sc_can_driver_api = {
 		.reg_addr = DT_INST_REG_ADDR(n),                                                   \
 		.irq_init = sc_can_##n##_irq_init,                                                 \
 		.clock_frequency = DT_INST_PROP(n, clock_frequency),                               \
-		.sjw = DT_INST_PROP(n, sjw),                                                       \
 		.tx_fifo_depth = DT_INST_PROP(n, tx_fifo_depth),                                   \
 		.max_filter = DT_INST_PROP(n, max_filter),                                         \
 	};                                                                                         \

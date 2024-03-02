@@ -55,7 +55,6 @@
 			interrupts = <5 0>;
 			reg = <0x40400000 0x10000>;
 			bus-speed = <1000000>;
-			sjw = <4>;
 			sample-point = <750>;
 			tx-fifo-depth = <64>;
 			max-filter = <4>;
@@ -71,7 +70,6 @@
 			interrupts = <19 0>;
 			reg = <0x50100000 0x10000>;
 			bus-speed = <1000000>;
-			sjw = <4>;
 			sample-point = <750>;
 			tx-fifo-depth = <64>;
 			max-filter = <4>;
@@ -87,7 +85,6 @@
 			interrupts = <20 0>;
 			reg = <0x50200000 0x10000>;
 			bus-speed = <1000000>;
-			sjw = <4>;
 			sample-point = <750>;
 			tx-fifo-depth = <64>;
 			max-filter = <4>;
