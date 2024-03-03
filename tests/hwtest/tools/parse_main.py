@@ -46,6 +46,7 @@ TARGET_LIST = [
     "IO_VDD_3V3_SYS Shunt:[mA]",
     "IO_VDD_3V3_SYS Bus:[v]",
     "IO_VDD_3V3 Shunt:[mA]",
+    "IO_VDD_3V3 Bus:[v]",
     "Uptime of EPS:[s]",
     "Uptime of SRS-3:[s]",
     "Uptime of ADCS Board:[s]",
@@ -91,7 +92,7 @@ def get_shunt_ohm(key):
     elif key == "OBC_3V3_IO Shunt":
         ohm = 0.01
     elif key == "IO_PDU_04_3V3 Shunt":
-        ohm = 0.1
+        ohm = 0.01
     elif key == "IO_VDD_3V3_SYS Shunt":
         ohm = 0.1
     elif key == "IO_VDD_3V3 Shunt":
