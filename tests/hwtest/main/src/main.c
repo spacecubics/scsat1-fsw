@@ -17,6 +17,7 @@
 #include "sunsens_test.h"
 #include "mtq_test.h"
 #include "dstrx3_test.h"
+#include "scbus.h"
 #include "main_init.h"
 #include "loop_test.h"
 #include "syshk_test.h"
