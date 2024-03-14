@@ -10,6 +10,12 @@
 #include <csp/drivers/can_zephyr.h>
 #include <zephyr/device.h>
 #include "common.h"
+#include "temp_test.h"
+#include "cv_test.h"
+#include "imu_test.h"
+#include "gnss_test.h"
+#include "rw_test.h"
+#include "syshk.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(csp);
@@ -18,6 +24,16 @@ LOG_MODULE_REGISTER(csp);
 #define SERVER_STACK_SIZE (1024U)
 #define ROUTER_PRIO       (0U)
 #define SERVER_PRIO       (0U)
+
+#define CSP_GET_SYSHK_PORT (10U)
+
+extern uint8_t syshk_head;
+extern struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
+extern struct adcs_temp_test_result temp_ret_fifo[SYSHK_FIFO_NUM];
+extern struct adcs_cv_test_result cv_ret_fifo[SYSHK_FIFO_NUM];
+extern struct imu_test_result imu_ret_fifo[SYSHK_FIFO_NUM];
+extern struct gnss_test_result gnss_ret_fifo[SYSHK_FIFO_NUM];
+extern struct all_test_result test_ret_fifo[SYSHK_FIFO_NUM];
 
 static csp_iface_t *can_iface = NULL;
 
@@ -62,6 +78,39 @@ static void server_start(void)
 
 extern csp_conf_t csp_conf;
 
+static void csp_get_syshk(csp_conn_t *conn, csp_packet_t *packet)
+{
+	enum adcs_obc_tlm_type type = packet->data[0];
+
+	switch (type) {
+	case TEMP:
+		send_syshk(type, &temp_ret_fifo[syshk_head], sizeof(struct adcs_temp_test_result),
+			   conn);
+		break;
+	case CURRENT_VOLTAGE:
+		send_syshk(type, &cv_ret_fifo[syshk_head], sizeof(struct adcs_cv_test_result),
+			   conn);
+		break;
+	case IMU:
+		send_syshk(type, &imu_ret_fifo[syshk_head], sizeof(struct imu_test_result), conn);
+		break;
+	case GNSS:
+		send_syshk(type, &gnss_ret_fifo[syshk_head], sizeof(struct gnss_test_result), conn);
+		break;
+	case RW:
+		send_syshk(type, &rw_data_fifo[syshk_head], sizeof(struct rw_count_data), conn);
+		break;
+	case ALL_TEST_RESULT:
+		send_syshk(type, &test_ret_fifo[syshk_head], sizeof(struct all_test_result), conn);
+		break;
+	default:
+		goto end;
+	}
+
+end:
+	return;
+}
+
 void server(void)
 {
 
@@ -83,6 +132,10 @@ void server(void)
 		csp_packet_t *packet;
 		while ((packet = csp_read(conn, 50)) != NULL) {
 			switch (csp_conn_dport(conn)) {
+			case CSP_GET_SYSHK_PORT:
+				csp_get_syshk(conn, packet);
+				csp_buffer_free(packet);
+				break;
 			default:
 				csp_service_handler(packet);
 				break;
