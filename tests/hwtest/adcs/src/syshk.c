@@ -6,7 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <csp/csp.h>
 #include "common.h"
 #include "syshk.h"
 
@@ -18,21 +17,25 @@ LOG_MODULE_REGISTER(syshk);
 
 static uint32_t seq_counters[TLM_TYPE_NUM] = {0};
 
-int send_syshk(enum adcs_obc_tlm_type type, void *data, uint16_t size)
+int send_syshk(enum adcs_obc_tlm_type type, void *data, uint16_t size, csp_conn_t *conn)
 {
 	int ret = 0;
 	size_t type_size = sizeof(type);
 	size_t seq_size = sizeof(seq_counters[type]);
 	size_t pkt_size = size + type_size + seq_size;
+	bool connected = false;
 
 	LOG_INF("Send System HK %d byte", size);
 
-	csp_conn_t *conn =
-		csp_connect(CSP_PRIO_NORM, CSP_ID_GND, SYSHK_PORT, CSP_TIMEOUT_MSEC, CSP_O_NONE);
 	if (conn == NULL) {
-		LOG_ERR("CSP Connection failed");
-		ret = -ETIMEDOUT;
-		goto end;
+		conn = csp_connect(CSP_PRIO_NORM, CSP_ID_GND, SYSHK_PORT, CSP_TIMEOUT_MSEC,
+				   CSP_O_NONE);
+		if (conn == NULL) {
+			LOG_ERR("CSP Connection failed");
+			ret = -ETIMEDOUT;
+			goto end;
+		}
+		connected = true;
 	}
 
 	csp_packet_t *packet = csp_buffer_get(pkt_size);
@@ -50,7 +53,9 @@ int send_syshk(enum adcs_obc_tlm_type type, void *data, uint16_t size)
 
 	csp_send(conn, packet);
 
-	csp_close(conn);
+	if (connected) {
+		csp_close(conn);
+	}
 
 end:
 	return ret;

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <csp/csp.h>
 
 enum adcs_obc_tlm_type {
 	SYSHK = 0,
@@ -59,4 +60,4 @@ struct syshk_double_data {
 	float data;
 } __attribute__((__packed__));
 
-int send_syshk(enum adcs_obc_tlm_type type, void *data, uint16_t size);
+int send_syshk(enum adcs_obc_tlm_type type, void *data, uint16_t size, csp_conn_t *conn);
