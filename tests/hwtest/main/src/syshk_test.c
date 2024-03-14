@@ -5,6 +5,7 @@
  */
 
 #include <zephyr/kernel.h>
+#include <csp/csp.h>
 #include "common.h"
 #include "pwrctrl.h"
 #include "temp_test.h"
@@ -14,6 +15,7 @@
 #include "mgnm_test.h"
 #include "dstrx3_test.h"
 #include "mtq.h"
+#include "csp.h"
 #include "syshk.h"
 
 #include <zephyr/logging/log.h>
@@ -26,6 +28,75 @@ struct all_test_result {
 	uint32_t loop_count;
 	uint32_t err_cnt;
 };
+
+#define CSP_GET_SYSHK_PORT (10U)
+#define CSP_GET_TEMP_CMD   (1U)
+#define CSP_GET_CV_CMD     (2U)
+#define CSP_GET_IMU_CMD    (3U)
+#define CSP_GET_GNSS_CMD   (4U)
+#define CSP_GET_RW_CMD     (5U)
+#define CSP_GET_RET_CMD    (6U)
+
+static int send_adcs_syshk(void)
+{
+	int ret = 0;
+	csp_conn_t *adcs_conn;
+	csp_conn_t *gnd_conn;
+	csp_packet_t *packet;
+	uint8_t csp_cmd_list[] = {
+		CSP_GET_TEMP_CMD, CSP_GET_CV_CMD, CSP_GET_IMU_CMD,
+		CSP_GET_GNSS_CMD, CSP_GET_RW_CMD, CSP_GET_RET_CMD,
+	};
+
+	gnd_conn = csp_connect(CSP_PRIO_NORM, CSP_ID_GND, SYSHK_PORT, CSP_SYSHK_TIMEOUT_MSEC,
+			       CSP_O_NONE);
+	if (gnd_conn == NULL) {
+		LOG_ERR("CSP Connection failed for GND");
+		ret = -ETIMEDOUT;
+		goto end;
+	}
+
+	adcs_conn = csp_connect(CSP_PRIO_NORM, CSP_ID_ADCS, CSP_GET_SYSHK_PORT,
+				CSP_SYSHK_TIMEOUT_MSEC, CSP_O_NONE);
+	if (adcs_conn == NULL) {
+		LOG_ERR("CSP Connection failed for ADCS");
+		ret = -ETIMEDOUT;
+		goto cleanup;
+	}
+
+	for (int i = 0; i < ARRAY_SIZE(csp_cmd_list); i++) {
+
+		packet = csp_buffer_get(0);
+		if (packet == NULL) {
+			LOG_ERR("Failed to get CSP buffer");
+			ret = -ENOBUFS;
+			continue;
+		}
+		memcpy(&packet->data, &csp_cmd_list[i], sizeof(uint8_t));
+		packet->length = sizeof(uint8_t);
+
+		csp_send(adcs_conn, packet);
+
+		packet = csp_read(adcs_conn, CSP_SYSHK_TIMEOUT_MSEC);
+		if (packet == NULL) {
+			LOG_ERR("Failed to CSP read for ADCS HK (cmd:%d)", csp_cmd_list[i]);
+			ret = -ETIMEDOUT;
+			continue;
+		}
+
+		/* Send ADCS HK to Ground */
+		csp_send(gnd_conn, packet);
+
+		csp_buffer_free(packet);
+	}
+
+	csp_close(adcs_conn);
+cleanup:
+	csp_close(gnd_conn);
+
+end:
+	return ret;
+}
 
 static void update_mtq_idx(uint8_t *axes_idx, uint8_t *pol_idx)
 {
@@ -51,6 +122,8 @@ static int one_loop(uint32_t *err_cnt)
 	struct sunsens_test_ret sunsens_ret;
 	struct mgnm_test_ret mgnm_ret;
 	struct dstrx3_test_ret dstrx3_ret;
+	struct all_test_result test_ret;
+	static uint32_t loop_count = 0;
 
 	LOG_INF("===[Temp Test Start (total err: %d)]===", *err_cnt);
 	ret = temp_test(&temp_ret, err_cnt, LOG_DISABLE);
@@ -102,21 +175,30 @@ static int one_loop(uint32_t *err_cnt)
 
 	k_sleep(K_MSEC(100));
 
-	if (test_mode < MAIN_ONLY) {
-		goto end;
+	if (test_mode >= MAIN_ONLY) {
+
+		LOG_INF("===[DSTRX-3 Test Start (total err: %d)]===", *err_cnt);
+		ret = dstrx3_test(&dstrx3_ret, err_cnt, LOG_DISABLE);
+		if (ret < 0) {
+			all_ret = -1;
+		}
+
+		send_syshk(DSTRX3, &dstrx3_ret, sizeof(dstrx3_ret));
+
+		k_sleep(K_MSEC(100));
 	}
 
-	LOG_INF("===[DSTRX-3 Test Start (total err: %d)]===", *err_cnt);
-	ret = dstrx3_test(&dstrx3_ret, err_cnt, LOG_DISABLE);
-	if (ret < 0) {
-		all_ret = -1;
+	test_ret.loop_count = loop_count;
+	test_ret.err_cnt = *err_cnt;
+	send_syshk(ALL_TEST_RESULT, &test_ret, sizeof(test_ret));
+	loop_count++;
+
+	if (test_mode >= MAIN_ADCS_ONLY) {
+
+		LOG_INF("===[ADCS HK Send Start (total err: %d)]===", *err_cnt);
+		send_adcs_syshk();
 	}
 
-	send_syshk(DSTRX3, &dstrx3_ret, sizeof(dstrx3_ret));
-
-	k_sleep(K_MSEC(100));
-
-end:
 	return all_ret;
 }
 
@@ -146,7 +228,6 @@ int syshk_test(int32_t loop_count, uint32_t *err_cnt)
 	};
 	uint8_t axes_idx = 0;
 	uint8_t pol_idx = 0;
-	struct all_test_result test_ret;
 
 	if (loop_count < 0) {
 		loop_count = INT32_MAX;
@@ -175,10 +256,6 @@ int syshk_test(int32_t loop_count, uint32_t *err_cnt)
 			(*err_cnt)++;
 			all_ret = -1;
 		}
-
-		test_ret.loop_count = i;
-		test_ret.err_cnt = *err_cnt;
-		send_syshk(ALL_TEST_RESULT, &test_ret, sizeof(test_ret));
 
 		update_mtq_idx(&axes_idx, &pol_idx);
 	}

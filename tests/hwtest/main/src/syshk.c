@@ -11,12 +11,10 @@
 #include <zephyr/device.h>
 #include "csp.h"
 #include "csp_test.h"
+#include "syshk.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk);
-
-#define CSP_TIMEOUT_MSEC (100U)
-#define SYSHK_PORT       (10U)
 
 static uint32_t seq_counters[TLM_TYPE_NUM] = {0};
 
@@ -29,8 +27,8 @@ int send_syshk(enum main_obc_tlm_type type, void *data, uint16_t size)
 
 	LOG_DBG("Send System HK %d byte (type:%d)", size, type);
 
-	csp_conn_t *conn =
-		csp_connect(CSP_PRIO_NORM, CSP_ID_GND, SYSHK_PORT, CSP_TIMEOUT_MSEC, CSP_O_NONE);
+	csp_conn_t *conn = csp_connect(CSP_PRIO_NORM, CSP_ID_GND, SYSHK_PORT,
+				       CSP_SYSHK_TIMEOUT_MSEC, CSP_O_NONE);
 	if (conn == NULL) {
 		LOG_ERR("CSP Connection failed");
 		ret = -ETIMEDOUT;
