@@ -8,6 +8,9 @@
 
 #include <stdint.h>
 
+#define SYSHK_PORT             (10U)
+#define CSP_SYSHK_TIMEOUT_MSEC (100U)
+
 enum main_obc_tlm_type {
 	SYSHK = 0,
 	TEMP,
