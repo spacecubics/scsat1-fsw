@@ -25,7 +25,7 @@ int send_syshk(enum adcs_obc_tlm_type type, void *data, uint16_t size, csp_conn_
 	size_t pkt_size = size + type_size + seq_size;
 	bool connected = false;
 
-	LOG_INF("Send System HK %d byte", size);
+	LOG_DBG("Send System HK %d byte (type:%d)", size, type);
 
 	if (conn == NULL) {
 		conn = csp_connect(CSP_PRIO_NORM, CSP_ID_GND, SYSHK_PORT, CSP_TIMEOUT_MSEC,
@@ -44,6 +44,8 @@ int send_syshk(enum adcs_obc_tlm_type type, void *data, uint16_t size, csp_conn_
 		ret = -ENOBUFS;
 		goto end;
 	}
+	/* TODO: For workaround, adds offset for telemetry type */
+	type += 8;
 	memcpy(packet->data, &type, type_size);
 	memcpy(packet->data + type_size, &seq_counters[type], seq_size);
 	memcpy(packet->data + type_size + seq_size, data, size);

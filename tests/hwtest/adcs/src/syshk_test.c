@@ -17,12 +17,15 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk_test);
 
+uint8_t syshk_head = 0;
 extern struct k_event loop_event;
 
-struct all_test_result {
-	uint32_t loop_count;
-	uint32_t err_cnt;
-};
+struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
+struct adcs_temp_test_result temp_ret_fifo[SYSHK_FIFO_NUM];
+struct adcs_cv_test_result cv_ret_fifo[SYSHK_FIFO_NUM];
+struct imu_test_result imu_ret_fifo[SYSHK_FIFO_NUM];
+struct gnss_test_result gnss_ret_fifo[SYSHK_FIFO_NUM];
+struct all_test_result test_ret_fifo[SYSHK_FIFO_NUM];
 
 static void update_rw_idx(uint8_t *rw_idx)
 {
@@ -41,43 +44,51 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	struct adcs_cv_test_result cv_ret;
 	struct imu_test_result imu_ret;
 	struct gnss_test_result gnss_ret;
+	struct all_test_result test_ret;
+	static uint32_t loop_count = 0;
 
 	LOG_INF("===[RW Count Test Start (total err: %d)]===", *err_cnt);
 	rw_get_counts(&rw_data);
-
-	send_syshk(RW, &rw_data, sizeof(rw_data));
+	rw_data_fifo[syshk_head] = rw_data;
 
 	LOG_INF("===[Temp Test Start (total err: %d)]===", *err_cnt);
 	ret = temp_test(&temp_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
-
-	send_syshk(TEMP, &temp_ret, sizeof(temp_ret));
+	temp_ret_fifo[syshk_head] = temp_ret;
 
 	LOG_INF("===[CV Test Start (total err: %d)]===", *err_cnt);
 	ret = cv_test(&cv_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
-
-	send_syshk(CURRENT_VOLTAGE, &cv_ret, sizeof(cv_ret));
+	cv_ret_fifo[syshk_head] = cv_ret;
 
 	LOG_INF("===[IMU Test Start (total err: %d)]===", *err_cnt);
 	ret = imu_test(&imu_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
-
-	send_syshk(IMU, &imu_ret, sizeof(imu_ret));
+	imu_ret_fifo[syshk_head] = imu_ret;
 
 	LOG_INF("===[GNSS Test Start (total err: %d)]===", *err_cnt);
 	ret = gnss_test(&gnss_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
+	gnss_ret_fifo[syshk_head] = gnss_ret;
 
-	send_syshk(GNSS, &gnss_ret, sizeof(gnss_ret));
+	test_ret.loop_count = loop_count;
+	test_ret.err_cnt = *err_cnt;
+	test_ret_fifo[syshk_head] = test_ret;
+
+	syshk_head++;
+	if (syshk_head >= SYSHK_FIFO_NUM) {
+		syshk_head = 0;
+	}
+
+	loop_count++;
 
 	return all_ret;
 }
@@ -116,7 +127,6 @@ int syshk_test(int32_t loop_count, uint32_t *err_cnt)
 		RW_POS_Z,
 	};
 	uint8_t rw_idx = 0;
-	struct all_test_result test_ret;
 
 	if (loop_count < 0) {
 		loop_count = INT32_MAX;
@@ -150,10 +160,6 @@ int syshk_test(int32_t loop_count, uint32_t *err_cnt)
 		}
 
 		rw_stop(pos_list[rw_idx]);
-
-		test_ret.loop_count = i;
-		test_ret.err_cnt = *err_cnt;
-		send_syshk(ALL_TEST_RESULT, &test_ret, sizeof(test_ret));
 
 		update_rw_idx(&rw_idx);
 	}

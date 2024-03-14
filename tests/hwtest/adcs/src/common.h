@@ -30,3 +30,10 @@
 	if (log) {                                                                                 \
 		LOG_ERR(format, ##__VA_ARGS__);                                                    \
 	}
+
+#define SYSHK_FIFO_NUM (10U)
+
+struct all_test_result {
+	uint32_t loop_count;
+	uint32_t err_cnt;
+};
