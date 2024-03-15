@@ -8,20 +8,20 @@
 # Title: SRS-3 test flow without GUI
 # GNU Radio version: v3.11.0.0git-352-g6efdc9d8
 
-from gnuradio import blocks
-from gnuradio import gr
-from gnuradio.filter import firdes
-from gnuradio.fft import window
-import sys
 import signal
+import sys
 from argparse import ArgumentParser
-from gnuradio.eng_arg import eng_float, intx
+
+from gnuradio import blocks
 from gnuradio import eng_notation
+from gnuradio import gr
 from gnuradio import iio
 from gnuradio import network
 from gnuradio import satlab
-
-
+from gnuradio.eng_arg import eng_float
+from gnuradio.eng_arg import intx
+from gnuradio.fft import window
+from gnuradio.filter import firdes
 
 
 class no_gui_srs3_flow(gr.top_block):
