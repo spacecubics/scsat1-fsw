@@ -15,6 +15,9 @@ struct csp_test_result {
 	struct syshk_u32_data uptime[CSP_TARGET_NUM];
 	struct syshk_float_data temp_pyld;
 	struct syshk_u16_data jpeg_count_pyld;
+	struct syshk_u8_data sof_err_pyld;
+	struct syshk_u16_data sof_fn_pyld;
+	struct syshk_u8_data sof_drop_pyld;
 };
 
 int csp_test(struct csp_test_result *test_ret, uint32_t *err_cnt, bool log);

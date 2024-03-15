@@ -23,7 +23,15 @@ LOG_MODULE_REGISTER(csp_test);
 #define CSP_INVALID_TEMP   (0U)
 #define CSP_INVALID_COUNT  (0U)
 
-static int csp_get_pyld_status_cmd(float *temp, uint16_t *count, bool log)
+struct pyld_status_data {
+	float temp;
+	uint16_t jpeg_count;
+	uint8_t sof_err;
+	uint16_t sof_fn;
+	uint8_t sof_drop;
+};
+
+static int csp_get_pyld_status_cmd(struct pyld_status_data *status, bool log)
 {
 	int ret = 0;
 
@@ -52,8 +60,11 @@ static int csp_get_pyld_status_cmd(float *temp, uint16_t *count, bool log)
 		goto cleanup;
 	}
 
-	*temp = (int8_t)packet->data[1] + (float)packet->data[0] * 0.0625f;
-	*count = (packet->data[3] << 8) + packet->data[2];
+	status->temp = (int8_t)packet->data[1] + (float)packet->data[0] * 0.0625f;
+	status->jpeg_count = (packet->data[3] << 8) + packet->data[2];
+	status->sof_err = packet->data[4];
+	status->sof_fn = (packet->data[6] << 8) + packet->data[5];
+	status->sof_drop = packet->data[7];
 cleanup:
 	csp_buffer_free(packet);
 	csp_close(conn);
@@ -67,8 +78,7 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 	int ret;
 	int all_ret = 0;
 	uint32_t uptime;
-	float temp = 0;
-	uint16_t count = 0;
+	struct pyld_status_data pyld_status = {0};
 	uint8_t csp_id_list[] = {
 		CSP_ID_EPS,
 		CSP_ID_SRS3,
@@ -109,22 +119,38 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		csp_ret->uptime[i].status = ret;
 	}
 
-	ret = csp_get_pyld_status_cmd(&temp, &count, log);
+	ret = csp_get_pyld_status_cmd(&pyld_status, log);
 	if (ret < 0) {
 		csp_ret->temp_pyld.data = CSP_INVALID_TEMP;
 		csp_ret->jpeg_count_pyld.data = CSP_INVALID_COUNT;
+		csp_ret->sof_err_pyld.data = CSP_INVALID_COUNT;
+		csp_ret->sof_fn_pyld.data = CSP_INVALID_COUNT;
+		csp_ret->sof_drop_pyld.data = CSP_INVALID_COUNT;
 		HWTEST_LOG_ERR(log, "Payload Board Temperature: Failed");
 		HWTEST_LOG_ERR(log, "Payload Board JPEG Count: Failed");
+		HWTEST_LOG_ERR(log, "Payload Board SOF Error Count: Failed");
+		HWTEST_LOG_ERR(log, "Payload Board SOF Current FN: Failed");
+		HWTEST_LOG_ERR(log, "Payload Board SOF Drop Count: Failed");
 		(*err_cnt)++;
 		all_ret = -1;
 	} else {
-		csp_ret->temp_pyld.data = temp;
-		csp_ret->jpeg_count_pyld.data = count;
-		HWTEST_LOG_INF(log, "Payload Board Temperature: %.1f [deg]", (double)temp);
-		HWTEST_LOG_INF(log, "Payload Board JPEG Count: %d", count);
+		csp_ret->temp_pyld.data = pyld_status.temp;
+		csp_ret->jpeg_count_pyld.data = pyld_status.jpeg_count;
+		csp_ret->sof_err_pyld.data = pyld_status.sof_err;
+		csp_ret->sof_fn_pyld.data = pyld_status.sof_fn;
+		csp_ret->sof_drop_pyld.data = pyld_status.sof_drop;
+		HWTEST_LOG_INF(log, "Payload Board Temperature: %.1f [deg]",
+			       (double)pyld_status.temp);
+		HWTEST_LOG_INF(log, "Payload Board JPEG Count: %d", pyld_status.jpeg_count);
+		HWTEST_LOG_ERR(log, "Payload Board SOF Error Count: %d", pyld_status.sof_err);
+		HWTEST_LOG_ERR(log, "Payload Board SOF Current FN: %d", pyld_status.sof_fn);
+		HWTEST_LOG_ERR(log, "Payload Board SOF Drop Count: %d", pyld_status.sof_drop);
 	}
 	csp_ret->temp_pyld.status = ret;
 	csp_ret->jpeg_count_pyld.status = ret;
+	csp_ret->sof_err_pyld.status = ret;
+	csp_ret->sof_fn_pyld.status = ret;
+	csp_ret->sof_drop_pyld.status = ret;
 
 	return all_ret;
 }
