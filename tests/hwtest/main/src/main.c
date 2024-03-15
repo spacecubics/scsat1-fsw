@@ -53,7 +53,7 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	if (strcmp(cmd, "info") == 0) {
 		sc_main_print_fpga_ids();
 	} else if (strcmp(cmd, "init") == 0) {
-		ret = main_init(&err_cnt);
+		ret = main_init((enum hwtest_mode)atoi(arg), &err_cnt);
 	} else if (strcmp(cmd, "off") == 0) {
 		ret = main_off(&err_cnt);
 	} else if (strcmp(cmd, "temp") == 0) {
@@ -132,7 +132,7 @@ int main(void)
 	k_event_init(&exec_event);
 
 	if (IS_ENABLED(CONFIG_SCSAT1_MAIN_AUTO_RUN_HWTEST)) {
-		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest init");
+		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest init 3");
 
 		k_sleep(K_SECONDS(150));
 
