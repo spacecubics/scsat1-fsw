@@ -104,6 +104,7 @@ class no_gui_srs3_flow(gr.top_block):
         )
         self.network_socket_pdu_0_1_0 = network.socket_pdu('UDP_CLIENT', udp_addr, '52004', 1500, False)
         self.network_socket_pdu_0_1 = network.socket_pdu('UDP_SERVER', '', '52002', 1500, False)
+
         self.iio_pluto_source_0 = iio.fmcomms2_source_fc32('ip:192.168.2.1' if 'ip:192.168.2.1' else iio.get_pluto_uri(), [True, True], 262144)
         self.iio_pluto_source_0.set_len_tag_key('packet_len')
         self.iio_pluto_source_0.set_frequency(int(rx_freq))
@@ -114,6 +115,7 @@ class no_gui_srs3_flow(gr.top_block):
         self.iio_pluto_source_0.set_rfdc(True)
         self.iio_pluto_source_0.set_bbdc(True)
         self.iio_pluto_source_0.set_filter_params('Auto', '', 0, 0)
+
         self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('ip:192.168.2.1' if 'ip:192.168.2.1' else iio.get_pluto_uri(), [True, True], (int((samp_rate / tx_rate) * ((satlab.frame_size(tx_size, tx_crc, tx_rs, tx_cc, tx_id, tx_encrypt, tx_auth, True, True) + tx_preamble) * 8 + 10))), False)
         self.iio_pluto_sink_0.set_len_tag_key('packet_len')
         self.iio_pluto_sink_0.set_bandwidth(20000000)
@@ -121,6 +123,7 @@ class no_gui_srs3_flow(gr.top_block):
         self.iio_pluto_sink_0.set_samplerate(int(samp_rate))
         self.iio_pluto_sink_0.set_attenuation(0, 0)
         self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
+
         self.blocks_message_debug_0 = blocks.message_debug(True)
 
         ##################################################
