@@ -44,7 +44,7 @@ class no_gui_srs3_flow(gr.top_block):
         self.rx_sps = rx_sps = 5
         self.rx_size = rx_size = 256
         self.rx_rs = rx_rs = True
-        self.rx_rate = rx_rate = rx_rate_kbps*1000
+        self.rx_rate = rx_rate = rx_rate_kbps * 1000
         self.rx_id = rx_id = 0
         self.rx_decrypt = rx_decrypt = False
         self.rx_crc = rx_crc = True
@@ -67,8 +67,8 @@ class no_gui_srs3_flow(gr.top_block):
         self.rx_rand = rx_rand = True
         self.rx_key = rx_key = "0000000000000000000000000000000000000000000000000000000000000000"
         self.rx_freq = rx_freq = 2278.6e6
-        self.rx_chan_samp_rate = rx_chan_samp_rate = rx_sps*rx_rate
-        self.frame_size = frame_size = satlab.frame_size(rx_size, rx_crc, rx_rs, rx_cc, rx_id , rx_decrypt, rx_auth)
+        self.rx_chan_samp_rate = rx_chan_samp_rate = rx_sps * rx_rate
+        self.frame_size = frame_size = satlab.frame_size(rx_size, rx_crc, rx_rs, rx_cc, rx_id, rx_decrypt, rx_auth)
 
         ##################################################
         # Blocks
@@ -78,20 +78,20 @@ class no_gui_srs3_flow(gr.top_block):
             uhd.stream_args(
                 cpu_format="fc32",
                 args='',
-                channels=list(range(0,1)),
+                channels=list(range(0, 1)),
             ),
         )
         self.uhd_usrp_source_0.set_samp_rate(samp_rate)
         # No synchronization enforced.
 
-        self.uhd_usrp_source_0.set_center_freq(uhd.tune_request(rx_freq, -samp_rate/2), 0)
+        self.uhd_usrp_source_0.set_center_freq(uhd.tune_request(rx_freq, -samp_rate / 2), 0)
         self.uhd_usrp_source_0.set_gain(15, 0)
         self.uhd_usrp_sink_0 = uhd.usrp_sink(
             ",".join(("", "")),
             uhd.stream_args(
                 cpu_format="fc32",
                 args='',
-                channels=list(range(0,1)),
+                channels=list(range(0, 1)),
             ),
             'packet_len',
         )
@@ -134,7 +134,6 @@ class no_gui_srs3_flow(gr.top_block):
         self.network_socket_pdu_0_1 = network.socket_pdu('UDP_SERVER', '', '52002', 1500, False)
         self.blocks_message_debug_0 = blocks.message_debug(True)
 
-
         ##################################################
         # Connections
         ##################################################
@@ -144,7 +143,6 @@ class no_gui_srs3_flow(gr.top_block):
         self.msg_connect((self.satlab_srs3_rx_0, 'csp_out'), (self.network_socket_pdu_0_1_0, 'pdus'))
         self.connect((self.satlab_srs3_tx_0, 0), (self.uhd_usrp_sink_0, 0))
         self.connect((self.uhd_usrp_source_0, 0), (self.satlab_srs3_rx_0, 0))
-
 
     def get_udp_addr(self):
         return self.udp_addr
@@ -163,7 +161,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_rate_kbps(self, rx_rate_kbps):
         self.rx_rate_kbps = rx_rate_kbps
-        self.set_rx_rate(self.rx_rate_kbps*1000)
+        self.set_rx_rate(self.rx_rate_kbps * 1000)
 
     def get_tx_rate_kbps(self):
         return self.tx_rate_kbps
@@ -177,14 +175,14 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_sps(self, rx_sps):
         self.rx_sps = rx_sps
-        self.set_rx_chan_samp_rate(self.rx_sps*self.rx_rate)
+        self.set_rx_chan_samp_rate(self.rx_sps * self.rx_rate)
 
     def get_rx_size(self):
         return self.rx_size
 
     def set_rx_size(self, rx_size):
         self.rx_size = rx_size
-        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id , self.rx_decrypt, self.rx_auth))
+        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id, self.rx_decrypt, self.rx_auth))
         self.satlab_srs3_rx_0.set_size(self.rx_size)
 
     def get_rx_rs(self):
@@ -192,7 +190,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_rs(self, rx_rs):
         self.rx_rs = rx_rs
-        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id , self.rx_decrypt, self.rx_auth))
+        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id, self.rx_decrypt, self.rx_auth))
         self.satlab_srs3_rx_0.set_rs(self.rx_rs)
 
     def get_rx_rate(self):
@@ -200,7 +198,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_rate(self, rx_rate):
         self.rx_rate = rx_rate
-        self.set_rx_chan_samp_rate(self.rx_sps*self.rx_rate)
+        self.set_rx_chan_samp_rate(self.rx_sps * self.rx_rate)
         self.satlab_srs3_rx_0.set_rate(self.rx_rate)
 
     def get_rx_id(self):
@@ -208,7 +206,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_id(self, rx_id):
         self.rx_id = rx_id
-        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id , self.rx_decrypt, self.rx_auth))
+        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id, self.rx_decrypt, self.rx_auth))
         self.satlab_srs3_rx_0.set_id(self.rx_id)
 
     def get_rx_decrypt(self):
@@ -216,7 +214,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_decrypt(self, rx_decrypt):
         self.rx_decrypt = rx_decrypt
-        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id , self.rx_decrypt, self.rx_auth))
+        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id, self.rx_decrypt, self.rx_auth))
         self.satlab_srs3_rx_0.set_decrypt(self.rx_decrypt)
 
     def get_rx_crc(self):
@@ -224,7 +222,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_crc(self, rx_crc):
         self.rx_crc = rx_crc
-        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id , self.rx_decrypt, self.rx_auth))
+        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id, self.rx_decrypt, self.rx_auth))
         self.satlab_srs3_rx_0.set_crc(self.rx_crc)
 
     def get_rx_cc(self):
@@ -232,7 +230,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_cc(self, rx_cc):
         self.rx_cc = rx_cc
-        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id , self.rx_decrypt, self.rx_auth))
+        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id, self.rx_decrypt, self.rx_auth))
         self.satlab_srs3_rx_0.set_cc(self.rx_cc)
 
     def get_rx_auth(self):
@@ -240,7 +238,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_auth(self, rx_auth):
         self.rx_auth = rx_auth
-        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id , self.rx_decrypt, self.rx_auth))
+        self.set_frame_size(satlab.frame_size(self.rx_size, self.rx_crc, self.rx_rs, self.rx_cc, self.rx_id, self.rx_decrypt, self.rx_auth))
         self.satlab_srs3_rx_0.set_auth(self.rx_auth)
 
     def get_tx_size(self):
@@ -341,7 +339,7 @@ class no_gui_srs3_flow(gr.top_block):
         self.samp_rate = samp_rate
         self.uhd_usrp_sink_0.set_samp_rate(self.samp_rate)
         self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
-        self.uhd_usrp_source_0.set_center_freq(uhd.tune_request(self.rx_freq, -self.samp_rate/2), 0)
+        self.uhd_usrp_source_0.set_center_freq(uhd.tune_request(self.rx_freq, -self.samp_rate / 2), 0)
 
     def get_rx_rand(self):
         return self.rx_rand
@@ -362,7 +360,7 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_rx_freq(self, rx_freq):
         self.rx_freq = rx_freq
-        self.uhd_usrp_source_0.set_center_freq(uhd.tune_request(self.rx_freq, -self.samp_rate/2), 0)
+        self.uhd_usrp_source_0.set_center_freq(uhd.tune_request(self.rx_freq, -self.samp_rate / 2), 0)
 
     def get_rx_chan_samp_rate(self):
         return self.rx_chan_samp_rate
@@ -375,7 +373,6 @@ class no_gui_srs3_flow(gr.top_block):
 
     def set_frame_size(self, frame_size):
         self.frame_size = frame_size
-
 
 
 def argument_parser():
