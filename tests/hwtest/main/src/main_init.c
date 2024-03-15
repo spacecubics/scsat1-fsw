@@ -5,6 +5,7 @@
  */
 
 #include <zephyr/kernel.h>
+#include "common.h"
 #include "pwrctrl.h"
 #include "sysmon.h"
 #include "csp.h"
@@ -13,10 +14,21 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main_init);
 
-int main_init(uint32_t *err_cnt)
+enum hwtest_mode test_mode;
+
+int main_init(enum hwtest_mode mode, uint32_t *err_cnt)
 {
 	int ret;
 	int all_ret = 0;
+
+	if (mode >= TEST_MODE_NUM) {
+		LOG_ERR("Invalid test mode. (%d)", mode);
+		(*err_cnt)++;
+		all_ret = -1;
+		goto end;
+	}
+
+	test_mode = mode;
 
 	ret = sc_main_bhm_enable();
 	if (ret < 0) {
@@ -31,19 +43,6 @@ int main_init(uint32_t *err_cnt)
 	LOG_INF("Power on the DRV1/DRV2");
 
 	k_sleep(K_SECONDS(1));
-
-	sc_main_power_enable(DSTRX_IO_PWR);
-	LOG_INF("Power on the DSTRX-3 IO");
-
-	k_sleep(K_SECONDS(1));
-
-	sc_main_power_enable(PDU_O1_PWR);
-	LOG_INF("Power on the ADCS Board");
-
-	k_sleep(K_SECONDS(1));
-
-	sc_main_power_enable(PDU_O2_PWR);
-	LOG_INF("Power on the Payload Board");
 
 	ret = csp_enable();
 	if (ret < 0) {
@@ -63,6 +62,26 @@ int main_init(uint32_t *err_cnt)
 		LOG_INF("Start the sending SOF Packet");
 	}
 
+	if (mode > MAIN_ONLY_WITHOUT_DSTRX) {
+		sc_main_power_enable(DSTRX_IO_PWR);
+		LOG_INF("Power on the DSTRX-3 IO");
+
+		k_sleep(K_SECONDS(1));
+	}
+
+	if (mode > MAIN_ONLY) {
+		sc_main_power_enable(PDU_O1_PWR);
+		LOG_INF("Power on the ADCS Board");
+
+		k_sleep(K_SECONDS(1));
+	}
+
+	if (mode > MAIN_ADCS_ONLY) {
+		sc_main_power_enable(PDU_O2_PWR);
+		LOG_INF("Power on the Payload Board");
+	}
+
+end:
 	return all_ret;
 }
 

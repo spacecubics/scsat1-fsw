@@ -20,6 +20,7 @@
 LOG_MODULE_REGISTER(syshk_test);
 
 extern struct k_event loop_event;
+extern enum hwtest_mode test_mode;
 
 struct all_test_result {
 	uint32_t loop_count;
@@ -101,6 +102,10 @@ static int one_loop(uint32_t *err_cnt)
 
 	k_sleep(K_MSEC(100));
 
+	if (test_mode < MAIN_ONLY) {
+		goto end;
+	}
+
 	LOG_INF("===[DSTRX-3 Test Start (total err: %d)]===", *err_cnt);
 	ret = dstrx3_test(&dstrx3_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
@@ -111,6 +116,7 @@ static int one_loop(uint32_t *err_cnt)
 
 	k_sleep(K_MSEC(100));
 
+end:
 	return all_ret;
 }
 

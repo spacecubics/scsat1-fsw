@@ -12,6 +12,14 @@
 #define LOG_ENABLE      (true)
 #define LOG_DISABLE     (false)
 
+enum hwtest_mode {
+	MAIN_ONLY_WITHOUT_DSTRX = 0,
+	MAIN_ONLY,
+	MAIN_ADCS_ONLY,
+	FULL,
+	TEST_MODE_NUM,
+};
+
 #define HWTEST_LOG_INF(log, format, ...)                                                           \
 	if (log) {                                                                                 \
 		LOG_INF(format, ##__VA_ARGS__);                                                    \

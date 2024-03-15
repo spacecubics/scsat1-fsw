@@ -23,6 +23,8 @@ LOG_MODULE_REGISTER(csp_test);
 #define CSP_INVALID_TEMP   (0U)
 #define CSP_INVALID_COUNT  (0U)
 
+extern enum hwtest_mode test_mode;
+
 struct pyld_status_data {
 	float temp;
 	uint16_t jpeg_count;
@@ -93,6 +95,14 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(csp_id_list); i++) {
+
+		if ((csp_id_list[i] == CSP_ID_ADCS) && test_mode < MAIN_ADCS_ONLY) {
+			continue;
+		}
+		if ((csp_id_list[i] == CSP_ID_PYLD) && test_mode < FULL) {
+			continue;
+		}
+
 		ret = csp_ping(csp_id_list[i], CSP_TIMEOUT_MSEC, 1, CSP_O_NONE);
 		if (ret < 0) {
 			csp_ret->ping[i].status = ret;
@@ -117,6 +127,10 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 			HWTEST_LOG_INF(log, "Uptime of %s: %d [s]", csp_name_list[i], uptime);
 		}
 		csp_ret->uptime[i].status = ret;
+	}
+
+	if (test_mode < FULL) {
+		goto end;
 	}
 
 	ret = csp_get_pyld_status_cmd(&pyld_status, log);
@@ -152,5 +166,6 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 	csp_ret->sof_fn_pyld.status = ret;
 	csp_ret->sof_drop_pyld.status = ret;
 
+end:
 	return all_ret;
 }
