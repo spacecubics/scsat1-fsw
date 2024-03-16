@@ -11,8 +11,6 @@ from datetime import datetime
 
 DEFAULT_YAMCS_URL='localhost:8090'
 YAMCS_INSTANCE='scsat1'
-PDF_NAME = './main.pdf'
-CSV_DIR = "./main_csv"
 
 x_data = {}
 y_data = {}
@@ -20,38 +18,12 @@ err_cnt = {}
 configs = {}
 
 
-def get_shunt_ohm(key):
-
-    ohm = 0
-
-    if key == "OBC_1V0 Shunt":
-        ohm = 0.01
-    elif key == "OBC_1V8 Shunt":
-        ohm = 0.01
-    elif key == "OBC_3V3 Shunt":
-        ohm = 0.01
-    elif key == "OBC_3V3_SYSA Shunt":
-        ohm = 0.01
-    elif key == "OBC_3V3_SYSB Shunt":
-        ohm = 0.01
-    elif key == "OBC_3V3_IO Shunt":
-        ohm = 0.01
-    elif key == "IO_PDU_04_3V3 Shunt":
-        ohm = 0.1
-    elif key == "IO_VDD_3V3_SYS Shunt":
-        ohm = 0.1
-    elif key == "IO_VDD_3V3 Shunt":
-        ohm = 0.1
-
-    return ohm
-
-
 def write_pdf():
 
     global x_data
     global y_data
 
-    with open(PDF_NAME, "wb") as file, PdfPages(file) as pdf:
+    with open(configs['pdf-name'], "wb") as file, PdfPages(file) as pdf:
         for param in configs['parameters']:
             target = param['name']
             pyplot.title(f"{target} (err: {err_cnt[target]})")
@@ -59,7 +31,7 @@ def write_pdf():
             pyplot.gca().xaxis.set_major_formatter(DateFormatter("%H:%M"))
             pyplot.gcf().autofmt_xdate()
 
-            if 'TEMP' not in target:
+            if 'TEMP' not in target and 'RW_' not in target:
                 y_min, y_max = pyplot.gca().get_ylim()
                 pyplot.gca().set_ylim(0, y_max * 1.1)
 
@@ -74,9 +46,10 @@ def write_csv():
 
     for param in configs['parameters']:
         target = param['name']
+        csvdir = configs['csv-dir']
         csvname = re.sub(r'[/:]+', '', target.split(':')[0]).replace(' ', '_')
         csvname = csvname.lower()
-        with open(f"{CSV_DIR}/{csvname}.csv", 'w',  encoding="utf-8") as outf:
+        with open(f"{csvdir}/{csvname}.csv", 'w',  encoding="utf-8") as outf:
             for idx, x in enumerate(x_data[target]):
                 outf.write(f"{x},{y_data[target][idx]}\n")
 
@@ -94,6 +67,9 @@ def read_yamcs_archive():
                 x_data[target].append(data.generation_time)
                 y_data[target].append(data.raw_value)
 
+        if param['status'] == "":
+            continue
+
         stream = archive.stream_parameter_values(param['status']);
         for pdata in stream:
             for data in pdata:
@@ -107,11 +83,11 @@ def init(yaml_file):
     global y_data
     global configs
 
-    if not os.path.exists(CSV_DIR):
-        os.makedirs(CSV_DIR)
-
     with open(yaml_file, 'r') as file:
         configs = yaml.safe_load(file)
+
+    if not os.path.exists(configs['csv-dir']):
+        os.makedirs(configs['csv-dir'])
 
     for param in configs['parameters']:
         target = param['name']
