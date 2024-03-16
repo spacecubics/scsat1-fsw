@@ -142,9 +142,9 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		HWTEST_LOG_INF(log, "Payload Board Temperature: %.1f [deg]",
 			       (double)pyld_status.temp);
 		HWTEST_LOG_INF(log, "Payload Board JPEG Count: %d", pyld_status.jpeg_count);
-		HWTEST_LOG_ERR(log, "Payload Board SOF Error Count: %d", pyld_status.sof_err);
-		HWTEST_LOG_ERR(log, "Payload Board SOF Current FN: %d", pyld_status.sof_fn);
-		HWTEST_LOG_ERR(log, "Payload Board SOF Drop Count: %d", pyld_status.sof_drop);
+		HWTEST_LOG_INF(log, "Payload Board SOF Error Count: %d", pyld_status.sof_err);
+		HWTEST_LOG_INF(log, "Payload Board SOF Current FN: %d", pyld_status.sof_fn);
+		HWTEST_LOG_INF(log, "Payload Board SOF Drop Count: %d", pyld_status.sof_drop);
 	}
 	csp_ret->temp_pyld.status = ret;
 	csp_ret->jpeg_count_pyld.status = ret;
