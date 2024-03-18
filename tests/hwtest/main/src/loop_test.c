@@ -15,6 +15,7 @@
 #include "mgnm_test.h"
 #include "dstrx3_test.h"
 #include "mtq.h"
+#include "scbus.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(loop_test);
@@ -134,6 +135,17 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		loop_count = INT32_MAX;
 	}
 
+	if (test_mode == FULL) {
+		ret = scbus_sof_start();
+		if (ret < 0) {
+			LOG_ERR("Failed to start the sending SOF. (%d)", ret);
+			(*err_cnt)++;
+			all_ret = -1;
+		} else {
+			LOG_INF("Start the sending SOF Packet");
+		}
+	}
+
 	for (int i = 1; i <= loop_count; i++) {
 		if (is_loop_stop()) {
 			break;
@@ -165,6 +177,11 @@ int loop_test(int32_t loop_count, uint32_t *err_cnt)
 		update_mtq_idx(&axes_idx, &pol_idx);
 
 		LOG_INF("===[Loop Test %d Finish (total err: %d))]===", i, *err_cnt);
+	}
+
+	if (test_mode == FULL) {
+		scbus_sof_stop();
+		LOG_INF("Stop the sending SOF Packet");
 	}
 
 	return all_ret;
