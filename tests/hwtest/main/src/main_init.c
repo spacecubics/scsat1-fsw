@@ -9,7 +9,6 @@
 #include "pwrctrl.h"
 #include "sysmon.h"
 #include "csp.h"
-#include "scbus.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main_init);
@@ -51,15 +50,6 @@ int main_init(enum hwtest_mode mode, uint32_t *err_cnt)
 		all_ret = -1;
 	} else {
 		LOG_INF("Enable the CSP");
-	}
-
-	ret = scbus_sof_start();
-	if (ret < 0) {
-		LOG_ERR("Failed to start the sending SOF. (%d)", ret);
-		(*err_cnt)++;
-		all_ret = -1;
-	} else {
-		LOG_INF("Start the sending SOF Packet");
 	}
 
 	if (mode > MAIN_ONLY_WITHOUT_DSTRX) {
@@ -119,9 +109,6 @@ int main_off(uint32_t *err_cnt)
 
 	csp_disable();
 	LOG_INF("Disable the CSP");
-
-	scbus_sof_stop();
-	LOG_INF("Stop the sending SOF Packet");
 
 	return all_ret;
 }
