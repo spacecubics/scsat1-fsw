@@ -136,7 +136,7 @@ int main(void)
 
 		k_sleep(K_SECONDS(150));
 
-		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest loop -1");
+		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest syshk -1");
 	}
 
 	return 0;
