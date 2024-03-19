@@ -28,7 +28,7 @@ def write_pdf():
             target = param['name']
             pyplot.title(f"{target} (err: {err_cnt[target]})")
             pyplot.plot(x_data[target], y_data[target])
-            pyplot.gca().xaxis.set_major_formatter(DateFormatter("%H:%M"))
+            pyplot.gca().xaxis.set_major_formatter(DateFormatter("%H:%M", tz='Asia/Tokyo'))
             pyplot.gcf().autofmt_xdate()
 
             if 'TEMP' not in target and 'RW_' not in target:
