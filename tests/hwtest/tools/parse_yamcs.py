@@ -67,7 +67,7 @@ def read_yamcs_archive():
                 x_data[target].append(data.generation_time)
                 y_data[target].append(data.raw_value)
 
-        if param['status'] == "":
+        if not 'status' in param or param['status'] == "":
             continue
 
         stream = archive.stream_parameter_values(param['status']);
