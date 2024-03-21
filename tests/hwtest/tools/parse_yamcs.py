@@ -47,7 +47,7 @@ def write_csv():
     for param in configs['parameters']:
         target = param['name']
         csvdir = configs['csv-dir']
-        csvname = re.sub(r'[/:]+', '', target.split(':')[0]).replace(' ', '_')
+        csvname = target.split('/')[-1]
         csvname = csvname.lower()
         with open(f"{csvdir}/{csvname}.csv", 'w',  encoding="utf-8") as outf:
             for idx, x in enumerate(x_data[target]):
