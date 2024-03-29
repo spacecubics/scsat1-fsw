@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import re
@@ -96,14 +97,26 @@ def init(yaml_file):
         err_cnt[target] = 0
 
 
-def main(yaml_file):
+def main(args):
 
-    init(yaml_file)
-    read_yamcs_archive()
-    write_csv()
-    write_pdf()
+    for yaml_file in args.yaml:
+
+        if not os.path.exists(yaml_file):
+            print(f"{yaml_file} is not exist, so skip the parse")
+            continue
+        else:
+            print(f"Start to parse according to {yaml_file}")
+
+        init(yaml_file)
+        read_yamcs_archive()
+        write_csv()
+        write_pdf()
 
 
 if __name__ == '__main__':
-    args = sys.argv
-    main(args[1])
+    parser = argparse.ArgumentParser(
+        description="SC-Sat1 Yamcs telemetry parse tool")
+    parser.add_argument("--yaml", type=str, required=True, nargs="+",
+        help="Target yaml files")
+    args = parser.parse_args()
+    main(args)
