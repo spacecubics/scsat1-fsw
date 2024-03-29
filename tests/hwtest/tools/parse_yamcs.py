@@ -3,6 +3,7 @@ import os
 import sys
 import re
 import yaml
+from datetime import timezone, timedelta
 from matplotlib import pyplot
 from matplotlib.dates import DateFormatter
 from matplotlib.backends.backend_pdf import PdfPages
@@ -55,18 +56,24 @@ def write_csv():
                 outf.write(f"{x},{y_data[target][idx]}\n")
 
 
-def read_yamcs_archive():
+def read_yamcs_archive(search_min):
 
     client = YamcsClient(configs['yamcs-url'])
     archive = client.get_archive(instance=YAMCS_INSTANCE)
 
+    now = datetime.now(tz=timezone.utc)
+    if search_min < 0:
+        start = None
+    else:
+        start = now - timedelta(minutes=search_min)
+
     for param in configs['parameters']:
         target = param['name']
-        stream = archive.stream_parameter_values(target);
+        stream = archive.stream_parameter_values(target, start=start, stop=now);
         for pdata in stream:
             for data in pdata:
                 x_data[target].append(data.generation_time)
-                y_data[target].append(data.raw_value)
+                y_data[target].append(data.eng_value)
 
         if not 'status' in param or param['status'] == "":
             continue
@@ -74,7 +81,7 @@ def read_yamcs_archive():
         stream = archive.stream_parameter_values(param['status']);
         for pdata in stream:
             for data in pdata:
-                if data.raw_value != 0:
+                if data.eng_value != 0:
                     err_cnt[target] += 1
 
 
@@ -108,7 +115,7 @@ def main(args):
             print(f"Start to parse according to {yaml_file}")
 
         init(yaml_file)
-        read_yamcs_archive()
+        read_yamcs_archive(args.min)
         write_csv()
         write_pdf()
 
@@ -118,5 +125,7 @@ if __name__ == '__main__':
         description="SC-Sat1 Yamcs telemetry parse tool")
     parser.add_argument("--yaml", type=str, required=True, nargs="+",
         help="Target yaml files")
+    parser.add_argument("--min", type=int, default=-1,
+        help="Target minutes from current time for searching")
     args = parser.parse_args()
     main(args)
