@@ -8,7 +8,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from yamcs.client import YamcsClient
 
 DEFAULT_YAMCS_URL = 'localhost:8090'
-YAMCS_INSTANCE = 'scsat1'
+DEFAULT_YAMCS_INSTANCE = 'scsat1'
 
 x_data = {}
 y_data = {}
@@ -56,10 +56,10 @@ def write_csv():
                 outf.write(f"{x},{y_data[target][idx]}\n")
 
 
-def read_yamcs_archive(search_min):
+def read_yamcs_archive(search_min, yamcs_url, yamcs_instance):
 
-    client = YamcsClient(configs['yamcs-url'])
-    archive = client.get_archive(instance=YAMCS_INSTANCE)
+    client = YamcsClient(yamcs_url)
+    archive = client.get_archive(instance=yamcs_instance)
 
     now = datetime.now(tz=timezone.utc)
     if search_min < 0:
@@ -67,20 +67,30 @@ def read_yamcs_archive(search_min):
     else:
         start = now - timedelta(minutes=search_min)
 
-    stream = archive.stream_parameter_values(params, start=start, stop=now)
-    for pdata in stream:
-        for data in pdata:
-            x_data[data.name].append(data.generation_time)
-            y_data[data.name].append(data.eng_value)
+    try:
+        stream = archive.stream_parameter_values(params, start=start, stop=now)
+        for pdata in stream:
+            for data in pdata:
+                x_data[data.name].append(data.generation_time)
+                y_data[data.name].append(data.eng_value)
+    except Exception as e:
+        print(e)
+        return False
 
     if len(statuses) == 0:
-        return
+        return True
 
-    stream = archive.stream_parameter_values(statuses, start=start, stop=now)
-    for pdata in stream:
-        for data in pdata:
-            if data.eng_value != 0:
-                err_cnt[param_name[data.name]] += 1
+    try:
+        stream = archive.stream_parameter_values(statuses, start=start, stop=now)
+        for pdata in stream:
+            for data in pdata:
+                if data.eng_value != 0:
+                    err_cnt[param_name[data.name]] += 1
+    except Exception as e:
+        print(e)
+        return False
+
+    return True
 
 
 def init(yaml_file):
@@ -118,7 +128,8 @@ def main(args):
             print(f"Start to parse according to {yaml_file}")
 
         init(yaml_file)
-        read_yamcs_archive(args.min)
+        if not read_yamcs_archive(args.min, args.url, args.instance):
+            return
         write_csv()
         write_pdf()
 
@@ -130,5 +141,9 @@ if __name__ == '__main__':
                         help="Target yaml files")
     parser.add_argument("--min", type=int, default=-1,
                         help="Target minutes from current time for searching")
+    parser.add_argument("--url", type=str, default=DEFAULT_YAMCS_URL,
+                        help=f"Yamcs URL and Port number (default: {DEFAULT_YAMCS_URL})")
+    parser.add_argument("--instance", type=str, default=DEFAULT_YAMCS_INSTANCE,
+                        help=f"Yamcs instance name (default: {DEFAULT_YAMCS_INSTANCE})")
     args = parser.parse_args()
     main(args)

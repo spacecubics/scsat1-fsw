@@ -1,4 +1,3 @@
-yamcs-url: "localhost:8090"
 pdf-name: "./eps.pdf"
 csv-dir: "./eps_csv"
 parameters:

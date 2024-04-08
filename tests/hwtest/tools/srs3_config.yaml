@@ -1,4 +1,3 @@
-yamcs-url: "localhost:8090"
 pdf-name: "./srs3.pdf"
 csv-dir: "./srs3_csv"
 parameters:
