@@ -1,18 +1,14 @@
 import argparse
 import os
-import sys
-import re
 import yaml
-from datetime import timezone, timedelta
+from datetime import datetime, timezone, timedelta
 from matplotlib import pyplot
 from matplotlib.dates import DateFormatter
 from matplotlib.backends.backend_pdf import PdfPages
 from yamcs.client import YamcsClient
 
-from datetime import datetime
-
-DEFAULT_YAMCS_URL='localhost:8090'
-YAMCS_INSTANCE='scsat1'
+DEFAULT_YAMCS_URL = 'localhost:8090'
+YAMCS_INSTANCE = 'scsat1'
 
 x_data = {}
 y_data = {}
@@ -33,7 +29,8 @@ def write_pdf():
             target = param['name']
             pyplot.title(f"{target} (err: {err_cnt[target]})")
             pyplot.plot(x_data[target], y_data[target])
-            pyplot.gca().xaxis.set_major_formatter(DateFormatter("%H:%M", tz='Asia/Tokyo'))
+            pyplot.gca().xaxis.set_major_formatter(DateFormatter("%H:%M",
+                                                   tz='Asia/Tokyo'))
             pyplot.gcf().autofmt_xdate()
 
             if 'TEMP' not in target and 'RW_' not in target:
@@ -70,7 +67,7 @@ def read_yamcs_archive(search_min):
     else:
         start = now - timedelta(minutes=search_min)
 
-    stream = archive.stream_parameter_values(params, start=start, stop=now);
+    stream = archive.stream_parameter_values(params, start=start, stop=now)
     for pdata in stream:
         for data in pdata:
             x_data[data.name].append(data.generation_time)
@@ -79,7 +76,7 @@ def read_yamcs_archive(search_min):
     if len(statuses) == 0:
         return
 
-    stream = archive.stream_parameter_values(statuses, start=start, stop=now);
+    stream = archive.stream_parameter_values(statuses, start=start, stop=now)
     for pdata in stream:
         for data in pdata:
             if data.eng_value != 0:
@@ -106,7 +103,6 @@ def init(yaml_file):
         params.append(target)
         if 'status' in param and param['status'] != "":
             status = param['status']
-            print(status)
             statuses.append(status)
             param_name[status] = target
 
@@ -131,8 +127,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="SC-Sat1 Yamcs telemetry parse tool")
     parser.add_argument("--yaml", type=str, required=True, nargs="+",
-        help="Target yaml files")
+                        help="Target yaml files")
     parser.add_argument("--min", type=int, default=-1,
-        help="Target minutes from current time for searching")
+                        help="Target minutes from current time for searching")
     args = parser.parse_args()
     main(args)
