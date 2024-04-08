@@ -9,6 +9,7 @@ from yamcs.client import YamcsClient
 
 DEFAULT_YAMCS_URL = 'localhost:8090'
 DEFAULT_YAMCS_INSTANCE = 'scsat1'
+BLANK_TIME_SEC = 60
 
 x_data = {}
 y_data = {}
@@ -17,6 +18,7 @@ configs = {}
 params = []
 statuses = []
 param_name = {}
+prev_time = {}
 
 
 def write_pdf():
@@ -71,8 +73,19 @@ def read_yamcs_archive(search_min, yamcs_url, yamcs_instance):
         stream = archive.stream_parameter_values(params, start=start, stop=now)
         for pdata in stream:
             for data in pdata:
-                x_data[data.name].append(data.generation_time)
-                y_data[data.name].append(data.eng_value)
+                target = data.name
+
+                # Insert NaN value when detect the blank time period
+                if not prev_time[target] is None:
+                    diff = data.generation_time - prev_time[target]
+                    if diff.total_seconds() > BLANK_TIME_SEC:
+                        x_data[target].append(data.generation_time -
+                                              timedelta(seconds=BLANK_TIME_SEC))
+                        y_data[target].append(None)
+
+                x_data[target].append(data.generation_time)
+                y_data[target].append(data.eng_value)
+                prev_time[target] = data.generation_time
     except Exception as e:
         print(e)
         return False
@@ -110,6 +123,7 @@ def init(yaml_file):
         x_data[target] = []
         y_data[target] = []
         err_cnt[target] = 0
+        prev_time[target] = None
         params.append(target)
         if 'status' in param and param['status'] != "":
             status = param['status']
