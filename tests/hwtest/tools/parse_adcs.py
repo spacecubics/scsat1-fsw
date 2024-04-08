@@ -115,7 +115,7 @@ def extract_gnss(line, target, idx):
         try:
             y_data[target].append(float(dat[idx]))
             x_data[target].append(datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
-        except:
+        except Exception as e:
             print(line)
 
 
