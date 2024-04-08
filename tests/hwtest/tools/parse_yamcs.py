@@ -18,6 +18,9 @@ x_data = {}
 y_data = {}
 err_cnt = {}
 configs = {}
+params = []
+statuses = []
+param_name = {}
 
 
 def write_pdf():
@@ -67,22 +70,20 @@ def read_yamcs_archive(search_min):
     else:
         start = now - timedelta(minutes=search_min)
 
-    for param in configs['parameters']:
-        target = param['name']
-        stream = archive.stream_parameter_values(target, start=start, stop=now);
-        for pdata in stream:
-            for data in pdata:
-                x_data[target].append(data.generation_time)
-                y_data[target].append(data.eng_value)
+    stream = archive.stream_parameter_values(params, start=start, stop=now);
+    for pdata in stream:
+        for data in pdata:
+            x_data[data.name].append(data.generation_time)
+            y_data[data.name].append(data.eng_value)
 
-        if not 'status' in param or param['status'] == "":
-            continue
+    if len(statuses) == 0:
+        return
 
-        stream = archive.stream_parameter_values(param['status']);
-        for pdata in stream:
-            for data in pdata:
-                if data.eng_value != 0:
-                    err_cnt[target] += 1
+    stream = archive.stream_parameter_values(statuses, start=start, stop=now);
+    for pdata in stream:
+        for data in pdata:
+            if data.eng_value != 0:
+                err_cnt[param_name[data.name]] += 1
 
 
 def init(yaml_file):
@@ -102,6 +103,12 @@ def init(yaml_file):
         x_data[target] = []
         y_data[target] = []
         err_cnt[target] = 0
+        params.append(target)
+        if 'status' in param and param['status'] != "":
+            status = param['status']
+            print(status)
+            statuses.append(status)
+            param_name[status] = target
 
 
 def main(args):
