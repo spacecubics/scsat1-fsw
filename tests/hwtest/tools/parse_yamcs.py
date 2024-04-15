@@ -58,19 +58,34 @@ def write_csv():
                 outf.write(f"{x},{y_data[target][idx]}\n")
 
 
-def read_yamcs_archive(search_min, yamcs_url, yamcs_instance):
+def read_yamcs_archive(args):
+
+    search_min = args.min
+    yamcs_url = args.url
+    yamcs_instance = args.instance
+    start_time = args.start
+    end_time = args.end
 
     client = YamcsClient(yamcs_url)
     archive = client.get_archive(instance=yamcs_instance)
 
     now = datetime.now(tz=timezone.utc)
-    if search_min < 0:
-        start = None
+
+    if end_time is None:
+        stop = now
     else:
-        start = now - timedelta(minutes=search_min)
+        stop = datetime.strptime(end_time + '+0900', '%Y-%m-%d %H:%M:%S%z')
+
+    if search_min < 0:
+        if start_time is not None:
+            start = datetime.strptime(start_time + '+0900', '%Y-%m-%d %H:%M:%S%z')
+        else:
+            start = None
+    else:
+        start = stop - timedelta(minutes=search_min)
 
     try:
-        stream = archive.stream_parameter_values(params, start=start, stop=now)
+        stream = archive.stream_parameter_values(params, start=start, stop=stop)
         for pdata in stream:
             for data in pdata:
                 target = data.name
@@ -94,7 +109,7 @@ def read_yamcs_archive(search_min, yamcs_url, yamcs_instance):
         return True
 
     try:
-        stream = archive.stream_parameter_values(statuses, start=start, stop=now)
+        stream = archive.stream_parameter_values(statuses, start=start, stop=stop)
         for pdata in stream:
             for data in pdata:
                 if data.eng_value != 0:
@@ -142,7 +157,7 @@ def main(args):
             print(f"Start to parse according to {yaml_file}")
 
         init(yaml_file)
-        if not read_yamcs_archive(args.min, args.url, args.instance):
+        if not read_yamcs_archive(args):
             return
         write_csv()
         write_pdf()
@@ -153,11 +168,16 @@ if __name__ == '__main__':
         description="SC-Sat1 Yamcs telemetry parse tool")
     parser.add_argument("--yaml", type=str, required=True, nargs="+",
                         help="Target yaml files")
-    parser.add_argument("--min", type=int, default=-1,
-                        help="Target minutes from current time for searching")
     parser.add_argument("--url", type=str, default=DEFAULT_YAMCS_URL,
                         help=f"Yamcs URL and Port number (default: {DEFAULT_YAMCS_URL})")
     parser.add_argument("--instance", type=str, default=DEFAULT_YAMCS_INSTANCE,
                         help=f"Yamcs instance name (default: {DEFAULT_YAMCS_INSTANCE})")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--min", type=int, default=-1,
+                       help="Target minutes from current time for searching")
+    group.add_argument("--start", type=str, default=None,
+                       help="Start time for searching")
+    parser.add_argument("--end", type=str, default=None,
+                        help="End time for searching")
     args = parser.parse_args()
     main(args)
