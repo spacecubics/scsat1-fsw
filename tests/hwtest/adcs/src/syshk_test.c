@@ -17,7 +17,8 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk_test);
 
-uint8_t syshk_head = 0;
+static uint8_t syshk_head = 0;
+uint8_t syshk_tail = 0;
 extern struct k_event loop_event;
 
 struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
@@ -83,6 +84,7 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	test_ret.err_cnt = *err_cnt;
 	test_ret_fifo[syshk_head] = test_ret;
 
+	syshk_tail = syshk_head;
 	syshk_head++;
 	if (syshk_head >= SYSHK_FIFO_NUM) {
 		syshk_head = 0;

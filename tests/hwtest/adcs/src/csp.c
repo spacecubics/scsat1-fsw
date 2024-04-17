@@ -27,7 +27,7 @@ LOG_MODULE_REGISTER(csp);
 
 #define CSP_GET_SYSHK_PORT (10U)
 
-extern uint8_t syshk_head;
+extern uint8_t syshk_tail;
 extern struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
 extern struct adcs_temp_test_result temp_ret_fifo[SYSHK_FIFO_NUM];
 extern struct adcs_cv_test_result cv_ret_fifo[SYSHK_FIFO_NUM];
@@ -84,24 +84,24 @@ static void csp_get_syshk(csp_conn_t *conn, csp_packet_t *packet)
 
 	switch (type) {
 	case TEMP:
-		send_syshk(type, &temp_ret_fifo[syshk_head], sizeof(struct adcs_temp_test_result),
+		send_syshk(type, &temp_ret_fifo[syshk_tail], sizeof(struct adcs_temp_test_result),
 			   conn);
 		break;
 	case CURRENT_VOLTAGE:
-		send_syshk(type, &cv_ret_fifo[syshk_head], sizeof(struct adcs_cv_test_result),
+		send_syshk(type, &cv_ret_fifo[syshk_tail], sizeof(struct adcs_cv_test_result),
 			   conn);
 		break;
 	case IMU:
-		send_syshk(type, &imu_ret_fifo[syshk_head], sizeof(struct imu_test_result), conn);
+		send_syshk(type, &imu_ret_fifo[syshk_tail], sizeof(struct imu_test_result), conn);
 		break;
 	case GNSS:
-		send_syshk(type, &gnss_ret_fifo[syshk_head], sizeof(struct gnss_test_result), conn);
+		send_syshk(type, &gnss_ret_fifo[syshk_tail], sizeof(struct gnss_test_result), conn);
 		break;
 	case RW:
-		send_syshk(type, &rw_data_fifo[syshk_head], sizeof(struct rw_count_data), conn);
+		send_syshk(type, &rw_data_fifo[syshk_tail], sizeof(struct rw_count_data), conn);
 		break;
 	case ALL_TEST_RESULT:
-		send_syshk(type, &test_ret_fifo[syshk_head], sizeof(struct all_test_result), conn);
+		send_syshk(type, &test_ret_fifo[syshk_tail], sizeof(struct all_test_result), conn);
 		break;
 	default:
 		goto end;
