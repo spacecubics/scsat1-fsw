@@ -35,7 +35,7 @@ def write_pdf():
                                                    tz='Asia/Tokyo'))
             pyplot.gcf().autofmt_xdate()
 
-            if 'TEMP' not in target and 'RW_' not in target:
+            if 'TEMP' not in target and 'temp' not in target and 'RW_' not in target:
                 y_min, y_max = pyplot.gca().get_ylim()
                 pyplot.gca().set_ylim(0, y_max * 1.1)
 
