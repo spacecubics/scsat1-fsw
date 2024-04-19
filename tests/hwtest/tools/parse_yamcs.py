@@ -113,6 +113,8 @@ def read_yamcs_archive(args):
         for pdata in stream:
             for data in pdata:
                 if data.eng_value != 0:
+                    error_time = data.generation_time.strftime("%Y-%m-%d %H:%M:%S %z")
+                    print(f"\033[31m[Error Detected] [{error_time}] {data.name}\033[0m")
                     err_cnt[param_name[data.name]] += 1
     except Exception as e:
         print(e)
