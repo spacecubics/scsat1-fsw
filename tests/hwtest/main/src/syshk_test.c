@@ -126,6 +126,12 @@ static int one_loop(uint32_t *err_cnt)
 	struct all_test_result test_ret;
 	static uint32_t loop_count = 0;
 
+	/*
+	 * The tests in CSP have some that are not conducted depending on
+	 * the test mode, so all result fields are initialized to 0.
+	 */
+	memset(&csp_ret, 0, sizeof(csp_ret));
+
 	LOG_INF("===[Temp Test Start (total err: %d)]===", *err_cnt);
 	ret = temp_test(&temp_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
