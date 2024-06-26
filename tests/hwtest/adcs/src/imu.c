@@ -16,7 +16,7 @@ LOG_MODULE_REGISTER(imu);
 #define IMU_EXT_DATA_SIZE    (26U)
 #define IMU_SPI_WRITE        (0U)
 #define IMU_SPI_READ         BIT(7)
-#define IMU_IMU_DATA_EXT_REG (0x61)
+#define IMU_IMU_DATA_EXT_REG (0x60)
 #define IMU_IMU_DATA_STD_REG (0x61)
 
 #define IMU_MEMPHIS3_ID (0x20)
@@ -49,13 +49,13 @@ static void imu_decode_imu_data_ext(uint8_t *rxbuf, struct imu_data *data)
 {
 	data->id = rxbuf[0];
 	data->timestamp = sys_get_be32(&rxbuf[1]);
-	data->temp = sys_get_be16(&rxbuf[5]);
-	data->gyro.x = sys_get_be16(&rxbuf[8]);
-	data->gyro.y = sys_get_be16(&rxbuf[11]);
-	data->gyro.z = sys_get_be16(&rxbuf[14]);
-	data->acc.x = sys_get_be16(&rxbuf[17]);
-	data->acc.y = sys_get_be16(&rxbuf[20]);
-	data->acc.z = sys_get_be16(&rxbuf[23]);
+	data->temp = sys_get_be24(&rxbuf[5]);
+	data->gyro.x = sys_get_be24(&rxbuf[8]);
+	data->gyro.y = sys_get_be24(&rxbuf[11]);
+	data->gyro.z = sys_get_be24(&rxbuf[14]);
+	data->acc.x = sys_get_be24(&rxbuf[17]);
+	data->acc.y = sys_get_be24(&rxbuf[20]);
+	data->acc.z = sys_get_be24(&rxbuf[23]);
 }
 
 void imu_enable(void)
