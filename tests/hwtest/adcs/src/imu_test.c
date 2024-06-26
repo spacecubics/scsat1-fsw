@@ -32,7 +32,7 @@ int imu_test(struct imu_test_result *imu_ret, uint32_t *err_cnt, bool log)
 		memset(&imu_ret->data, 0, sizeof(imu_ret->data));
 		(*err_cnt)++;
 	} else {
-		memcpy(&imu_ret->data, &data, sizeof(imu_ret->data));
+		imu_ret->data = data;
 		if (log) {
 			imu_print_imu_data(&data);
 		}
