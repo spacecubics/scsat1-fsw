@@ -34,7 +34,7 @@ static int csp_get_pyld_status_cmd(struct pyld_status_data *status, bool log)
 {
 	int ret = 0;
 
-	csp_conn_t *conn = csp_connect(CSP_PRIO_NORM, CSP_ID_PYLD, MY_SERVER_PORT, CSP_TIMEOUT_MSEC,
+	csp_conn_t *conn = csp_connect(CSP_PRIO_NORM, CSP_ID_ZERO, MY_SERVER_PORT, CSP_TIMEOUT_MSEC,
 				       CSP_O_NONE);
 	if (conn == NULL) {
 		HWTEST_LOG_ERR(log, "CSP Connection failed");
@@ -79,13 +79,13 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		CSP_ID_EPS,
 		CSP_ID_SRS3,
 		CSP_ID_ADCS,
-		CSP_ID_PYLD,
+		CSP_ID_ZERO,
 	};
-	const char csp_name_list[][20] = {
+	const char csp_name_list[][12] = {
 		"EPS",
 		"SRS-3",
 		"ADCS Board",
-		"Payload Board",
+		"Zero",
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(csp_id_list); i++) {
@@ -93,7 +93,7 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		if ((csp_id_list[i] == CSP_ID_ADCS) && test_mode < MAIN_ADCS_ONLY) {
 			continue;
 		}
-		if ((csp_id_list[i] == CSP_ID_PYLD) && test_mode < FULL) {
+		if ((csp_id_list[i] == CSP_ID_ZERO) && test_mode < FULL) {
 			continue;
 		}
 
@@ -131,16 +131,16 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 	if (ret < 0) {
 		csp_ret->temp_pyld.data = CSP_INVALID_TEMP;
 		csp_ret->jpeg_count_pyld.data = CSP_INVALID_COUNT;
-		HWTEST_LOG_ERR(log, "Payload Board Temperature: Failed");
-		HWTEST_LOG_ERR(log, "Payload Board JPEG Count: Failed");
+		HWTEST_LOG_ERR(log, "Zero Temperature: Failed");
+		HWTEST_LOG_ERR(log, "Zero JPEG Count: Failed");
 		(*err_cnt)++;
 		all_ret = -1;
 	} else {
 		csp_ret->temp_pyld.data = pyld_status.temp;
 		csp_ret->jpeg_count_pyld.data = pyld_status.jpeg_count;
-		HWTEST_LOG_INF(log, "Payload Board Temperature: %.1f [deg]",
+		HWTEST_LOG_INF(log, "Zero Temperature: %.1f [deg]",
 			       (double)pyld_status.temp);
-		HWTEST_LOG_INF(log, "Payload Board JPEG Count: %d", pyld_status.jpeg_count);
+		HWTEST_LOG_INF(log, "Zero JPEG Count: %d", pyld_status.jpeg_count);
 	}
 	csp_ret->temp_pyld.status = ret;
 	csp_ret->jpeg_count_pyld.status = ret;

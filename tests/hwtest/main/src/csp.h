@@ -8,10 +8,11 @@
 
 #define CSP_ID_MAIN (1U)
 #define CSP_ID_ADCS (2U)
-#define CSP_ID_PYLD (3U)
 #define CSP_ID_EPS  (4U)
 #define CSP_ID_SRS3 (5U)
 #define CSP_ID_GND  (10U)
+#define CSP_ID_ZERO (12U)
+#define CSP_ID_PICO (14U)
 
 int csp_enable(void);
 void csp_disable(void);
