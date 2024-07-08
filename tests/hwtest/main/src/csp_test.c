@@ -19,6 +19,7 @@ LOG_MODULE_REGISTER(csp_test);
 #define CSP_TIMEOUT_MSEC   (100U)
 #define CSP_GET_TEMP_ZERO  (11U)
 #define CSP_INIT_DIR_ZERO  (12U)
+#define CSP_CAP_FRAME_ZERO (13U)
 #define CSP_GET_COUNT_ZERO (14U)
 #define CSP_INVALID_PING   (0U)
 #define CSP_INVALID_UPTIME (0U)
@@ -95,6 +96,52 @@ static int csp_get_zero_frame_count(uint16_t *count, bool log)
 	*count = (packet->data[1] << 8) + packet->data[0];
 	csp_buffer_free(packet);
 end:
+	return ret;
+}
+
+static bool csp_is_capture_period(void)
+{
+	uint32_t cur_uptime;
+	static uint32_t last_cap_uptime = 0;
+
+	cur_uptime = k_uptime_get_32() / MSEC_PER_SEC;
+
+	if (last_cap_uptime == 0 ||
+	    (cur_uptime - last_cap_uptime) >= CONFIG_SCSAT1_MAIN_CAP_INTERVAL_SEC) {
+		last_cap_uptime = cur_uptime;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+int csp_capture_frame(void)
+{
+	int ret = 0;
+	csp_packet_t *packet;
+	bool reply = false;
+	bool log = true;
+
+	packet = csp_send_cmd_to_zero(CSP_INIT_DIR_ZERO, reply, log);
+	if (packet == NULL) {
+		ret = -1;
+	}
+
+	return ret;
+}
+
+static int csp_capture_frame_zero(void)
+{
+	int ret = 0;
+	csp_packet_t *packet;
+	bool reply = false;
+	bool log = true;
+
+	packet = csp_send_cmd_to_zero(CSP_CAP_FRAME_ZERO, reply, log);
+	if (packet == NULL) {
+		ret = -1;
+	}
+
 	return ret;
 }
 
@@ -189,6 +236,10 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		HWTEST_LOG_INF(log, "Zero Frame Count: %d", zero_fcount);
 	}
 	csp_ret->fcount_zero.status = ret;
+
+	if (csp_is_capture_period()) {
+		(void)csp_capture_frame_zero();
+	}
 
 end:
 	return all_ret;
