@@ -8,7 +8,7 @@
 
 #include "syshk.h"
 
-#define CSP_TARGET_NUM (4U)
+#define CSP_TARGET_NUM (5U)
 
 struct csp_test_result {
 	struct syshk_i32_data ping[CSP_TARGET_NUM];
