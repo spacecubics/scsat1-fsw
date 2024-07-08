@@ -18,6 +18,7 @@ LOG_MODULE_REGISTER(csp_test);
 
 #define CSP_TIMEOUT_MSEC   (100U)
 #define CSP_GET_TEMP_ZERO  (11U)
+#define CSP_INIT_DIR_ZERO  (12U)
 #define CSP_GET_COUNT_ZERO (14U)
 #define CSP_INVALID_PING   (0U)
 #define CSP_INVALID_UPTIME (0U)
@@ -26,7 +27,7 @@ LOG_MODULE_REGISTER(csp_test);
 
 extern enum hwtest_mode test_mode;
 
-static csp_packet_t *csp_send_cmd_to_zero(uint8_t port, bool log)
+static csp_packet_t *csp_send_cmd_to_zero(uint8_t port, bool reply, bool log)
 {
 	csp_packet_t *packet = NULL;
 
@@ -46,10 +47,12 @@ static csp_packet_t *csp_send_cmd_to_zero(uint8_t port, bool log)
 
 	csp_send(conn, packet);
 
-	packet = csp_read(conn, CSP_TIMEOUT_MSEC);
-	if (packet == NULL) {
-		HWTEST_LOG_ERR(log, "Failed to CSP read");
-		goto cleanup;
+	if (reply) {
+		packet = csp_read(conn, CSP_TIMEOUT_MSEC);
+		if (packet == NULL) {
+			HWTEST_LOG_ERR(log, "Failed to CSP read");
+			goto cleanup;
+		}
 	}
 
 cleanup:
@@ -63,8 +66,9 @@ static int csp_get_zero_temp(float *temp, bool log)
 {
 	csp_packet_t *packet;
 	int ret = 0;
+	bool reply = true;
 
-	packet = csp_send_cmd_to_zero(CSP_GET_TEMP_ZERO, log);
+	packet = csp_send_cmd_to_zero(CSP_GET_TEMP_ZERO, reply, log);
 	if (packet == NULL || packet->length != 2) {
 		ret = -1;
 		goto end;
@@ -80,8 +84,9 @@ static int csp_get_zero_frame_count(uint16_t *count, bool log)
 {
 	csp_packet_t *packet;
 	int ret = 0;
+	bool reply = true;
 
-	packet = csp_send_cmd_to_zero(CSP_GET_COUNT_ZERO, log);
+	packet = csp_send_cmd_to_zero(CSP_GET_COUNT_ZERO, reply, log);
 	if (packet == NULL || packet->length != 2) {
 		ret = -1;
 		goto end;
@@ -90,6 +95,21 @@ static int csp_get_zero_frame_count(uint16_t *count, bool log)
 	*count = (packet->data[1] << 8) + packet->data[0];
 	csp_buffer_free(packet);
 end:
+	return ret;
+}
+
+int csp_test_init(void)
+{
+	int ret = 0;
+	csp_packet_t *packet;
+	bool reply = false;
+	bool log = true;
+
+	packet = csp_send_cmd_to_zero(CSP_INIT_DIR_ZERO, reply, log);
+	if (packet == NULL) {
+		ret = -1;
+	}
+
 	return ret;
 }
 
