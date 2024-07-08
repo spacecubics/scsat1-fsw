@@ -100,7 +100,7 @@ void server(void)
 int csp_enable(void)
 {
 	int ret;
-	const char *rtable = "2 CAN2,3 CAN2";
+	const char *rtable = "2 CAN2,12 CAN2";
 	const char *ifname1 = "CAN1";
 	const char *ifname2 = "CAN2";
 	const struct device *can1 = DEVICE_DT_GET(DT_NODELABEL(can0));
