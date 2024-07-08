@@ -239,6 +239,11 @@ int syshk_test(int32_t loop_count, uint32_t *err_cnt)
 		loop_count = INT32_MAX;
 	}
 
+	LOG_INF("===[Init photo directory on Zero)]===");
+	csp_test_init();
+
+	k_sleep(K_SECONDS(3));
+
 	for (int i = 1; i <= loop_count; i++) {
 		if (is_loop_stop()) {
 			break;
