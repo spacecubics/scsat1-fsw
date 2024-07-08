@@ -134,7 +134,7 @@ int main(void)
 	if (IS_ENABLED(CONFIG_SCSAT1_MAIN_AUTO_RUN_HWTEST)) {
 		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest init 3");
 
-		k_sleep(K_SECONDS(150));
+		k_sleep(K_SECONDS(60));
 
 		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest syshk -1");
 	}
