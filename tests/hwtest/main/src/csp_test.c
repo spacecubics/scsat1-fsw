@@ -80,12 +80,14 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		CSP_ID_SRS3,
 		CSP_ID_ADCS,
 		CSP_ID_ZERO,
+		CSP_ID_PICO,
 	};
 	const char csp_name_list[][12] = {
 		"EPS",
 		"SRS-3",
 		"ADCS Board",
 		"Zero",
+		"Pico",
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(csp_id_list); i++) {
