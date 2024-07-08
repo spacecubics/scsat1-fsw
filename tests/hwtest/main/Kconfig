@@ -8,6 +8,12 @@ config SCSAT1_MAIN_AUTO_RUN_HWTEST
 	help
 	  Enable auto run for HW test.
 
+config SCSAT1_MAIN_CAP_INTERVAL_SEC
+	int "Interval (seconds) of capture frame command"
+	default 60
+	help
+	  Interval (seconds) of capture frame command
+
 endmenu
 
 menu "Zephyr"
