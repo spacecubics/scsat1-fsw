@@ -17,7 +17,8 @@
 LOG_MODULE_REGISTER(csp_test);
 
 #define CSP_TIMEOUT_MSEC   (100U)
-#define MY_SERVER_PORT     (10U)
+#define CSP_GET_TEMP_ZERO  (11U)
+#define CSP_GET_COUNT_ZERO (14U)
 #define CSP_INVALID_PING   (0U)
 #define CSP_INVALID_UPTIME (0U)
 #define CSP_INVALID_TEMP   (0U)
@@ -25,27 +26,20 @@ LOG_MODULE_REGISTER(csp_test);
 
 extern enum hwtest_mode test_mode;
 
-struct pyld_status_data {
-	float temp;
-	uint16_t jpeg_count;
-};
-
-static int csp_get_pyld_status_cmd(struct pyld_status_data *status, bool log)
+static csp_packet_t *csp_send_cmd_to_zero(uint8_t port, bool log)
 {
-	int ret = 0;
+	csp_packet_t *packet = NULL;
 
-	csp_conn_t *conn = csp_connect(CSP_PRIO_NORM, CSP_ID_ZERO, MY_SERVER_PORT, CSP_TIMEOUT_MSEC,
-				       CSP_O_NONE);
+	csp_conn_t *conn =
+		csp_connect(CSP_PRIO_NORM, CSP_ID_ZERO, port, CSP_TIMEOUT_MSEC, CSP_O_NONE);
 	if (conn == NULL) {
 		HWTEST_LOG_ERR(log, "CSP Connection failed");
-		ret = -ETIMEDOUT;
 		goto end;
 	}
 
-	csp_packet_t *packet = csp_buffer_get(0);
+	packet = csp_buffer_get(0);
 	if (packet == NULL) {
 		HWTEST_LOG_ERR(log, "Failed to get CSP buffer");
-		ret = -ENOBUFS;
 		goto end;
 	}
 	packet->length = 0;
@@ -55,16 +49,46 @@ static int csp_get_pyld_status_cmd(struct pyld_status_data *status, bool log)
 	packet = csp_read(conn, CSP_TIMEOUT_MSEC);
 	if (packet == NULL) {
 		HWTEST_LOG_ERR(log, "Failed to CSP read");
-		ret = -ETIMEDOUT;
 		goto cleanup;
 	}
 
-	status->temp = (int8_t)packet->data[1] + (float)packet->data[0] * 0.0625f;
-	status->jpeg_count = (packet->data[3] << 8) + packet->data[2];
 cleanup:
-	csp_buffer_free(packet);
 	csp_close(conn);
 
+end:
+	return packet;
+}
+
+static int csp_get_zero_temp(float *temp, bool log)
+{
+	csp_packet_t *packet;
+	int ret = 0;
+
+	packet = csp_send_cmd_to_zero(CSP_GET_TEMP_ZERO, log);
+	if (packet == NULL || packet->length != 2) {
+		ret = -1;
+		goto end;
+	}
+
+	*temp = (int8_t)packet->data[1] + (float)packet->data[0] * 0.0625f;
+	csp_buffer_free(packet);
+end:
+	return ret;
+}
+
+static int csp_get_zero_frame_count(uint16_t *count, bool log)
+{
+	csp_packet_t *packet;
+	int ret = 0;
+
+	packet = csp_send_cmd_to_zero(CSP_GET_COUNT_ZERO, log);
+	if (packet == NULL || packet->length != 2) {
+		ret = -1;
+		goto end;
+	}
+
+	*count = (packet->data[1] << 8) + packet->data[0];
+	csp_buffer_free(packet);
 end:
 	return ret;
 }
@@ -74,20 +98,13 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 	int ret;
 	int all_ret = 0;
 	uint32_t uptime;
-	struct pyld_status_data pyld_status = {0};
+	float zero_temp;
+	uint16_t zero_fcount;
 	uint8_t csp_id_list[] = {
-		CSP_ID_EPS,
-		CSP_ID_SRS3,
-		CSP_ID_ADCS,
-		CSP_ID_ZERO,
-		CSP_ID_PICO,
+		CSP_ID_EPS, CSP_ID_SRS3, CSP_ID_ADCS, CSP_ID_ZERO, CSP_ID_PICO,
 	};
 	const char csp_name_list[][12] = {
-		"EPS",
-		"SRS-3",
-		"ADCS Board",
-		"Zero",
-		"Pico",
+		"EPS", "SRS-3", "ADCS Board", "Zero", "Pico",
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(csp_id_list); i++) {
@@ -129,23 +146,29 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		goto end;
 	}
 
-	ret = csp_get_pyld_status_cmd(&pyld_status, log);
+	ret = csp_get_zero_temp(&zero_temp, log);
 	if (ret < 0) {
-		csp_ret->temp_pyld.data = CSP_INVALID_TEMP;
-		csp_ret->jpeg_count_pyld.data = CSP_INVALID_COUNT;
+		csp_ret->temp_zero.data = CSP_INVALID_TEMP;
 		HWTEST_LOG_ERR(log, "Zero Temperature: Failed");
-		HWTEST_LOG_ERR(log, "Zero JPEG Count: Failed");
 		(*err_cnt)++;
 		all_ret = -1;
 	} else {
-		csp_ret->temp_pyld.data = pyld_status.temp;
-		csp_ret->jpeg_count_pyld.data = pyld_status.jpeg_count;
-		HWTEST_LOG_INF(log, "Zero Temperature: %.1f [deg]",
-			       (double)pyld_status.temp);
-		HWTEST_LOG_INF(log, "Zero JPEG Count: %d", pyld_status.jpeg_count);
+		csp_ret->temp_zero.data = zero_temp;
+		HWTEST_LOG_INF(log, "Zero Temperature: %.1f [deg]", (double)zero_temp);
 	}
-	csp_ret->temp_pyld.status = ret;
-	csp_ret->jpeg_count_pyld.status = ret;
+	csp_ret->temp_zero.status = ret;
+
+	ret = csp_get_zero_frame_count(&zero_fcount, log);
+	if (ret < 0) {
+		csp_ret->fcount_zero.data = CSP_INVALID_COUNT;
+		HWTEST_LOG_ERR(log, "Zero Frame Count: Failed");
+		(*err_cnt)++;
+		all_ret = -1;
+	} else {
+		csp_ret->fcount_zero.data = zero_fcount;
+		HWTEST_LOG_INF(log, "Zero Frame Count: %d", zero_fcount);
+	}
+	csp_ret->fcount_zero.status = ret;
 
 end:
 	return all_ret;
