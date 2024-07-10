@@ -22,3 +22,5 @@ struct sunsens_data {
 
 int get_sunsens_temp(enum sunsens_pos pos, float *temp);
 int get_sunsens_data(enum sunsens_pos pos, struct sunsens_data *sun_data);
+int set_sunsens_addr(enum sunsens_pos pos, uint16_t old_addr, uint16_t new_addr);
+int save_sunsens_addr(enum sunsens_pos pos);
