@@ -16,6 +16,8 @@ LOG_MODULE_REGISTER(sunsens);
 #define SUNSENS_GET_SUN_CMD    (0x01)
 #define SUNSENS_SAMPLE_TMP_CMD (0x04)
 #define SUNSENS_GET_TMP_CMD    (0x05)
+#define SUNSENS_SET_ADDR_CMD   (0x06)
+#define SUNSENS_SAVE_ADDR_CMD  (0x07)
 
 #define SUNSENS_RETRY_COUNT (100U)
 
@@ -105,6 +107,57 @@ int get_sunsens_data(enum sunsens_pos pos, struct sunsens_data *sun_data)
 	sun_data->b = (data[2] << 8) | data[3];
 	sun_data->c = (data[4] << 8) | data[5];
 	sun_data->d = (data[6] << 8) | data[7];
+end:
+	return ret;
+}
+
+int set_sunsens_addr(enum sunsens_pos pos, uint16_t old_addr, uint16_t new_addr)
+{
+	int ret;
+	uint8_t data[3];
+
+	const struct device *dev = get_sunsens_device(pos);
+	if (dev == NULL) {
+		LOG_ERR("I2C device is not ready. (pos: %d)", pos);
+		ret = -ENODEV;
+		goto end;
+	}
+
+	data[0] = SUNSENS_SET_ADDR_CMD;
+	data[1] = new_addr;
+	data[2] = 0x00;
+
+	ret = i2c_write(dev, data, 3, old_addr);
+	if (ret < 0) {
+		LOG_ERR("Failed to i2c_write for set slave addr. (%d)", ret);
+		goto end;
+	}
+
+end:
+	return ret;
+}
+
+int save_sunsens_addr(enum sunsens_pos pos)
+{
+	int ret;
+	uint8_t data[2];
+
+	const struct device *dev = get_sunsens_device(pos);
+	if (dev == NULL) {
+		LOG_ERR("I2C device is not ready. (pos: %d)", pos);
+		ret = -ENODEV;
+		goto end;
+	}
+
+	data[0] = SUNSENS_SAVE_ADDR_CMD;
+	data[1] = 0x33;
+
+	ret = i2c_write(dev, data, 2, SUNSENS_SLAVE_ADDR);
+	if (ret < 0) {
+		LOG_ERR("Failed to i2c_write for set slave addr. (%d)", ret);
+		goto end;
+	}
+
 end:
 	return ret;
 }
