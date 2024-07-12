@@ -6,6 +6,7 @@
 
 #include <zephyr/kernel.h>
 #include "sysmon.h"
+#include "version.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sysmon);
@@ -345,6 +346,7 @@ void sc_adcs_kick_wdt_timer(void)
 
 void sc_adcs_print_fpga_ids(void)
 {
+	LOG_INF("* FSW Version       : %s", ADCS_HWTEST_VERSION);
 	LOG_INF("* IP Version        : %08x",
 		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_VER_OFFSET));
 	LOG_INF("* Build Information : %08x",
