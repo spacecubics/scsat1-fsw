@@ -38,8 +38,8 @@ int main_init(enum hwtest_mode mode, uint32_t *err_cnt)
 		LOG_INF("Enable the BHM");
 	}
 
-	sc_main_power_enable(DRV2_PWR | DRV1_PWR);
-	LOG_INF("Power on the DRV1/DRV2");
+	sc_main_power_enable(DRV1_PWR);
+	LOG_INF("Power on the DRV1");
 
 	k_sleep(K_SECONDS(1));
 
@@ -89,8 +89,8 @@ int main_off(uint32_t *err_cnt)
 		LOG_INF("Disable the BHM");
 	}
 
-	sc_main_power_disable(DRV2_PWR | DRV1_PWR);
-	LOG_INF("Power off the DRV1/DRV2");
+	sc_main_power_disable(DRV1_PWR);
+	LOG_INF("Power off the DRV1");
 
 	k_sleep(K_SECONDS(1));
 
