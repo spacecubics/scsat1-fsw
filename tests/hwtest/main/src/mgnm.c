@@ -12,16 +12,15 @@
 LOG_MODULE_REGISTER(mgnm);
 
 #define MGNM_SLAVE_ADDR  (0x30)
-#define MGNM_XOUT0_REG   (0x00)
-#define MGNM_XOUT1_REG   (0x01)
-#define MGNM_YOUT0_REG   (0x02)
-#define MGNM_YOUT1_REG   (0x03)
-#define MGNM_ZOUT0_REG   (0x04)
-#define MGNM_ZOUT1_REG   (0x05)
-#define MGNM_XYXOUT2_REG (0x06)
-#define MGNM_TOUT_REG    (0x07)
-#define MGNM_STATUS_REG  (0x08)
-#define MGNM_CTRL0_REG   (0x09)
+#define MGNM_XOUTL_REG   (0x00)
+#define MGNM_XOUTH_REG   (0x01)
+#define MGNM_YOUTL_REG   (0x02)
+#define MGNM_YOUTH_REG   (0x03)
+#define MGNM_ZOUTL_REG   (0x04)
+#define MGNM_ZOUTH_REG   (0x05)
+#define MGNM_TOUT_REG    (0x06)
+#define MGNM_STATUS_REG  (0x07)
+#define MGNM_CTRL0_REG   (0x08)
 
 #define MGNM_START_T BIT(1)
 #define MGNM_START_M BIT(0)
@@ -145,7 +144,7 @@ int get_mgnm_temp(enum mgnm_pos pos, float *temp)
 		goto end;
 	}
 
-	*temp = -75 + (data * 0.8);
+	*temp = -75 + (data * 0.7);
 end:
 	return ret;
 }
@@ -154,8 +153,8 @@ int get_mgnm_magnet(enum mgnm_pos pos, struct magnet_field *magnet)
 {
 	int ret = 0;
 	uint8_t data;
-	uint8_t out0_regs[] = {MGNM_XOUT0_REG, MGNM_YOUT0_REG, MGNM_ZOUT0_REG};
-	uint8_t out1_regs[] = {MGNM_XOUT1_REG, MGNM_YOUT1_REG, MGNM_ZOUT1_REG};
+	uint8_t out_low_regs[] = {MGNM_XOUTL_REG, MGNM_YOUTL_REG, MGNM_ZOUTL_REG};
+	uint8_t out_hi_regs[] = {MGNM_XOUTH_REG, MGNM_YOUTH_REG, MGNM_ZOUTH_REG};
 	uint32_t out_data[3] = {0};
 
 	const struct device *dev = get_mgnm_device(pos);
@@ -166,50 +165,32 @@ int get_mgnm_magnet(enum mgnm_pos pos, struct magnet_field *magnet)
 	}
 
 	for (int i = 0; i < 3; i++) {
-		ret = i2c_burst_read(dev, MGNM_SLAVE_ADDR, out0_regs[i], &data, 1);
+		ret = i2c_burst_read(dev, MGNM_SLAVE_ADDR, out_low_regs[i], &data, 1);
 		if (ret < 0) {
 			LOG_ERR("Failed to i2c_burst_read for Magnet Filed 0(%d): %d", i, ret);
 			out_data[i] = 0xFFFF;
 			ret--;
 			continue;
 		}
-		out_data[i] |= data << 10;
+		out_data[i] |= data;
 
-		ret = i2c_burst_read(dev, MGNM_SLAVE_ADDR, out1_regs[i], &data, 1);
+		ret = i2c_burst_read(dev, MGNM_SLAVE_ADDR, out_hi_regs[i], &data, 1);
 		if (ret < 0) {
 			LOG_ERR("Failed to i2c_burst_read for Magnet Filed 1(%d): %d", i, ret);
 			out_data[i] = 0xFFFF;
 			ret--;
 			continue;
 		}
-		out_data[i] |= data << 2;
-	}
-
-	ret = i2c_burst_read(dev, MGNM_SLAVE_ADDR, MGNM_XYXOUT2_REG, &data, 1);
-	if (ret < 0) {
-		LOG_ERR("Failed to i2c_burst_read for Magnet Filed 2: %d", ret);
-		ret--;
-		out_data[0] = 0xFFFF;
-		out_data[1] = 0xFFFF;
-		out_data[2] = 0xFFFF;
+		out_data[i] |= data << 8;
 	}
 
 	/* Xout */
-	if (out_data[0] != 0xFFFF) {
-		out_data[0] |= (data & 0xC0);
-	}
 	magnet->x_out = out_data[0];
 
 	/* Yout */
-	if (out_data[1] != 0xFFFF) {
-		out_data[1] |= (data & 0x30);
-	}
 	magnet->y_out = out_data[1];
 
 	/* Zout */
-	if (out_data[2] != 0xFFFF) {
-		out_data[2] |= (data & 0x0C);
-	}
 	magnet->z_out = out_data[2];
 
 end:
