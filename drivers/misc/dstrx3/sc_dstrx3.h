@@ -55,6 +55,8 @@ void sc_dstrx3_enable_hk(const struct device *dev);
 void sc_dstrx3_disable_hk(const struct device *dev);
 void sc_dstrx3_enable_cmdif(const struct device *dev);
 void sc_dstrx3_disable_cmdif(const struct device *dev);
+void sc_dstrx3_enable_downlink(const struct device *dev);
+void sc_dstrx3_disable_downlink(const struct device *dev);
 int sc_dstrx3_get_hk_telemetry(const struct device *dev, struct sc_dstrx3_hk *hk);
 void sc_dstrx3_set_tx_param(const struct device *dev, enum sc_dstrx3_tx_power tx_power,
 			    enum sc_dstrx3_bit_rate bit_rate);
