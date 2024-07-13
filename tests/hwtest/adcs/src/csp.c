@@ -32,7 +32,8 @@ extern struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
 extern struct adcs_temp_test_result temp_ret_fifo[SYSHK_FIFO_NUM];
 extern struct adcs_cv_test_result cv_ret_fifo[SYSHK_FIFO_NUM];
 extern struct imu_test_result imu_ret_fifo[SYSHK_FIFO_NUM];
-extern struct gnss_test_result gnss_ret_fifo[SYSHK_FIFO_NUM];
+extern struct gnss_hwmon_result gnss_hwmon_ret_fifo[SYSHK_FIFO_NUM];
+extern struct gnss_bestpos_result gnss_bestpos_ret_fifo[SYSHK_FIFO_NUM];
 extern struct all_test_result test_ret_fifo[SYSHK_FIFO_NUM];
 
 static csp_iface_t *can_iface = NULL;
@@ -94,8 +95,13 @@ static void csp_get_syshk(csp_conn_t *conn, csp_packet_t *packet)
 	case IMU:
 		send_syshk(type, &imu_ret_fifo[syshk_tail], sizeof(struct imu_test_result), conn);
 		break;
-	case GNSS:
-		send_syshk(type, &gnss_ret_fifo[syshk_tail], sizeof(struct gnss_test_result), conn);
+	case GNSS_HWMON:
+		send_syshk(type, &gnss_hwmon_ret_fifo[syshk_tail], sizeof(struct gnss_hwmon_result),
+			   conn);
+		break;
+	case GNSS_BESTPOS:
+		send_syshk(type, &gnss_bestpos_ret_fifo[syshk_tail],
+			   sizeof(struct gnss_bestpos_result), conn);
 		break;
 	case RW:
 		send_syshk(type, &rw_data_fifo[syshk_tail], sizeof(struct rw_count_data), conn);

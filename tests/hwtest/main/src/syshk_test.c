@@ -29,13 +29,14 @@ struct all_test_result {
 	uint32_t err_cnt;
 };
 
-#define CSP_GET_SYSHK_PORT (10U)
-#define CSP_GET_TEMP_CMD   (1U)
-#define CSP_GET_CV_CMD     (2U)
-#define CSP_GET_IMU_CMD    (3U)
-#define CSP_GET_GNSS_CMD   (4U)
-#define CSP_GET_RW_CMD     (5U)
-#define CSP_GET_RET_CMD    (6U)
+#define CSP_GET_SYSHK_PORT       (10U)
+#define CSP_GET_TEMP_CMD         (1U)
+#define CSP_GET_CV_CMD           (2U)
+#define CSP_GET_IMU_CMD          (3U)
+#define CSP_GET_GNSS_HWMON_CMD   (4U)
+#define CSP_GET_GNSS_BESTPOS_CMD (5U)
+#define CSP_GET_RW_CMD           (6U)
+#define CSP_GET_RET_CMD          (7U)
 
 static int send_adcs_syshk(void)
 {
@@ -44,8 +45,8 @@ static int send_adcs_syshk(void)
 	csp_conn_t *gnd_conn;
 	csp_packet_t *packet;
 	uint8_t csp_cmd_list[] = {
-		CSP_GET_TEMP_CMD, CSP_GET_CV_CMD, CSP_GET_IMU_CMD,
-		CSP_GET_GNSS_CMD, CSP_GET_RW_CMD, CSP_GET_RET_CMD,
+		CSP_GET_TEMP_CMD,         CSP_GET_CV_CMD, CSP_GET_IMU_CMD, CSP_GET_GNSS_HWMON_CMD,
+		CSP_GET_GNSS_BESTPOS_CMD, CSP_GET_RW_CMD, CSP_GET_RET_CMD,
 	};
 
 	gnd_conn = csp_connect(CSP_PRIO_NORM, CSP_ID_GND, SYSHK_PORT, CSP_SYSHK_TIMEOUT_MSEC,

@@ -39,7 +39,8 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	struct adcs_temp_test_result temp_ret;
 	struct adcs_cv_test_result cv_ret;
 	struct imu_test_result imu_ret;
-	struct gnss_test_result gnss_ret;
+	struct gnss_hwmon_result hwmon_ret;
+	struct gnss_bestpos_result bestpos_ret;
 
 	k_event_set(&exec_event, CMD_EXEC_EVENT);
 
@@ -58,7 +59,7 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	} else if (strcmp(cmd, "imu") == 0) {
 		ret = imu_test(&imu_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "gnss") == 0) {
-		ret = gnss_test(&gnss_ret, &err_cnt, LOG_ENABLE);
+		ret = gnss_test(&hwmon_ret, &bestpos_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "rw") == 0) {
 		ret = rw_test(&err_cnt);
 	} else if (strcmp(cmd, "loop") == 0) {
