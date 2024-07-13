@@ -49,7 +49,29 @@ int gnss_test(struct gnss_hwmon_result *hwmon_ret, struct gnss_bestpos_result *p
 		pos_ret->week = pos_data.week;
 		pos_ret->seconds = pos_data.seconds;
 		pos_ret->receiver_status = pos_data.receiver_status;
+		memcpy(pos_ret->sol_stat, pos_data.sol_stat, sizeof(pos_ret->sol_stat));
+		memcpy(pos_ret->pos_type, pos_data.pos_type, sizeof(pos_ret->pos_type));
+		pos_ret->lat_deg = pos_data.lat_deg;
+		pos_ret->lon_deg = pos_data.lon_deg;
+		pos_ret->hgt_deg = pos_data.hgt_deg;
+		pos_ret->undulation = pos_data.undulation;
+		memcpy(pos_ret->datum_id, pos_data.datum_id, sizeof(pos_ret->datum_id));
+		pos_ret->lat_m = pos_data.lat_m;
+		pos_ret->lon_m = pos_data.lon_m;
+		pos_ret->hgt_m = pos_data.hgt_m;
+		memcpy(pos_ret->stn_id, pos_data.stn_id, sizeof(pos_ret->stn_id));
+		pos_ret->diff_age = pos_data.diff_age;
+		pos_ret->sol_age = pos_data.sol_age;
+		pos_ret->svs = pos_data.svs;
+		pos_ret->soln_svs = pos_data.soln_svs;
+		pos_ret->soln1_svs = pos_data.soln1_svs;
+		pos_ret->solnmulti_svs = pos_data.solnmulti_svs;
+		pos_ret->pos_reserved = pos_data.pos_reserved;
+		pos_ret->ext_sol_stat = pos_data.ext_sol_stat;
+		pos_ret->galileo_mask = pos_data.galileo_mask;
+		pos_ret->gps_mask = pos_data.gps_mask;
 	}
+	pos_ret->status = ret;
 
 	return ret;
 }
