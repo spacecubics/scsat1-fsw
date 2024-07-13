@@ -182,6 +182,9 @@ int csp_test(struct csp_test_result *csp_ret, uint32_t *err_cnt, bool log)
 		if ((csp_id_list[i] == CSP_ID_ZERO) && test_mode < FULL) {
 			continue;
 		}
+		if ((csp_id_list[i] == CSP_ID_PICO) && test_mode < FULL) {
+			continue;
+		}
 
 		ret = csp_ping(csp_id_list[i], CSP_TIMEOUT_MSEC, 1, CSP_O_NONE);
 		if (ret < 0) {
