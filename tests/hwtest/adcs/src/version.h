@@ -6,4 +6,4 @@
 
 #pragma once
 
-#define ADCS_HWTEST_VERSION "0.2.0"
+#define ADCS_HWTEST_VERSION "0.2.1"
