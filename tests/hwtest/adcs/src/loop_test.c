@@ -35,7 +35,8 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	struct adcs_temp_test_result temp_ret;
 	struct adcs_cv_test_result cv_ret;
 	struct imu_test_result imu_ret;
-	struct gnss_test_result gnss_ret;
+	struct gnss_hwmon_result hwmon_ret;
+	struct gnss_bestpos_result bestpos_ret;
 
 	LOG_INF("===[RW Count Test Start (total err: %d)]===", *err_cnt);
 	LOG_INF("%s count: %d", rw_pos_name[pos], rw_get_count(pos));
@@ -59,7 +60,7 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	}
 
 	LOG_INF("===[GNSS Test Start (total err: %d)]===", *err_cnt);
-	ret = gnss_test(&gnss_ret, err_cnt, LOG_ENABLE);
+	ret = gnss_test(&hwmon_ret, &bestpos_ret, err_cnt, LOG_ENABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}

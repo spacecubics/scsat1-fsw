@@ -25,7 +25,8 @@ struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
 struct adcs_temp_test_result temp_ret_fifo[SYSHK_FIFO_NUM];
 struct adcs_cv_test_result cv_ret_fifo[SYSHK_FIFO_NUM];
 struct imu_test_result imu_ret_fifo[SYSHK_FIFO_NUM];
-struct gnss_test_result gnss_ret_fifo[SYSHK_FIFO_NUM];
+struct gnss_hwmon_result gnss_hwmon_ret_fifo[SYSHK_FIFO_NUM];
+struct gnss_bestpos_result gnss_bestpos_ret_fifo[SYSHK_FIFO_NUM];
 struct all_test_result test_ret_fifo[SYSHK_FIFO_NUM];
 
 static void update_rw_idx(uint8_t *rw_idx)
@@ -44,7 +45,8 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	struct adcs_temp_test_result temp_ret;
 	struct adcs_cv_test_result cv_ret;
 	struct imu_test_result imu_ret;
-	struct gnss_test_result gnss_ret;
+	struct gnss_hwmon_result hwmon_ret;
+	struct gnss_bestpos_result bestpos_ret;
 	struct all_test_result test_ret;
 	static uint32_t loop_count = 0;
 
@@ -74,11 +76,12 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	imu_ret_fifo[syshk_head] = imu_ret;
 
 	LOG_INF("===[GNSS Test Start (total err: %d)]===", *err_cnt);
-	ret = gnss_test(&gnss_ret, err_cnt, LOG_DISABLE);
+	ret = gnss_test(&hwmon_ret, &bestpos_ret, err_cnt, LOG_DISABLE);
 	if (ret < 0) {
 		all_ret = -1;
 	}
-	gnss_ret_fifo[syshk_head] = gnss_ret;
+	gnss_hwmon_ret_fifo[syshk_head] = hwmon_ret;
+	gnss_bestpos_ret_fifo[syshk_head] = bestpos_ret;
 
 	test_ret.loop_count = loop_count;
 	test_ret.err_cnt = *err_cnt;
