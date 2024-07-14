@@ -29,10 +29,18 @@ int imu_test(struct imu_test_result *imu_ret, uint32_t *err_cnt, bool log)
 
 	ret = get_imu_data_ext(&data);
 	if (ret < 0) {
-		memset(&imu_ret->data, 0, sizeof(imu_ret->data));
+		memset(imu_ret, 0, sizeof(*imu_ret));
 		(*err_cnt)++;
 	} else {
-		imu_ret->data = data;
+		imu_ret->timestamp = data.timestamp;
+		imu_ret->id = data.id;
+		imu_ret->temp = data.temp;
+		imu_ret->gyro.x = data.gyro.x;
+		imu_ret->gyro.y = data.gyro.y;
+		imu_ret->gyro.z = data.gyro.z;
+		imu_ret->acc.x = data.acc.x;
+		imu_ret->acc.y = data.acc.y;
+		imu_ret->acc.z = data.acc.z;
 		if (log) {
 			imu_print_imu_data(&data);
 		}
