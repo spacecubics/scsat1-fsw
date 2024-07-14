@@ -10,6 +10,7 @@
 LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
 
 #include <zephyr/irq.h>
+#include <zephyr/sys/byteorder.h>
 #include "sc_dstrx3.h"
 
 /* Registers */
@@ -87,6 +88,17 @@ LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
 /* Command Transmit Register */
 #define SC_DSTRX3_CM_PWR_MODE(x) (((x) & 0x0000000F) << 4)
 #define SC_DSTRX3_CM_BIT_RATE(x) (((x) & 0x00000003) << 2)
+
+/* Downlink Buffer Control/Status Register */
+#define SC_DSTRX_DLBCS_TYPE(x)     (((x) & 0x0000000F) << 28)
+#define SC_DSTRX_DLBCS_DLEN(x)     (((x) & 0x000001FF) << 16)
+#define SC_DSTRX_DLBCS_INT         BIT(8)
+#define SC_DSTRX_DLBCS_COUNT_SHIFT (((x) & 0x0000000F) << 4)
+#define SC_DSTRX_DLBCS_CLEAR       BIT(1)
+#define SC_DSTRX_DLBCS_WCOMP       BIT(0)
+
+/* Maximum size of the downlink buffer */
+#define SC_DSTRX3_MAX_DOWNLINK_BUFFER_SIZE (256U)
 
 typedef void (*irq_init_func_t)(const struct device *dev);
 
@@ -232,6 +244,43 @@ void sc_dstrx3_disable_uplink(const struct device *dev)
 {
 	const struct sc_dstrx3_cfg *cfg = dev->config;
 	sys_clear_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_ULIF_EN_BIT);
+}
+
+int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint16_t size)
+{
+	int ret;
+	uint32_t val;
+	uint32_t ctrl;
+	int16_t remain_size = size;
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	mem_addr_t offset = 0;
+
+	if (size > SC_DSTRX3_MAX_DOWNLINK_BUFFER_SIZE) {
+		LOG_ERR("Invalid data size. Downlink buffer of DSTRX-3 must be 256 bytes or less.");
+		ret = -EMSGSIZE;
+		goto end;
+	}
+
+	while (remain_size > 0) {
+		val = sys_cpu_to_be32((uint32_t)&data[offset]);
+		LOG_DBG("Write 0x%08x to DLB", val);
+		sys_write32(val, cfg->base + SC_DSTRX3_DLB_OFFSET + offset);
+		offset += sizeof(val);
+		remain_size -= sizeof(val);
+	}
+
+	ctrl = sys_read32(cfg->base + SC_DSTRX3_DLBCS_OFFSET);
+	LOG_DBG("DLBCS Reg: 0x%08x", ctrl);
+	ctrl |= SC_DSTRX_DLBCS_DLEN(size);
+	ctrl |= SC_DSTRX_DLBCS_INT;
+	LOG_DBG("DLBCS Reg: 0x%08x", ctrl);
+	ctrl |= SC_DSTRX_DLBCS_WCOMP;
+	LOG_DBG("DLBCS Reg: 0x%08x", ctrl);
+
+	sys_write32(ctrl, cfg->base + SC_DSTRX3_DLBCS_OFFSET);
+
+end:
+	return ret;
 }
 
 #define SC_DSTRX3_INIT(n)                                                                          \
