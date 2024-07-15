@@ -14,5 +14,7 @@
 #define CSP_ID_ZERO (12U)
 #define CSP_ID_PICO (14U)
 
+#define CSP_PORT_MAIN_SHELL_CMD (10U)
+
 int csp_enable(void);
 void csp_disable(void);

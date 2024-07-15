@@ -9,6 +9,7 @@
 #include <csp/csp.h>
 #include <csp/drivers/can_zephyr.h>
 #include <zephyr/device.h>
+#include <zephyr/shell/shell_uart.h>
 #include "csp.h"
 
 #include <zephyr/logging/log.h>
@@ -85,6 +86,9 @@ void server(void)
 		csp_packet_t *packet;
 		while ((packet = csp_read(conn, 50)) != NULL) {
 			switch (csp_conn_dport(conn)) {
+			case CSP_PORT_MAIN_SHELL_CMD:
+				shell_execute_cmd(shell_backend_uart_get_ptr(), packet->data);
+				break;
 			default:
 				csp_service_handler(packet);
 				break;
