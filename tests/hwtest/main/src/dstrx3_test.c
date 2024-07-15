@@ -64,3 +64,26 @@ int dstrx3_test(struct dstrx3_test_ret *dstrx3_ret, uint32_t *err_cnt, bool log)
 
 	return ret;
 }
+
+void dstrx3_downlink_loop_test(uint32_t loop, uint8_t flags)
+{
+	const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(dstrx));
+	uint8_t data[4];
+
+	sc_dstrx3_enable_downlink(dev);
+
+	sc_dstrx3_set_downlink_control(dev, flags);
+
+	for (uint32_t i = 0; i < loop; i++) {
+		data[0] = i % 0xFF;
+		data[1] = data[0] + 1;
+		data[2] = data[1] + 1;
+		data[3] = data[2] + 1;
+		sc_dstrx3_downlink_data(dev, data, 4);
+		LOG_INF("Downlink 0x%02x 0x%02x 0x%02x 0x%02x to Ground with flags 0x%02x", data[0],
+			data[1], data[2], data[3], flags);
+		k_sleep(K_SECONDS(1));
+	}
+
+	sc_dstrx3_disable_downlink(dev);
+}
