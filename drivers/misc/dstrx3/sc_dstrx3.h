@@ -51,6 +51,14 @@ enum sc_dstrx3_bit_rate {
 	SC_DSTRX3_BIT_RATE_64K,
 };
 
+/* Downlink Data Control */
+#define DLD_NRZI_EN     BIT(5)
+#define DLD_CC_EN       BIT(4)
+#define DLD_PR_EN       BIT(3)
+#define DLD_RS_EN       BIT(2)
+#define DLD_CRC32C_EN   BIT(1)
+#define DLD_ZPADDING_EN BIT(0)
+
 void sc_dstrx3_enable_hk(const struct device *dev);
 void sc_dstrx3_disable_hk(const struct device *dev);
 void sc_dstrx3_enable_cmdif(const struct device *dev);
@@ -63,4 +71,5 @@ int sc_dstrx3_get_hk_telemetry(const struct device *dev, struct sc_dstrx3_hk *hk
 void sc_dstrx3_set_tx_param(const struct device *dev, enum sc_dstrx3_tx_power tx_power,
 			    enum sc_dstrx3_bit_rate bit_rate);
 void sc_dstrx3_set_default_tx_param(const struct device *dev);
+void sc_dstrx3_set_downlink_control(const struct device *dev, uint32_t control);
 int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint16_t size);
