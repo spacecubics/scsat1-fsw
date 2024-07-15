@@ -8,7 +8,6 @@
 #include "common.h"
 #include "pwrctrl.h"
 #include "sysmon.h"
-#include "csp.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main_init);
@@ -42,15 +41,6 @@ int main_init(enum hwtest_mode mode, uint32_t *err_cnt)
 	LOG_INF("Power on the DRV1");
 
 	k_sleep(K_SECONDS(1));
-
-	ret = csp_enable();
-	if (ret < 0) {
-		LOG_ERR("Failed to enable the CSP. (%d)", ret);
-		(*err_cnt)++;
-		all_ret = -1;
-	} else {
-		LOG_INF("Enable the CSP");
-	}
 
 	if (mode > MAIN_ONLY_WITHOUT_DSTRX) {
 		sc_main_power_enable(DSTRX_IO_PWR);
@@ -106,9 +96,6 @@ int main_off(uint32_t *err_cnt)
 
 	sc_main_power_disable(PDU_O2_PWR);
 	LOG_INF("Power off the Payload Board");
-
-	csp_disable();
-	LOG_INF("Disable the CSP");
 
 	return all_ret;
 }

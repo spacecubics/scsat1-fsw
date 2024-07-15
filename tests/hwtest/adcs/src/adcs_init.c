@@ -9,7 +9,6 @@
 #include "sysmon.h"
 #include "gnss.h"
 #include "imu.h"
-#include "csp.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(adcs_init);
@@ -49,17 +48,6 @@ int adcs_init(uint32_t *err_cnt)
 		LOG_INF("Power on the GNSS");
 	}
 
-	k_sleep(K_SECONDS(1));
-
-	ret = csp_enable();
-	if (ret < 0) {
-		LOG_ERR("Failed to enable the CSP. (%d)", ret);
-		(*err_cnt)++;
-		all_ret = -1;
-	} else {
-		LOG_INF("Enable the CSP");
-	}
-
 	return all_ret;
 }
 
@@ -91,11 +79,6 @@ int adcs_off(uint32_t *err_cnt)
 	sc_adcs_power_disable(GPS_PWR);
 	gnss_disable();
 	LOG_INF("Power off the GNSS");
-
-	k_sleep(K_SECONDS(1));
-
-	csp_disable();
-	LOG_INF("Disable the CSP");
 
 	return all_ret;
 }

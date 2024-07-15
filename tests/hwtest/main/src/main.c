@@ -8,6 +8,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell_uart.h>
 #include "common.h"
+#include "csp.h"
 #include "wdog.h"
 #include "sysmon.h"
 #include "temp_test.h"
@@ -123,6 +124,8 @@ end:
 
 int main(void)
 {
+	int ret;
+
 	printk("This is for HW test program for %s\n", CONFIG_BOARD);
 
 	start_kick_wdt_thread();
@@ -130,6 +133,13 @@ int main(void)
 	sc_main_print_fpga_ids();
 
 	k_event_init(&exec_event);
+
+	ret = csp_enable();
+	if (ret < 0) {
+		LOG_ERR("Failed to enable the CSP. (%d)", ret);
+	} else {
+		LOG_INF("Enable the CSP");
+	}
 
 	if (IS_ENABLED(CONFIG_SCSAT1_MAIN_AUTO_RUN_HWTEST)) {
 		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest init 3");
