@@ -26,3 +26,4 @@ struct dstrx3_test_ret {
 } __attribute__((__packed__));
 
 int dstrx3_test(struct dstrx3_test_ret *dstrx3_ret, uint32_t *err_cnt, bool log);
+void dstrx3_downlink_loop_test(uint32_t loop, uint8_t flags);

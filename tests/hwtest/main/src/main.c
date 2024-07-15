@@ -41,7 +41,8 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	int ret = 0;
 	uint32_t err_cnt = 0;
 	char *cmd = (char *)p1;
-	char *arg = (char *)p2;
+	char *arg1 = (char *)p2;
+	char *arg2 = (char *)p3;
 	struct main_temp_test_result temp_ret;
 	struct main_cv_test_result cv_ret;
 	struct csp_test_result csp_ret;
@@ -56,7 +57,7 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	if (strcmp(cmd, "info") == 0) {
 		sc_main_print_fpga_ids();
 	} else if (strcmp(cmd, "init") == 0) {
-		ret = main_init((enum hwtest_mode)atoi(arg), &err_cnt);
+		ret = main_init((enum hwtest_mode)atoi(arg1), &err_cnt);
 	} else if (strcmp(cmd, "off") == 0) {
 		ret = main_off(&err_cnt);
 	} else if (strcmp(cmd, "temp") == 0) {
@@ -73,13 +74,15 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 		ret = mtq_test(&err_cnt);
 	} else if (strcmp(cmd, "dstrx3") == 0) {
 		ret = dstrx3_test(&dstrx3_ret, &err_cnt, LOG_ENABLE);
+	} else if (strcmp(cmd, "dstrx3_down") == 0) {
+		dstrx3_downlink_loop_test(atoi(arg1), atoi(arg2));
 	} else if (strcmp(cmd, "loop") == 0) {
 		k_event_set(&loop_event, LOOP_START_EVENT);
-		ret = loop_test(atoi(arg), &err_cnt);
+		ret = loop_test(atoi(arg1), &err_cnt);
 		k_event_clear(&loop_event, LOOP_STOP_EVENT);
 	} else if (strcmp(cmd, "syshk") == 0) {
 		k_event_set(&loop_event, LOOP_START_EVENT);
-		ret = syshk_test(atoi(arg), &err_cnt);
+		ret = syshk_test(atoi(arg1), &err_cnt);
 		k_event_clear(&loop_event, LOOP_STOP_EVENT);
 	} else {
 		goto end;
@@ -118,7 +121,7 @@ static int start_cmd_thread(const struct shell *sh, size_t argc, char **argv)
 
 	cmd_tid = k_thread_create(&cmd_thread, cmd_thread_stack,
 				  K_THREAD_STACK_SIZEOF(cmd_thread_stack),
-				  (k_thread_entry_t)cmd_handler, argv[0], argv[1], NULL,
+				  (k_thread_entry_t)cmd_handler, argv[0], argv[1], argv[2],
 				  CMD_HANDLER_PRIO, 0, K_NO_WAIT);
 	if (!cmd_tid) {
 		shell_error(sh, "Failed to create command thread");
@@ -176,6 +179,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(csp, NULL, "CSP test command", start_cmd_thread),
 	SHELL_CMD(sun, NULL, "Sun Sensor test command", start_cmd_thread),
 	SHELL_CMD(dstrx3, NULL, "DSTRX-3 test command", start_cmd_thread),
+	SHELL_CMD(dstrx3_down, NULL, "DSTRX-3 Downlink loop test command", start_cmd_thread),
 	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread),
 	SHELL_CMD(syshk, NULL, "System HK test command", start_cmd_thread), SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);
