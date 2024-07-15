@@ -246,6 +246,12 @@ void sc_dstrx3_disable_uplink(const struct device *dev)
 	sys_clear_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_ULIF_EN_BIT);
 }
 
+void sc_dstrx3_set_downlink_control(const struct device *dev, uint32_t control)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_write32(control, cfg->base + SC_DSTRX3_DLDC_OFFSET);
+}
+
 int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint16_t size)
 {
 	int ret;
