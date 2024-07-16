@@ -24,6 +24,8 @@
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
 
+char last_cmd[32];
+
 K_THREAD_STACK_DEFINE(cmd_thread_stack, 2048);
 static struct k_thread cmd_thread;
 static struct k_event exec_event;
@@ -89,6 +91,8 @@ static int start_cmd_thread(const struct shell *sh, size_t argc, char **argv)
 	int ret = 0;
 	k_tid_t cmd_tid;
 
+	strncpy(last_cmd, sh->ctx->temp_buff, MIN(sh->ctx->cmd_tmp_buff_len, sizeof(last_cmd) - 1));
+
 	if (argc < 1) {
 		shell_error(sh, "Invalid argument");
 		ret = -EINVAL;
@@ -116,6 +120,7 @@ end:
 
 static int stop_cmd(const struct shell *sh, size_t argc, char **argv)
 {
+	strncpy(last_cmd, sh->ctx->temp_buff, MIN(sh->ctx->cmd_tmp_buff_len, sizeof(last_cmd) - 1));
 	k_event_set(&loop_event, LOOP_STOP_EVENT);
 	return 0;
 }

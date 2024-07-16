@@ -13,6 +13,7 @@
 #include "imu_test.h"
 #include "gnss_test.h"
 #include "rw_test.h"
+#include "version.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk_test);
@@ -20,6 +21,7 @@ LOG_MODULE_REGISTER(syshk_test);
 static uint8_t syshk_head = 0;
 uint8_t syshk_tail = 0;
 extern struct k_event loop_event;
+extern char last_cmd[];
 
 struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
 struct adcs_temp_test_result temp_ret_fifo[SYSHK_FIFO_NUM];
@@ -83,8 +85,11 @@ static int one_loop(enum rw_pos pos, uint32_t *err_cnt)
 	gnss_hwmon_ret_fifo[syshk_head] = hwmon_ret;
 	gnss_bestpos_ret_fifo[syshk_head] = bestpos_ret;
 
+	memset(&test_ret, 0, sizeof(test_ret));
 	test_ret.loop_count = loop_count;
 	test_ret.err_cnt = *err_cnt;
+	strcpy(test_ret.version, ADCS_HWTEST_VERSION);
+	strcpy(test_ret.last_cmd, last_cmd);
 	test_ret_fifo[syshk_head] = test_ret;
 
 	syshk_tail = syshk_head;
