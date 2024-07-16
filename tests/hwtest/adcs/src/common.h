@@ -36,4 +36,6 @@
 struct all_test_result {
 	uint32_t loop_count;
 	uint32_t err_cnt;
+	char version[32];
+	char last_cmd[32];
 };

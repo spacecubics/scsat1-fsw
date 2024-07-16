@@ -17,16 +17,20 @@
 #include "mtq.h"
 #include "csp.h"
 #include "syshk.h"
+#include "version.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk_test);
 
 extern struct k_event loop_event;
 extern enum hwtest_mode test_mode;
+extern char last_cmd[];
 
 struct all_test_result {
 	uint32_t loop_count;
 	uint32_t err_cnt;
+	char version[32];
+	char last_cmd[32];
 };
 
 #define CSP_GET_SYSHK_PORT       (10U)
@@ -195,8 +199,12 @@ static int one_loop(uint32_t *err_cnt)
 		k_sleep(K_MSEC(100));
 	}
 
+	memset(&test_ret, 0, sizeof(test_ret));
 	test_ret.loop_count = loop_count;
 	test_ret.err_cnt = *err_cnt;
+	strcpy(test_ret.version, MAIN_HWTEST_VERSION);
+	strcpy(test_ret.last_cmd, last_cmd);
+
 	send_syshk(ALL_TEST_RESULT, &test_ret, sizeof(test_ret));
 	loop_count++;
 
