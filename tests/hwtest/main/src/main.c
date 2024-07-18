@@ -74,9 +74,11 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	} else if (strcmp(cmd, "dstrx3") == 0) {
 		ret = dstrx3_test(&dstrx3_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "loop") == 0) {
+		k_event_set(&loop_event, LOOP_START_EVENT);
 		ret = loop_test(atoi(arg), &err_cnt);
 		k_event_clear(&loop_event, LOOP_STOP_EVENT);
 	} else if (strcmp(cmd, "syshk") == 0) {
+		k_event_set(&loop_event, LOOP_START_EVENT);
 		ret = syshk_test(atoi(arg), &err_cnt);
 		k_event_clear(&loop_event, LOOP_STOP_EVENT);
 	} else {

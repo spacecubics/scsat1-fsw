@@ -8,9 +8,10 @@
 
 #include <zephyr/logging/log.h>
 
-#define LOOP_STOP_EVENT (1U)
-#define LOG_ENABLE      (true)
-#define LOG_DISABLE     (false)
+#define LOOP_START_EVENT (0U)
+#define LOOP_STOP_EVENT  (1U)
+#define LOG_ENABLE       (true)
+#define LOG_DISABLE      (false)
 
 enum hwtest_mode {
 	MAIN_ONLY_WITHOUT_DSTRX = 0,
