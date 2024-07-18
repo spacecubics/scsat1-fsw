@@ -8,15 +8,16 @@
 
 #include <zephyr/logging/log.h>
 
-#define CSP_ID_MAIN     (1U)
-#define CSP_ID_ADCS     (2U)
-#define CSP_ID_PYLD     (3U)
-#define CSP_ID_EPS      (4U)
-#define CSP_ID_SRS3     (5U)
-#define CSP_ID_GND      (10U)
-#define LOOP_STOP_EVENT (1U)
-#define LOG_ENABLE      (true)
-#define LOG_DISABLE     (false)
+#define CSP_ID_MAIN      (1U)
+#define CSP_ID_ADCS      (2U)
+#define CSP_ID_PYLD      (3U)
+#define CSP_ID_EPS       (4U)
+#define CSP_ID_SRS3      (5U)
+#define CSP_ID_GND       (10U)
+#define LOOP_START_EVENT (0U)
+#define LOOP_STOP_EVENT  (1U)
+#define LOG_ENABLE       (true)
+#define LOG_DISABLE      (false)
 
 #define HWTEST_LOG_INF(log, format, ...)                                                           \
 	if (log) {                                                                                 \
