@@ -4,7 +4,7 @@ menu "Application"
 
 config SCSAT1_ADCS_AUTO_RUN_HWTEST
 	bool "Enable auto run for HW test"
-	default n
+	default y
 	help
 	  Enable auto run for HW test.
 
