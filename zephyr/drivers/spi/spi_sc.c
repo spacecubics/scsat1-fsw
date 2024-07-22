@@ -149,10 +149,12 @@ static int spi_sc_read_rx_data(struct spi_context *ctx, const struct device *dev
 	int ret;
 	uint8_t byte;
 
-	ret = spi_sc_request_rx_data(dev, ctx->current_rx->len);
-	if (ret < 0) {
-		LOG_ERR("Failed to request the RX data. (%d)", ret);
-		goto end;
+	if (!cfg->data_capture_mode) {
+		ret = spi_sc_request_rx_data(dev, ctx->current_rx->len);
+		if (ret < 0) {
+			LOG_ERR("Failed to request the RX data. (%d)", ret);
+			goto end;
+		}
 	}
 
 	for (int i = 0; i < ctx->current_rx->len; i++) {
@@ -380,6 +382,10 @@ static int spi_sc_init(const struct device *dev)
 	spi_sc_clock_configure(cfg);
 
 	spi_context_unlock_unconditionally(&data->ctx);
+
+	if (cfg->data_capture_mode) {
+		sys_write32(SC_QSPI_DCMSR_DTCAPT, cfg->base + SC_QSPI_DCMSR_OFFSET);
+	}
 
 	spi_sc_enable_irq(dev);
 
