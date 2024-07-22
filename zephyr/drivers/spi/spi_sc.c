@@ -306,6 +306,8 @@ static int spi_sc_transceive(const struct device *dev,
 	struct spi_sc_data *data = dev->data;
 	struct spi_context *ctx = &data->ctx;
 	int ret;
+	/* SC QSPI Core only supports 1-byte words. */
+	uint8_t dfs = 1;
 
 	if (config->slave >= cfg->slave_num) {
 		LOG_ERR("Invalid slave number: %d (range: 0 - %d)", config->slave, cfg->slave_num - 1);
@@ -323,7 +325,7 @@ static int spi_sc_transceive(const struct device *dev,
 	spi_context_buffers_setup(ctx, tx_bufs, rx_bufs, 1);
 	spi_context_cs_control(ctx, true);
 
-	ret = spi_sc_xfer(ctx, dev, SPI_WORD_SIZE_GET(config->operation));
+	ret = spi_sc_xfer(ctx, dev, dfs);
 	if (ret < 0) {
 		LOG_ERR("Failed to xfer the SPI data, but will continue the cleanup. (%d)", ret);
 		goto cleanup;
