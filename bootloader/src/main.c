@@ -7,6 +7,7 @@
 #include <string.h>
 #include <zephyr/kernel.h>
 #include <zephyr/storage/flash_map.h>
+#include "version.h"
 
 #define SCOBCA1_FPGA_SYSREG_CODEMSEL (0x4F000000)
 #define SCOBCA1_FPGA_HRMEM_ADDR      (0x60000000)
@@ -50,6 +51,8 @@ end:
 int main(void)
 {
 	int ret;
+
+	printk("Start SC-Sat1 Boot loader (v%s)\n", BOOT_LOADER_VERSION);
 
 	ret = copy_norflash_to_hrmem(FIXED_PARTITION_ID(fsw_partition), SCOBCA1_FPGA_HRMEM_ADDR,
 				     KB(CONFIG_SCOBC_A1_BOOT_CFG_COPY_SIZE_KB));
