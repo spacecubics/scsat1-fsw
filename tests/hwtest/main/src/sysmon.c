@@ -16,6 +16,7 @@ LOG_MODULE_REGISTER(sysmon);
 #define SC_MAIN_SYSMON_BASE_ADDR (0x4F040000) /* Systemo Monitor */
 #define SC_MAIN_GPT_BASE_ADDR    (0x4F050000) /* General Purpose Timer */
 
+#define SC_MAIN_SYSREG_CFGMEMCTL_OFFSET (0x0010)
 #define SC_MAIN_SYSREG_VER_OFFSET       (0xF000)
 #define SC_MAIN_SYSREG_BUILDINFO_OFFSET (0xFF00)
 #define SC_MAIN_SYSREG_DNA1_OFFSET      (0xFF10)
@@ -88,6 +89,9 @@ LOG_MODULE_REGISTER(sysmon);
 
 /* Timer Enable Control Register */
 #define SC_MAIN_SYSMON_GPTMR_HITEN BIT(1)
+
+/* Configuration Flash Memory Register */
+#define SC_MAIN_SYSREG_CFGBOOTMEM(x) (((x) & 0x00001000) >> 12)
 
 #define SYSMON_RETRY_COUNT (100U)
 
@@ -335,6 +339,9 @@ void sc_main_kick_wdt_timer(void)
 void sc_main_print_fpga_ids(void)
 {
 	LOG_INF("* FSW Version       : %s", MAIN_HWTEST_VERSION);
+	LOG_INF("* Boot CFG Memory   : %d",
+		SC_MAIN_SYSREG_CFGBOOTMEM(
+			sys_read32(SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_SYSREG_CFGMEMCTL_OFFSET)));
 	LOG_INF("* IP Version        : %08x",
 		sys_read32(SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_SYSREG_VER_OFFSET));
 	LOG_INF("* Build Information : %08x",
