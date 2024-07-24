@@ -17,3 +17,4 @@
 
 void sc_main_power_enable(uint8_t target_bit);
 void sc_main_power_disable(uint8_t target_bit);
+void sc_main_power_cycle_req(void);
