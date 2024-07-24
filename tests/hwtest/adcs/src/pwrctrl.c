@@ -7,7 +7,7 @@
 #include <zephyr/kernel.h>
 
 /* Registers */
-#define SCADCS_SYSREG_BASE_ADDR (0x50000000)
+#define SCADCS_ADCS_BASE_ADDR   (0x50000000)
 #define SCADCS_PCR_OFFSET       (0x0000)
 #define SCADCS_IRCR_OFFSET      (0x0004)
 #define SCADCS_MDCR_OFFSET      (0x0008)
@@ -22,33 +22,33 @@
 
 void sc_adcs_power_enable(uint8_t target_bit)
 {
-	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_PCR_OFFSET, SCADCS_PCR_KEYCODE | target_bit);
+	sys_set_bits(SCADCS_ADCS_BASE_ADDR + SCADCS_PCR_OFFSET, SCADCS_PCR_KEYCODE | target_bit);
 }
 
 void sc_adcs_power_disable(uint8_t target_bit)
 {
-	sys_clear_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_PCR_OFFSET,
+	sys_clear_bits(SCADCS_ADCS_BASE_ADDR + SCADCS_PCR_OFFSET,
 		       SCADCS_PCR_KEYCODE | target_bit);
 }
 
 void sc_adcs_imu_reset(void)
 {
-	sys_clear_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET_BIT);
+	sys_clear_bits(SCADCS_ADCS_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET_BIT);
 	k_sleep(K_USEC(1));
 }
 
 void sc_adcs_imu_reset_release(void)
 {
-	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET_BIT);
+	sys_set_bits(SCADCS_ADCS_BASE_ADDR + SCADCS_IRCR_OFFSET, SCADCS_IMU_RESET_BIT);
 	k_sleep(K_MSEC(300));
 }
 
 void sc_adcs_motor_enable(uint8_t target_bit)
 {
-	sys_set_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_MDCR_OFFSET, target_bit);
+	sys_set_bits(SCADCS_ADCS_BASE_ADDR + SCADCS_MDCR_OFFSET, target_bit);
 }
 
 void sc_adcs_motor_disable(uint8_t target_bit)
 {
-	sys_clear_bits(SCADCS_SYSREG_BASE_ADDR + SCADCS_MDCR_OFFSET, target_bit);
+	sys_clear_bits(SCADCS_ADCS_BASE_ADDR + SCADCS_MDCR_OFFSET, target_bit);
 }
