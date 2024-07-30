@@ -85,7 +85,7 @@ int main(void)
 
 	printk("Start SC-Sat1 Boot loader (v%s)\n", BOOT_LOADER_VERSION);
 
-	ret = copy_norflash_to_hrmem(FIXED_PARTITION_ID(fsw_partition), SCOBCA1_FPGA_HRMEM_ADDR,
+	ret = copy_norflash_to_hrmem(FIXED_PARTITION_ID(update_fsw), SCOBCA1_FPGA_HRMEM_ADDR,
 				     KB(CONFIG_SCOBC_A1_BOOT_CFG_COPY_SIZE_KB));
 	if (ret < 0) {
 		goto end;

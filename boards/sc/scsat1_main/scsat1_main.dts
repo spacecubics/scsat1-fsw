@@ -130,17 +130,24 @@
 				size = <DT_SIZE_M(256)>;
 				spi-max-frequency = <12000000>;
 				status = "okay";
+				enter-4byte-addr = <1>;
 				jedec-id = [01 60 19];
 
 				partitions {
 					compatible = "fixed-partitions";
 					#address-cells = <1>;
 					#size-cells = <1>;
-					bit_partition: partition@0 {
+					golden_fpga: partition@0 {
 						reg = <0x00000000 DT_SIZE_M(8)>;
 					};
-					fsw_partition: partition@800000 {
-						reg = <0x00800000 (DT_SIZE_M(24))>;
+					golden_fsw: partition@800000 {
+						reg = <0x00800000 (DT_SIZE_M(4))>;
+					};
+					update_fpga: partition@1000000 {
+						reg = <0x01000000 DT_SIZE_M(10)>;
+					};
+					update_fsw: partition@1A00000 {
+						reg = <0x01A00000 (DT_SIZE_M(4))>;
 					};
 				};
 			};
