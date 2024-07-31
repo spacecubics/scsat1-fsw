@@ -52,9 +52,9 @@ LOG_MODULE_REGISTER(spi_sc, CONFIG_SPI_LOG_LEVEL);
 #define SC_QSPI_RXFIFOOVFEMB BIT(17)
 #define SC_QSPI_RXFIFOUDFEMB BIT(16)
 #define SC_QSPI_SPIBUSYDNEMB BIT(0)
-#define SC_QSPI_IER_ALL \
-	(SC_QSPI_TXFIFOUTHEMB | SC_QSPI_TXFIFOOVFEMB | SC_QSPI_TXFIFOUDFEMB |	\
-	 SC_QSPI_RXFIFOOTHEMB | SC_QSPI_RXFIFOOVFEMB | SC_QSPI_RXFIFOUDFEMB |	\
+#define SC_QSPI_IER_ALL                                                                            \
+	(SC_QSPI_TXFIFOUTHEMB | SC_QSPI_TXFIFOOVFEMB | SC_QSPI_TXFIFOUDFEMB |                      \
+	 SC_QSPI_RXFIFOOTHEMB | SC_QSPI_RXFIFOOVFEMB | SC_QSPI_RXFIFOUDFEMB |                      \
 	 SC_QSPI_SPIBUSYDNEMB)
 
 /* QSPI Clock Control Register */
@@ -215,7 +215,7 @@ static int spi_sc_xfer(struct spi_context *ctx, const struct device *dev, uint8_
 
 		if (spi_context_tx_buf_on(ctx)) {
 			ret = spi_sc_send_tx_data(ctx, dev, dfs);
-			if (ret < 0 ){
+			if (ret < 0) {
 				LOG_ERR("Failed to send the TX data. (%d)", ret);
 				goto end;
 			}
@@ -223,7 +223,7 @@ static int spi_sc_xfer(struct spi_context *ctx, const struct device *dev, uint8_
 
 		if (spi_context_rx_buf_on(ctx)) {
 			ret = spi_sc_read_rx_data(ctx, dev, dfs);
-			if (ret < 0 ){
+			if (ret < 0) {
 				LOG_ERR("Failed to read the RX data. (%d)", ret);
 				goto end;
 			}
@@ -241,8 +241,7 @@ end:
 	return ret;
 }
 
-static int spi_sc_configure(struct spi_context *ctx,
-			    const struct spi_config *config,
+static int spi_sc_configure(struct spi_context *ctx, const struct spi_config *config,
 			    const struct spi_sc_cfg *cfg)
 {
 	int ret = 0;
@@ -266,9 +265,9 @@ static int spi_sc_configure(struct spi_context *ctx,
 	}
 
 	/*
-	* QSPI IP core supports a Dual and Quad SPI mode, but it has not been
-	* implemented in this driver yet.
-	*/
+	 * QSPI IP core supports a Dual and Quad SPI mode, but it has not been
+	 * implemented in this driver yet.
+	 */
 	if ((config->operation & SPI_LINES_DUAL) == SPI_LINES_DUAL) {
 		LOG_ERR("Dual SPI mode is not supprted yet.");
 		ret = -ENOTSUP;
@@ -291,18 +290,15 @@ static void spi_sc_clock_configure(const struct spi_sc_cfg *cfg)
 {
 	uint32_t clock;
 
-	clock = cfg->cpol << SC_QSPI_CCR_SCKPOL_SHIFT |
-			cfg->cpha << SC_QSPI_CCR_SCKPHA_SHIFT |
-			cfg->spiclk_div << SC_QSPI_CCR_SCKDIV_SHIFT;
+	clock = cfg->cpol << SC_QSPI_CCR_SCKPOL_SHIFT | cfg->cpha << SC_QSPI_CCR_SCKPHA_SHIFT |
+		cfg->spiclk_div << SC_QSPI_CCR_SCKDIV_SHIFT;
 
 	sys_write32(clock, cfg->base + SC_QSPI_CCR_OFFSET);
 	LOG_DBG("SPI Clock Control Register: 0x%08x", clock);
 }
 
-static int spi_sc_transceive(const struct device *dev,
-			     const struct spi_config *config,
-			     const struct spi_buf_set *tx_bufs,
-			     const struct spi_buf_set *rx_bufs)
+static int spi_sc_transceive(const struct device *dev, const struct spi_config *config,
+			     const struct spi_buf_set *tx_bufs, const struct spi_buf_set *rx_bufs)
 {
 	const struct spi_sc_cfg *cfg = dev->config;
 	struct spi_sc_data *data = dev->data;
@@ -312,7 +308,8 @@ static int spi_sc_transceive(const struct device *dev,
 	uint8_t dfs = 1;
 
 	if (config->slave >= cfg->slave_num) {
-		LOG_ERR("Invalid slave number: %d (range: 0 - %d)", config->slave, cfg->slave_num - 1);
+		LOG_ERR("Invalid slave number: %d (range: 0 - %d)", config->slave,
+			cfg->slave_num - 1);
 		ret = -EINVAL;
 		goto end;
 	}
@@ -331,7 +328,7 @@ static int spi_sc_transceive(const struct device *dev,
 	if (ret < 0) {
 		LOG_ERR("Failed to xfer the SPI data, but will continue the cleanup. (%d)", ret);
 		goto cleanup;
-	} 
+	}
 
 	ret = spi_context_wait_for_completion(ctx);
 
@@ -343,8 +340,7 @@ end:
 	return ret;
 }
 
-static int spi_sc_release(const struct device *dev,
-			  const struct spi_config *config)
+static int spi_sc_release(const struct device *dev, const struct spi_config *config)
 {
 	struct spi_sc_data *data = dev->data;
 
@@ -397,40 +393,31 @@ static struct spi_driver_api spi_sc_api = {
 	.release = spi_sc_release,
 };
 
-#define SPI_SC_INIT(n)						\
-									\
-	static void spi_sc_##n##_irq_init(const struct device *dev);	\
-	static struct spi_sc_data spi_sc_data_##n = {		\
-		SPI_CONTEXT_INIT_LOCK(spi_sc_data_##n, ctx),		\
-		SPI_CONTEXT_INIT_SYNC(spi_sc_data_##n, ctx),		\
-	};								\
-									\
-	static const struct spi_sc_cfg spi_sc_cfg_##n = {		\
-		.base = DT_INST_REG_ADDR(n),				\
-		.irq_init = spi_sc_##n##_irq_init,		\
-		.data_capture_mode = DT_INST_PROP(n, data_capture_mode),	\
-		.slave_num = DT_INST_PROP(n, slave_num),	\
-		.cpol = DT_INST_PROP(n, cpol),	\
-		.cpha = DT_INST_PROP(n, cpha),	\
-		.spiclk_div = DT_INST_PROP(n, spiclk_div),	\
-	};								\
-									\
-	DEVICE_DT_INST_DEFINE(n,					\
-			      spi_sc_init,				\
-			      NULL,					\
-			      &spi_sc_data_##n,			\
-			      &spi_sc_cfg_##n,			\
-			      POST_KERNEL,				\
-			      CONFIG_SPI_INIT_PRIORITY,			\
-			      &spi_sc_api);		\
-	static void spi_sc_##n##_irq_init(const struct device *dev)			\
-	{																	\
-		IRQ_CONNECT(DT_INST_IRQN(n),				\
-			    0,						\
-			    spi_sc_isr,					\
-			    DEVICE_DT_INST_GET(n), 0);			\
-									\
-		irq_enable(DT_INST_IRQN(n));		\
+#define SPI_SC_INIT(n)                                                                             \
+                                                                                                   \
+	static void spi_sc_##n##_irq_init(const struct device *dev);                               \
+	static struct spi_sc_data spi_sc_data_##n = {                                              \
+		SPI_CONTEXT_INIT_LOCK(spi_sc_data_##n, ctx),                                       \
+		SPI_CONTEXT_INIT_SYNC(spi_sc_data_##n, ctx),                                       \
+	};                                                                                         \
+                                                                                                   \
+	static const struct spi_sc_cfg spi_sc_cfg_##n = {                                          \
+		.base = DT_INST_REG_ADDR(n),                                                       \
+		.irq_init = spi_sc_##n##_irq_init,                                                 \
+		.data_capture_mode = DT_INST_PROP(n, data_capture_mode),                           \
+		.slave_num = DT_INST_PROP(n, slave_num),                                           \
+		.cpol = DT_INST_PROP(n, cpol),                                                     \
+		.cpha = DT_INST_PROP(n, cpha),                                                     \
+		.spiclk_div = DT_INST_PROP(n, spiclk_div),                                         \
+	};                                                                                         \
+                                                                                                   \
+	DEVICE_DT_INST_DEFINE(n, spi_sc_init, NULL, &spi_sc_data_##n, &spi_sc_cfg_##n,             \
+			      POST_KERNEL, CONFIG_SPI_INIT_PRIORITY, &spi_sc_api);                 \
+	static void spi_sc_##n##_irq_init(const struct device *dev)                                \
+	{                                                                                          \
+		IRQ_CONNECT(DT_INST_IRQN(n), 0, spi_sc_isr, DEVICE_DT_INST_GET(n), 0);             \
+                                                                                                   \
+		irq_enable(DT_INST_IRQN(n));                                                       \
 	}
 
 DT_INST_FOREACH_STATUS_OKAY(SPI_SC_INIT)
