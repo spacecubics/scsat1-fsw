@@ -143,10 +143,11 @@ static int spi_sc_request_rx_data(const struct device *dev, size_t size)
 	return spi_sc_wait_for_idle(dev);
 }
 
-static int spi_sc_read_rx_data(struct spi_context *ctx, const struct device *dev, uint8_t dfs)
+static int spi_sc_read_rx_data(struct spi_context *ctx, const struct device *dev, size_t size,
+			       uint8_t dfs, bool discard)
 {
 	const struct spi_sc_cfg *cfg = dev->config;
-	int ret;
+	int ret = 0;
 	uint8_t byte;
 
 	if (!cfg->data_capture_mode) {
@@ -157,13 +158,15 @@ static int spi_sc_read_rx_data(struct spi_context *ctx, const struct device *dev
 		}
 	}
 
-	for (int i = 0; i < ctx->current_rx->len; i++) {
+	for (int i = 0; i < size; i++) {
 		byte = sys_read32(cfg->base + SC_QSPI_RDR_OFFSET);
 		LOG_DBG("0x%02x recv", byte);
-		ctx->rx_buf[i] = byte;
+		if (!discard) {
+			ctx->rx_buf[i] = byte;
+		}
 	}
 
-	spi_context_update_rx(ctx, dfs, ctx->current_rx->len);
+	spi_context_update_rx(ctx, dfs, size);
 end:
 	return ret;
 }
@@ -197,6 +200,9 @@ static int spi_sc_cs_control(struct spi_context *ctx, const struct device *dev, 
 static int spi_sc_xfer(struct spi_context *ctx, const struct device *dev, uint8_t dfs)
 {
 	int ret;
+	bool discard;
+	size_t last_tx_size = 0;
+	const struct spi_sc_cfg *cfg = dev->config;
 
 	/*
 	 * spi_context_cs_control() in spi_sc_transeive() is a fake.
@@ -214,6 +220,7 @@ static int spi_sc_xfer(struct spi_context *ctx, const struct device *dev, uint8_
 		LOG_DBG("rx buf count %d len %d", ctx->rx_count, ctx->rx_len);
 
 		if (spi_context_tx_buf_on(ctx)) {
+			last_tx_size = ctx->current_tx->len;
 			ret = spi_sc_send_tx_data(ctx, dev, dfs);
 			if (ret < 0) {
 				LOG_ERR("Failed to send the TX data. (%d)", ret);
@@ -222,7 +229,16 @@ static int spi_sc_xfer(struct spi_context *ctx, const struct device *dev, uint8_
 		}
 
 		if (spi_context_rx_buf_on(ctx)) {
-			ret = spi_sc_read_rx_data(ctx, dev, dfs);
+			discard = false;
+			ret = spi_sc_read_rx_data(ctx, dev, ctx->current_rx->len, dfs, discard);
+			if (ret < 0) {
+				LOG_ERR("Failed to read the RX data. (%d)", ret);
+				goto end;
+			}
+		} else if (cfg->data_capture_mode) {
+			/* Read and discard capture data when write command */
+			discard = true;
+			ret = spi_sc_read_rx_data(ctx, dev, last_tx_size, dfs, discard);
 			if (ret < 0) {
 				LOG_ERR("Failed to read the RX data. (%d)", ret);
 				goto end;
