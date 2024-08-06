@@ -4,5 +4,6 @@
 zephyr_library()
 
 zephyr_library_sources_ifdef(CONFIG_SC_FPGASYS sc_fpgasys.c)
+zephyr_library_sources_ifdef(CONFIG_SC_FPGACONF sc_fpgaconf.c)
 
 zephyr_include_directories(.)

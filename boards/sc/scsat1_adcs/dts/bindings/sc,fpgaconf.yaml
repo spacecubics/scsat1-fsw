@@ -1,0 +1,12 @@
+# Copyright (c) 2024, Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+description: Space Cubics FPGA Configration Register
+
+compatible: "sc,fpgaconf"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
