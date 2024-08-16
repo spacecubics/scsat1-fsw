@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 build:
-  kconfig: zephyr/Kconfig
-  cmake: zephyr
+  kconfig: Kconfig
+  cmake: .
   settings:
     #board_root: .
     dts_root: zephyr
