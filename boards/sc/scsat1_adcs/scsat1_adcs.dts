@@ -60,7 +60,7 @@
 			clock-frequency = <24000000>;
 			interrupts = <5 0>;
 			reg = <0x40400000 0x10000>;
-			bus-speed = <1000000>;
+			bitrate = <1000000>;
 			sample-point = <750>;
 			tx-fifo-depth = <64>;
 			max-filter = <4>;
