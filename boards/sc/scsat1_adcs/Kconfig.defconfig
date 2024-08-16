@@ -5,9 +5,6 @@
 
 if BOARD_SCSAT1_ADCS
 
-config BOARD
-	default "scsat1_adcs"
-
 config CPU_CORTEX_M_HAS_SYSTICK
 	default y
 
