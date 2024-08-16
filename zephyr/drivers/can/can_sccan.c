@@ -1050,7 +1050,7 @@ static int sc_can_init(const struct device *dev)
 	uint32_t v;
 
 	/* Set timing according to dts default setting */
-	ret = can_calc_timing(dev, &timing, config->common.bus_speed, config->common.sample_point);
+	ret = can_calc_timing(dev, &timing, config->common.bitrate, config->common.sample_point);
 	if (ret == -EINVAL) {
 		LOG_ERR("Can't find timing for given param");
 		return -EIO;
