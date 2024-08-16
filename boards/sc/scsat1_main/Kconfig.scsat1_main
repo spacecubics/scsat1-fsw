@@ -1,8 +1,5 @@
-# SC-Sat1 MAIN Board configuration
-
 # Copyright (c) 2023 Space Cubics, LLC.
 # SPDX-License-Identifier: Apache-2.0
 
 config BOARD_SCSAT1_MAIN
-	bool "SC-Sat1 MAIN Board"
-	depends on SOC_SERIES_ARM_DESIGNSTART
+	select SOC_DESIGNSTART_FPGA_CORTEX_M3

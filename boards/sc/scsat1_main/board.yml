@@ -1,0 +1,5 @@
+board:
+  name: scsat1_main
+  vendor: sc
+  socs:
+    - name: designstart_fpga_cortex_m3
