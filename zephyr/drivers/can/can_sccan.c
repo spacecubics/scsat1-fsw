@@ -883,7 +883,7 @@ static void sc_can_set_state_change_callback(const struct device *dev,
 	data->common.state_change_cb_user_data = user_data;
 }
 
-#ifndef CONFIG_CAN_AUTO_BUS_OFF_RECOVERY
+#ifdef CONFIG_CAN_MANUAL_RECOVERY_MODE
 static int sc_can_recover(const struct device *dev, k_timeout_t timeout)
 {
 	const struct sc_can_cfg *config = dev->config;
@@ -1102,7 +1102,7 @@ static const struct can_driver_api sc_can_driver_api = {
 	.add_rx_filter = sc_can_add_rx_filter,
 	.remove_rx_filter = sc_can_remove_rx_filter,
 	.get_state = sc_can_get_state,
-#ifndef CONFIG_CAN_AUTO_BUS_OFF_RECOVERY
+#ifdef CONFIG_CAN_MANUAL_RECOVERY_MODE
 	.recover = sc_can_recover,
 #endif
 	.set_state_change_callback = sc_can_set_state_change_callback,
