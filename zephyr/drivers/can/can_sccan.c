@@ -1153,7 +1153,7 @@ static const struct can_driver_api sc_can_driver_api = {
 	static struct sc_can_tx_cb_data tx_cb_data_list_##n[DT_INST_PROP(n, tx_fifo_depth)];       \
 	static struct sc_can_rx_filters rx_filters_##n[DT_INST_PROP(n, max_filter)];          \
 	static const struct sc_can_cfg sc_can_cfg_##n = {                                          \
-		.common = CAN_DT_DRIVER_CONFIG_INST_GET(n, 1000000),       \
+		.common = CAN_DT_DRIVER_CONFIG_INST_GET(n, 0, 1000000),                            \
 		.reg_addr = DT_INST_REG_ADDR(n),                                                   \
 		.irq_init = sc_can_##n##_irq_init,                                                 \
 		.clock_frequency = DT_INST_PROP(n, clock_frequency),                               \
