@@ -1,0 +1,19 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_DSTRX3
+	bool "Space Cubics DSTRX-3 (S-Band Transceiver) driver"
+	default y
+	depends on DT_HAS_SC_DSTRX3_ENABLED
+	help
+	  Enable Space Cubics DSTRX-3 (S-Band Transceiver) driver.
+
+if SC_DSTRX3
+
+config SC_DSTRX3_INIT_PRIORITY
+	int "Init priority"
+	default 50
+	help
+	  DSTRX-3 Device driver initialization priority.
+
+endif
