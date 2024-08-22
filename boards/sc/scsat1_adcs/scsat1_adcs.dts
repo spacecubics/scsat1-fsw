@@ -193,6 +193,11 @@
 			compatible = "sc,fpgasys";
 			reg = <0x4f000000 0x10000>;
 		};
+
+		fpgaconf: fpgaconf@4f0f0000 {
+			compatible = "sc,fpgaconf";
+			reg = <0x4f0f0000 0x1000>;
+		};
 	};
 };
 
