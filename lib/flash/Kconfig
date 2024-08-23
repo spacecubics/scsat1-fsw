@@ -1,0 +1,33 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_FLASH
+	bool "Space Cubics Flash Memory libraries"
+	default y
+	help
+	  Enable Space Cubics Flash Memory libraries.
+
+if SC_LIB_FLASH
+
+config SC_LIB_FLASH_DATA
+	bool "Enable Data Store Flash Memory"
+	default y
+	depends on FILE_SYSTEM_LITTLEFS
+	help
+	  Enable Data Store Flash Memory
+
+if SC_LIB_FLASH_DATA
+
+config SC_LIB_FLASH_DATA_STORE_MNT_POINT
+	string "Mount point name for Data Store Flash memory"
+	default "/storage"
+	help
+	  Mount point name for Data Store Flash memory
+
+endif #SC_LIB_FLASH_DATA
+
+module = SC_LIB_FLASH
+module-str = Space Cubics Flash Memory libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif #SC_LIB_FLASH

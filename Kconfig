@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Space Cubics, LLC.
 # SPDX-License-Identifier: Apache-2.0
 
+rsource "lib/Kconfig"
 rsource "drivers/can/Kconfig"
 rsource "drivers/i2c/Kconfig"
 rsource "drivers/spi/Kconfig"

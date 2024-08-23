@@ -1,0 +1,8 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menu "Space Cubics Libraries"
+
+rsource "flash/Kconfig"
+
+endmenu
