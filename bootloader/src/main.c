@@ -8,25 +8,17 @@
 #include <zephyr/kernel.h>
 #include <zephyr/storage/flash_map.h>
 #include "version.h"
+#include "sc_fpgasys.h"
 
-#define SCOBCA1_FPGA_SYSREG_CODEMSEL  (0x4F000000)
 #define SCOBCA1_FPGA_SYSREG_CFGMEMCTL (0x4F000010)
 #define SCOBCA1_FPGA_HRMEM_ADDR       (0x60000000)
 #define SYSREG_CODEMSEL_ENABLE_HRMEM  (0x5a5a0000)
-#define SCOBCA1_FPGA_CFGBOOTMEM(x)    ((((x) & 0x00001000) >> 12))
-#define SCOBCA1_FPGA_CFGMEMMON(x)     ((((x) & 0x00000020) >> 5))
-#define SCOBCA1_FPGA_CFGMEMSEL(x)     ((((x) & 0x00000001) << 4))
 #define QSPI_RX_FIFO_MAX_BYTE         (16U)
-#define CFG_MEMSEL_RETRY_COUNT        (100U)
-#define CFG_MEMSEL_RETRY_INTERVAL     K_MSEC(1)
 
 static int select_cfg_memory(void)
 {
-	int ret = -1;
-	uint8_t boot_bank;
-	uint8_t sel_bank;
-	mm_reg_t sysreg = SCOBCA1_FPGA_SYSREG_CFGMEMCTL;
-	uint16_t retry = CFG_MEMSEL_RETRY_COUNT;
+	int ret;
+	enum sc_cfgmem boot_bank;
 
 	/*
 	 * FPGA configures using the Config memory bank specified by TRCH,
@@ -36,19 +28,13 @@ static int select_cfg_memory(void)
 	 * configuration, and then load the FSW from the same bank and copy
 	 * it to HRMEM.
 	 */
-	boot_bank = SCOBCA1_FPGA_CFGBOOTMEM(sys_read32(sysreg));
+	boot_bank = sc_get_boot_cfgmem();
 
-	sys_write32(SCOBCA1_FPGA_CFGMEMSEL(boot_bank), sysreg);
-
-	while (retry--) {
-		sel_bank = SCOBCA1_FPGA_CFGMEMMON(sys_read32(sysreg));
-		if (sel_bank == boot_bank) {
-			printk("Boot from CFG bank %d\n", sel_bank);
-			ret = 0;
-			break;
-		}
-
-		k_sleep(CFG_MEMSEL_RETRY_INTERVAL);
+	ret = sc_select_cfgmem(boot_bank);
+	if (ret == 0) {
+		printk("Boot from CFG bank %d\n", boot_bank);
+	} else {
+		printk("Faild to boot from CFG bank %d\n", boot_bank);
 	}
 
 	return ret;
@@ -105,7 +91,7 @@ int main(void)
 		goto end;
 	}
 
-	sys_write32(SYSREG_CODEMSEL_ENABLE_HRMEM, SCOBCA1_FPGA_SYSREG_CODEMSEL);
+	sc_select_codemem(SC_HRMEM);
 
 end:
 	return ret;
