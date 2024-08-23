@@ -189,6 +189,11 @@
 			tx-power = <15>;
 			bit-rate = <3>;
 		};
+
+		fpgasys: fpgasys@4f000000 {
+			compatible = "sc,fpgasys";
+			reg = <0x4f000000 0x10000>;
+		};
 	};
 };
 

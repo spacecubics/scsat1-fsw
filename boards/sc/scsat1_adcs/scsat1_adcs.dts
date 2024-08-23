@@ -181,6 +181,11 @@
 			reg = <0x50070000 0x10000>;
 			max-out-channel = <3>;
 		};
+
+		fpgasys: fpgasys@4f000000 {
+			compatible = "sc,fpgasys";
+			reg = <0x4f000000 0x10000>;
+		};
 	};
 };
 

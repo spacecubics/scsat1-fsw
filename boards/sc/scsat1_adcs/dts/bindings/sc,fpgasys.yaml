@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+
+description: Space Cubics FPGA System Register
+
+compatible: "sc,fpgasys"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
