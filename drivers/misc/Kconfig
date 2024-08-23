@@ -4,5 +4,6 @@
 menu "Space Cubics Miscellaneous Drivers"
 
 rsource "dstrx3/Kconfig"
+rsource "fpga/Kconfig"
 
 endmenu

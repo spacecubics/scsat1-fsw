@@ -1,0 +1,19 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_FPGASYS
+	bool "Space Cubics FPGA System Register driver"
+	default y
+	depends on DT_HAS_SC_FPGASYS_ENABLED
+	help
+	  Enable Space Cubics FPGA System Register driver.
+
+if SC_FPGASYS
+
+config SC_FPGASYS_INIT_PRIORITY
+	int "Init priority"
+	default 50
+	help
+	   FPGA System Register driver initialization priority.
+
+endif
