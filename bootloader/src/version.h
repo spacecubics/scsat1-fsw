@@ -6,4 +6,4 @@
 
 #pragma once
 
-#define BOOT_LOADER_VERSION "0.2.0"
+#define BOOT_LOADER_VERSION "0.2.1"
