@@ -42,6 +42,9 @@ struct all_test_result {
 #define CSP_GET_RW_CMD           (6U)
 #define CSP_GET_RET_CMD          (7U)
 
+/* TODO: This is workaround for send ADCS telemetry to GND */
+void csp_send_direct(csp_id_t* idout, csp_packet_t * packet, csp_iface_t * routed_from);
+
 static int send_adcs_syshk(void)
 {
 	int ret = 0;
@@ -90,7 +93,10 @@ static int send_adcs_syshk(void)
 		}
 
 		/* Send ADCS HK to Ground */
-		csp_send(gnd_conn, packet);
+		/* TODO: This is workaround for send ADCS telemetry to GND */
+		packet->id.dst = CSP_ID_GND;
+		LOG_INF("Send ADCS HK (src:%d dst:%d)", packet->id.src, packet->id.dst);
+		csp_send_direct(&packet->id, packet, NULL);
 
 		csp_buffer_free(packet);
 	}
