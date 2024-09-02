@@ -43,7 +43,7 @@ int main_init(enum hwtest_mode mode, uint32_t *err_cnt)
 	k_sleep(K_SECONDS(1));
 
 	if (mode > MAIN_ONLY_WITHOUT_DSTRX) {
-		sc_main_power_enable(DSTRX_IO_PWR);
+		sc_main_dstrx3_io_power_enable();
 		LOG_INF("Power on the DSTRX-3 IO");
 
 		k_sleep(K_SECONDS(1));
@@ -84,7 +84,7 @@ int main_off(uint32_t *err_cnt)
 
 	k_sleep(K_SECONDS(1));
 
-	sc_main_power_disable(DSTRX_IO_PWR);
+	sc_main_dstrx3_io_power_disable();
 	LOG_INF("Power off the DSTRX-3 IO");
 
 	k_sleep(K_SECONDS(1));
