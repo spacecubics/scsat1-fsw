@@ -152,6 +152,12 @@ void sc_dstrx3_set_tx_param(const struct device *dev, enum sc_dstrx3_tx_power tx
 	LOG_DBG("CMTX: 0x%08x", sys_read32(cfg->base + SC_DSTRX3_CMTX_OFFSET));
 }
 
+void sc_dstrx3_set_default_tx_param(const struct device *dev)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sc_dstrx3_set_tx_param(dev, cfg->tx_power, cfg->bit_rate);
+}
+
 static void sc_dstrx3_isr(const struct device *dev)
 {
 	uint32_t isr;
