@@ -5,6 +5,8 @@
  */
 
 #include <zephyr/kernel.h>
+#include "sc_dstrx3.h"
+#include "pwrctrl.h"
 
 /* Registers */
 #define SC_MAIN_SYSREG_BASE_ADDR (0x4F000000)
@@ -37,4 +39,23 @@ void sc_main_power_cycle_req(void)
 {
 	sys_write32(SC_MAIN_PWRCYCLEPKC | SC_MAIN_PWRCYCLEREQ,
 		    SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_PWRCYCLE);
+}
+
+void sc_main_dstrx3_io_power_enable(void)
+{
+	const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(dstrx));
+
+	sc_main_power_enable(DSTRX_IO_PWR);
+	sc_dstrx3_enable_hk(dev);
+	sc_dstrx3_enable_cmdif(dev);
+	sc_dstrx3_set_default_tx_param(dev);
+}
+
+void sc_main_dstrx3_io_power_disable(void)
+{
+	const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(dstrx));
+
+	sc_dstrx3_disable_cmdif(dev);
+	sc_dstrx3_disable_hk(dev);
+	sc_main_power_disable(DSTRX_IO_PWR);
 }
