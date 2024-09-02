@@ -170,13 +170,13 @@ static void sc_dstrx3_enable_irq(const struct device *dev)
 	cfg->irq_init(dev);
 }
 
-static void sc_dstrx3_enable_hk(const struct device *dev)
+void sc_dstrx3_enable_hk(const struct device *dev)
 {
 	const struct sc_dstrx3_cfg *cfg = dev->config;
 	sys_set_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_HKIF_EN_BIT);
 }
 
-static void sc_dstrx3_enable_cmdif(const struct device *dev)
+void sc_dstrx3_enable_cmdif(const struct device *dev)
 {
 	const struct sc_dstrx3_cfg *cfg = dev->config;
 	sys_set_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_CMIF_EN_BIT);
@@ -184,12 +184,7 @@ static void sc_dstrx3_enable_cmdif(const struct device *dev)
 
 static int sc_dstrx3_init(const struct device *dev)
 {
-	const struct sc_dstrx3_cfg *cfg = dev->config;
-
 	sc_dstrx3_enable_irq(dev);
-	sc_dstrx3_enable_hk(dev);
-	sc_dstrx3_enable_cmdif(dev);
-	sc_dstrx3_set_tx_param(dev, cfg->tx_power, cfg->bit_rate);
 
 	return 0;
 }
