@@ -176,10 +176,22 @@ void sc_dstrx3_enable_hk(const struct device *dev)
 	sys_set_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_HKIF_EN_BIT);
 }
 
+void sc_dstrx3_disable_hk(const struct device *dev)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_clear_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_HKIF_EN_BIT);
+}
+
 void sc_dstrx3_enable_cmdif(const struct device *dev)
 {
 	const struct sc_dstrx3_cfg *cfg = dev->config;
 	sys_set_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_CMIF_EN_BIT);
+}
+
+void sc_dstrx3_disable_cmdif(const struct device *dev)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_clear_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_CMIF_EN_BIT);
 }
 
 static int sc_dstrx3_init(const struct device *dev)
