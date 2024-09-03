@@ -255,11 +255,8 @@ void sc_dstrx3_set_downlink_control(const struct device *dev, uint32_t control)
 int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint16_t size)
 {
 	int ret;
-	uint32_t val;
 	uint32_t ctrl;
-	int16_t remain_size = size;
 	const struct sc_dstrx3_cfg *cfg = dev->config;
-	mem_addr_t offset = 0;
 
 	if (size > SC_DSTRX3_MAX_DOWNLINK_BUFFER_SIZE) {
 		LOG_ERR("Invalid data size. Downlink buffer of DSTRX-3 must be 256 bytes or less.");
@@ -267,12 +264,9 @@ int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint1
 		goto end;
 	}
 
-	while (remain_size > 0) {
-		val = sys_cpu_to_be32((uint32_t)&data[offset]);
-		LOG_DBG("Write 0x%08x to DLB", val);
-		sys_write32(val, cfg->base + SC_DSTRX3_DLB_OFFSET + offset);
-		offset += sizeof(val);
-		remain_size -= sizeof(val);
+	for (mem_addr_t offset = 0; offset < size; offset++) {
+		LOG_DBG("Write 0x%02x to DLB", data[offset]);
+		sys_write8(data[offset], cfg->base + SC_DSTRX3_DLB_OFFSET + offset);
 	}
 
 	ctrl = sys_read32(cfg->base + SC_DSTRX3_DLBCS_OFFSET);
