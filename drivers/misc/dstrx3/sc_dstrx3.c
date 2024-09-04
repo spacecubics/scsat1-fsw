@@ -89,6 +89,14 @@ LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
 #define SC_DSTRX3_CM_PWR_MODE(x) (((x) & 0x0000000F) << 4)
 #define SC_DSTRX3_CM_BIT_RATE(x) (((x) & 0x00000003) << 2)
 
+/* Uplink Buffer Control/Status Register */
+#define SC_DSTRX_ULB_DLEN(x)   (((x) & 0x001FF000) >> 16)
+#define SC_DSTRX_ULB_COUNT(x)  (((x) & 0x00000F00) >> 8)
+#define SC_DSTRX_ULB_STATUS(x) (((x) & 0x00000070))
+#define SC_DSTRX_ULB_CRC_ERR   BIT(6)
+#define SC_DSTRX_ULB_RS_ERR    BIT(5)
+#define SC_DSTRX_ULB_DLEN_ERR  BIT(4)
+
 /* Downlink Buffer Control/Status Register */
 #define SC_DSTRX_DLBCS_TYPE(x)     (((x) & 0x0000000F) << 28)
 #define SC_DSTRX_DLBCS_DLEN(x)     (((x) & 0x000001FF) << 16)
@@ -281,6 +289,31 @@ int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint1
 
 end:
 	return ret;
+}
+
+void sc_dstrx3_get_uplink_status(const struct device *dev, uint8_t *count, uint8_t *status)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	uint32_t val;
+
+	val = sys_read32(cfg->base + SC_DSTRX3_ULBCS_OFFSET);
+	*count = SC_DSTRX_ULB_COUNT(val);
+	*status = SC_DSTRX_ULB_STATUS(val);
+}
+
+bool sc_dstrx3_is_uplink_crc_error(const struct device *dev, uint8_t status)
+{
+	return status & SC_DSTRX_ULB_CRC_ERR ? true : false;
+}
+
+bool sc_dstrx3_is_uplink_rs_error(const struct device *dev, uint8_t status)
+{
+	return status & SC_DSTRX_ULB_RS_ERR ? true : false;
+}
+
+bool sc_dstrx3_is_uplink_dlen_error(const struct device *dev, uint8_t status)
+{
+	return status & SC_DSTRX_ULB_DLEN_ERR ? true : false;
 }
 
 #define SC_DSTRX3_INIT(n)                                                                          \
