@@ -105,7 +105,8 @@ LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
 #define SC_DSTRX_DLBCS_CLEAR       BIT(1)
 #define SC_DSTRX_DLBCS_WCOMP       BIT(0)
 
-/* Maximum size of the downlink buffer */
+/* Maximum size of the downlink/uplink buffer */
+#define SC_DSTRX3_MAX_UPLINK_BUFFER_SIZE   (256U)
 #define SC_DSTRX3_MAX_DOWNLINK_BUFFER_SIZE (256U)
 
 typedef void (*irq_init_func_t)(const struct device *dev);
@@ -322,6 +323,27 @@ bool sc_dstrx3_is_uplink_rs_error(const struct device *dev, uint8_t status)
 bool sc_dstrx3_is_uplink_dlen_error(const struct device *dev, uint8_t status)
 {
 	return status & SC_DSTRX_ULB_DLEN_ERR ? true : false;
+}
+
+int sc_dstrx3_get_uplink_data(const struct device *dev, uint8_t *data, uint16_t *size)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	int ret = 0;
+
+	*size = SC_DSTRX_ULB_DLEN(sys_read32(cfg->base + SC_DSTRX3_ULBCS_OFFSET));
+	if (*size > SC_DSTRX3_MAX_UPLINK_BUFFER_SIZE) {
+		LOG_ERR("Invalid data size. Uplink buffer of DSTRX-3 must be 256 bytes or less.");
+		ret = -EMSGSIZE;
+		goto end;
+	}
+
+	for (mem_addr_t offset = 0; offset < *size; offset++) {
+		LOG_DBG("Read 0x%02x from DLB", data[offset]);
+		data[offset] = sys_read8(cfg->base + SC_DSTRX3_ULB_OFFSET + offset);
+	}
+
+end:
+	return ret;
 }
 
 #define SC_DSTRX3_INIT(n)                                                                          \
