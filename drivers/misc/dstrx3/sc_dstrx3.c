@@ -96,6 +96,8 @@ LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
 #define SC_DSTRX_ULB_CRC_ERR   BIT(6)
 #define SC_DSTRX_ULB_RS_ERR    BIT(5)
 #define SC_DSTRX_ULB_DLEN_ERR  BIT(4)
+#define SC_DSTRX_ULB_CLEAR     BIT(1)
+#define SC_DSTRX_ULB_CHANGE    BIT(0)
 
 /* Downlink Buffer Control/Status Register */
 #define SC_DSTRX_DLBCS_TYPE(x)     (((x) & 0x0000000F) << 28)
@@ -340,6 +342,18 @@ int sc_dstrx3_get_uplink_data(const struct device *dev, uint8_t *data, uint16_t 
 
 end:
 	return ret;
+}
+
+void sc_dstrx3_clear_uplink_buffer(const struct device *dev)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_set_bits(cfg->base + SC_DSTRX3_ULBCS_OFFSET, SC_DSTRX_ULB_CLEAR);
+}
+
+void sc_dstrx3_discard_uplink_data(const struct device *dev)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_set_bits(cfg->base + SC_DSTRX3_ULBCS_OFFSET, SC_DSTRX_ULB_CHANGE);
 }
 
 #define SC_DSTRX3_INIT(n)                                                                          \
