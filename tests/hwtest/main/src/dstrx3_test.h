@@ -27,3 +27,4 @@ struct dstrx3_test_ret {
 
 int dstrx3_test(struct dstrx3_test_ret *dstrx3_ret, uint32_t *err_cnt, bool log);
 void dstrx3_downlink_loop_test(uint32_t loop, uint8_t flags);
+void dstrx3_uplink_test(const char *arg);
