@@ -91,3 +91,5 @@ bool sc_dstrx3_is_uplink_crc_error(const struct device *dev, uint8_t status);
 bool sc_dstrx3_is_uplink_rs_error(const struct device *dev, uint8_t status);
 bool sc_dstrx3_is_uplink_dlen_error(const struct device *dev, uint8_t status);
 int sc_dstrx3_get_uplink_data(const struct device *dev, uint8_t *data, uint16_t *size);
+void sc_dstrx3_clear_uplink_buffer(const struct device *dev);
+void sc_dstrx3_discard_uplink_data(const struct device *dev);
