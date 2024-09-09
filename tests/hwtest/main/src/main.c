@@ -76,6 +76,8 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 		ret = dstrx3_test(&dstrx3_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "dstrx3_down") == 0) {
 		dstrx3_downlink_loop_test(atoi(arg1), atoi(arg2));
+	} else if (strcmp(cmd, "dstrx3_up") == 0) {
+		dstrx3_uplink_test(arg1);
 	} else if (strcmp(cmd, "loop") == 0) {
 		k_event_set(&loop_event, LOOP_START_EVENT);
 		ret = loop_test(atoi(arg1), &err_cnt);
@@ -180,6 +182,7 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(sun, NULL, "Sun Sensor test command", start_cmd_thread),
 	SHELL_CMD(dstrx3, NULL, "DSTRX-3 test command", start_cmd_thread),
 	SHELL_CMD(dstrx3_down, NULL, "DSTRX-3 Downlink loop test command", start_cmd_thread),
+	SHELL_CMD(dstrx3_up, NULL, "DSTRX-3 Uplink test command", start_cmd_thread),
 	SHELL_CMD(loop, NULL, "Loop test command", start_cmd_thread),
 	SHELL_CMD(syshk, NULL, "System HK test command", start_cmd_thread), SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(hwtest, &sub_hwtest, "SC-Sat1 HW test commands", NULL);

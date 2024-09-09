@@ -87,3 +87,38 @@ void dstrx3_downlink_loop_test(uint32_t loop, uint8_t flags)
 
 	sc_dstrx3_disable_downlink(dev);
 }
+
+void dstrx3_uplink_test(const char *arg)
+{
+	const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(dstrx));
+	uint8_t count;
+	uint8_t status;
+	int ret;
+	uint8_t data[SC_DSTRX3_MAX_UPLINK_BUFFER_SIZE];
+	uint16_t size;
+
+	if (strcmp(arg, "clear") == 0) {
+		LOG_INF("Clear uplink buffer");
+		sc_dstrx3_clear_uplink_buffer(dev);
+		goto end;
+	} else if (strcmp(arg, "discard") == 0) {
+		LOG_INF("Discard uplink data");
+		sc_dstrx3_discard_uplink_data(dev);
+		goto end;
+	}
+
+	sc_dstrx3_get_uplink_status(dev, &count, &status);
+	LOG_INF("Uplink buffer count: %d, status: 0x%08x", count, status);
+
+	ret = sc_dstrx3_get_uplink_data(dev, data, &size);
+	if (ret < 0) {
+		LOG_ERR("Failed to get the uplink data (%d)", ret);
+		goto end;
+	}
+
+	LOG_INF("Uplink data size: %d [byte]", size);
+	LOG_HEXDUMP_INF(data, size, "Uplink data (hex)");
+
+end:
+	return;
+}
