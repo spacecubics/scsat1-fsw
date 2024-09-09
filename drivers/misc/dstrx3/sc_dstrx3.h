@@ -59,6 +59,14 @@ enum sc_dstrx3_bit_rate {
 #define DLD_CRC32C_EN   BIT(1)
 #define DLD_ZPADDING_EN BIT(0)
 
+/* Uplink Data Control */
+#define ULD_NRZI_EN    BIT(5)
+#define ULD_CC_EN      BIT(4)
+#define ULD_PR_EN      BIT(3)
+#define ULD_RS_EN      BIT(2)
+#define ULD_CRC32C_EN  BIT(1)
+#define ULD_FIXDLEN_EN BIT(0)
+
 void sc_dstrx3_enable_hk(const struct device *dev);
 void sc_dstrx3_disable_hk(const struct device *dev);
 void sc_dstrx3_enable_cmdif(const struct device *dev);
@@ -73,6 +81,7 @@ void sc_dstrx3_set_tx_param(const struct device *dev, enum sc_dstrx3_tx_power tx
 void sc_dstrx3_set_default_tx_param(const struct device *dev);
 void sc_dstrx3_set_downlink_control(const struct device *dev, uint32_t control);
 int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint16_t size);
+void sc_dstrx3_set_uplink_control(const struct device *dev, uint32_t control);
 void sc_dstrx3_get_uplink_status(const struct device *dev, uint8_t *count, uint8_t *status);
 bool sc_dstrx3_is_uplink_crc_error(const struct device *dev, uint8_t status);
 bool sc_dstrx3_is_uplink_rs_error(const struct device *dev, uint8_t status);

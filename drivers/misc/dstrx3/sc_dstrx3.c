@@ -226,6 +226,8 @@ static int sc_dstrx3_init(const struct device *dev)
 {
 	sc_dstrx3_enable_irq(dev);
 	sc_dstrx3_enable_uplink(dev);
+	/* Enable de-randomize */
+	sc_dstrx3_set_uplink_control(dev, ULD_PR_EN);
 
 	return 0;
 }
@@ -289,6 +291,12 @@ int sc_dstrx3_downlink_data(const struct device *dev, const uint8_t *data, uint1
 
 end:
 	return ret;
+}
+
+void sc_dstrx3_set_uplink_control(const struct device *dev, uint32_t control)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_write32(control, cfg->base + SC_DSTRX3_ULDC_OFFSET);
 }
 
 void sc_dstrx3_get_uplink_status(const struct device *dev, uint8_t *count, uint8_t *status)
