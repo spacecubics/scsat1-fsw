@@ -105,10 +105,6 @@ LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
 #define SC_DSTRX_DLBCS_CLEAR       BIT(1)
 #define SC_DSTRX_DLBCS_WCOMP       BIT(0)
 
-/* Maximum size of the downlink/uplink buffer */
-#define SC_DSTRX3_MAX_UPLINK_BUFFER_SIZE   (256U)
-#define SC_DSTRX3_MAX_DOWNLINK_BUFFER_SIZE (256U)
-
 typedef void (*irq_init_func_t)(const struct device *dev);
 
 struct sc_dstrx3_cfg {

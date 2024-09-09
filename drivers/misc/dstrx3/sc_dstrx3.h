@@ -67,6 +67,10 @@ enum sc_dstrx3_bit_rate {
 #define ULD_CRC32C_EN  BIT(1)
 #define ULD_FIXDLEN_EN BIT(0)
 
+/* Maximum size of the downlink/uplink buffer */
+#define SC_DSTRX3_MAX_UPLINK_BUFFER_SIZE   (256U)
+#define SC_DSTRX3_MAX_DOWNLINK_BUFFER_SIZE (256U)
+
 void sc_dstrx3_enable_hk(const struct device *dev);
 void sc_dstrx3_disable_hk(const struct device *dev);
 void sc_dstrx3_enable_cmdif(const struct device *dev);
