@@ -37,6 +37,7 @@ LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
 #define SC_DSTRX3_DLB_OFFSET   (0x0200) /* Downlink Data Buffer */
 
 /* DSTRX3 Control Status Register */
+#define SC_DSTRX3_ULIF_EN_BIT (24)
 #define SC_DSTRX3_DLIF_EN_BIT (16)
 #define SC_DSTRX3_HKIF_EN_BIT (8)
 #define SC_DSTRX3_CMIF_EN_BIT (0)
@@ -204,6 +205,7 @@ void sc_dstrx3_disable_cmdif(const struct device *dev)
 static int sc_dstrx3_init(const struct device *dev)
 {
 	sc_dstrx3_enable_irq(dev);
+	sc_dstrx3_enable_uplink(dev);
 
 	return 0;
 }
@@ -218,6 +220,18 @@ void sc_dstrx3_disable_downlink(const struct device *dev)
 {
 	const struct sc_dstrx3_cfg *cfg = dev->config;
 	sys_clear_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_DLIF_EN_BIT);
+}
+
+void sc_dstrx3_enable_uplink(const struct device *dev)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_set_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_ULIF_EN_BIT);
+}
+
+void sc_dstrx3_disable_uplink(const struct device *dev)
+{
+	const struct sc_dstrx3_cfg *cfg = dev->config;
+	sys_clear_bit(cfg->base + SC_DSTRX3_CS_OFFSET, SC_DSTRX3_ULIF_EN_BIT);
 }
 
 #define SC_DSTRX3_INIT(n)                                                                          \
