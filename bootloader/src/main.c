@@ -9,6 +9,7 @@
 #include <zephyr/storage/flash_map.h>
 #include "version.h"
 #include "sc_fpgasys.h"
+#include "sc_fpgaconf.h"
 
 #define SCOBCA1_FPGA_SYSREG_CFGMEMCTL (0x4F000010)
 #define SCOBCA1_FPGA_HRMEM_ADDR       (0x60000000)
@@ -53,6 +54,8 @@ static int copy_norflash_to_hrmem(uint8_t partition_id, mm_reg_t sram_mem_addr, 
 		goto end;
 	}
 
+	printk("Load from partition id: %d\n", partition_id);
+
 	ret = flash_area_open(partition_id, &flash);
 	if (ret < 0) {
 		goto end;
@@ -82,10 +85,16 @@ end:
 int main(void)
 {
 	int ret;
+	uint8_t partition_id = FIXED_PARTITION_ID(update_fsw);
 
 	printk("Start SC-Sat1 Boot loader (v%s)\n", BOOT_LOADER_VERSION);
+	printk("FPGA Boot Status : 0x%08x\n", sc_fpgaconf_get_bootsts());
 
-	ret = copy_norflash_to_hrmem(FIXED_PARTITION_ID(update_fsw), SCOBCA1_FPGA_HRMEM_ADDR,
+	if (sc_fpgaconf_is_fallback()) {
+		partition_id = FIXED_PARTITION_ID(golden_fsw);
+	}
+
+	ret = copy_norflash_to_hrmem(partition_id, SCOBCA1_FPGA_HRMEM_ADDR,
 				     KB(CONFIG_SCOBC_A1_BOOT_CFG_COPY_SIZE_KB));
 	if (ret < 0) {
 		goto end;
