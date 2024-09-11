@@ -9,6 +9,7 @@
 #include <csp/csp.h>
 #include <csp/drivers/can_zephyr.h>
 #include <zephyr/device.h>
+#include <zephyr/shell/shell_uart.h>
 #include "common.h"
 #include "temp_test.h"
 #include "cv_test.h"
@@ -26,6 +27,7 @@ LOG_MODULE_REGISTER(csp);
 #define SERVER_PRIO       (0U)
 
 #define CSP_GET_SYSHK_PORT (10U)
+#define CSP_SHELL_CMD_PORT (11U)
 
 extern uint8_t syshk_tail;
 extern struct rw_count_data rw_data_fifo[SYSHK_FIFO_NUM];
@@ -140,6 +142,10 @@ void server(void)
 			switch (csp_conn_dport(conn)) {
 			case CSP_GET_SYSHK_PORT:
 				csp_get_syshk(conn, packet);
+				csp_buffer_free(packet);
+				break;
+			case CSP_SHELL_CMD_PORT:
+				shell_execute_cmd(shell_backend_uart_get_ptr(), packet->data);
 				csp_buffer_free(packet);
 				break;
 			default:
