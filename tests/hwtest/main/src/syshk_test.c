@@ -248,8 +248,7 @@ int syshk_test(int32_t loop_count, uint32_t *err_cnt)
 		loop_count = INT32_MAX;
 	}
 
-	if (test_mode == FULL) {
-		LOG_INF("===[Init photo directory on Zero)]===");
+	if (test_mode >= MAIN_ADCS_ONLY) {
 		csp_test_init();
 		k_sleep(K_SECONDS(10));
 	}
