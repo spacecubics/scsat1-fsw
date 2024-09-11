@@ -13,14 +13,9 @@ LOG_MODULE_REGISTER(mtq_test);
 
 static int print_mgnm(uint32_t sec)
 {
-	int ret;
-
 	for (int i = 0; i < sec; i++) {
 		k_sleep(K_SECONDS(1));
-		ret = print_mgnm_field();
-		if (ret < 0) {
-			break;
-		}
+		print_mgnm_field();
 	}
 
 	return 0;
