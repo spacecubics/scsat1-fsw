@@ -88,6 +88,7 @@ void server(void)
 			switch (csp_conn_dport(conn)) {
 			case CSP_PORT_MAIN_SHELL_CMD:
 				shell_execute_cmd(shell_backend_uart_get_ptr(), packet->data);
+				csp_buffer_free(packet);
 				break;
 			default:
 				csp_service_handler(packet);
