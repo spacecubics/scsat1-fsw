@@ -21,7 +21,7 @@ static int print_mgnm(uint32_t sec)
 	return 0;
 }
 
-int mtq_test(uint32_t *err_cnt)
+int mtq_test(uint32_t *err_cnt, uint32_t wait_sec)
 {
 	int ret;
 	int all_ret = 0;
@@ -37,6 +37,10 @@ int mtq_test(uint32_t *err_cnt)
 		MTQ_POL_NON,
 	};
 
+	if (wait_sec == 0) {
+		wait_sec = 5;
+	}
+
 	for (int i = 0; i < ARRAY_SIZE(axes_list); i++) {
 		for (int j = 0; j < ARRAY_SIZE(pol_list); j++) {
 			ret = mtq_start(axes_list[i], pol_list[j], duty);
@@ -46,7 +50,7 @@ int mtq_test(uint32_t *err_cnt)
 				continue;
 			}
 
-			ret = print_mgnm(5);
+			ret = print_mgnm(wait_sec);
 			if (ret < 0) {
 				(*err_cnt)++;
 				all_ret = -1;

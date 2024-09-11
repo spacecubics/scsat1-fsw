@@ -71,7 +71,7 @@ static void cmd_handler(void *p1, void *p2, void *p3)
 	} else if (strcmp(cmd, "sun") == 0) {
 		ret = sunsens_test(&sunsens_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "mtq") == 0) {
-		ret = mtq_test(&err_cnt);
+		ret = mtq_test(&err_cnt, atoi(arg1));
 	} else if (strcmp(cmd, "dstrx3") == 0) {
 		ret = dstrx3_test(&dstrx3_ret, &err_cnt, LOG_ENABLE);
 	} else if (strcmp(cmd, "dstrx3_down") == 0) {
