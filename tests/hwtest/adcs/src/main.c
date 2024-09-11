@@ -146,9 +146,9 @@ int main(void)
 		LOG_INF("Enable the CSP");
 	}
 
-	if (IS_ENABLED(CONFIG_SCSAT1_ADCS_AUTO_RUN_HWTEST)) {
-		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest init");
+	shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest init");
 
+	if (IS_ENABLED(CONFIG_SCSAT1_ADCS_AUTO_RUN_HWTEST)) {
 		k_sleep(K_SECONDS(30));
 
 		shell_execute_cmd(shell_backend_uart_get_ptr(), "hwtest syshk -1");
