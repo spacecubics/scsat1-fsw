@@ -8,4 +8,4 @@
 
 #include <stdint.h>
 
-int mtq_test(uint32_t *err_cnt);
+int mtq_test(uint32_t *err_cnt, uint32_t wait_sec);
