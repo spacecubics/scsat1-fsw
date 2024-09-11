@@ -25,6 +25,7 @@ LOG_MODULE_REGISTER(csp_test);
 #define CSP_INVALID_UPTIME (0U)
 #define CSP_INVALID_TEMP   (0U)
 #define CSP_INVALID_COUNT  (0U)
+#define CSP_ADCS_SHELL_CMD (11U)
 
 extern enum hwtest_mode test_mode;
 
@@ -61,6 +62,37 @@ cleanup:
 
 end:
 	return packet;
+}
+
+static int csp_send_cmd_to_adcs(const char *cmd, bool log)
+{
+	int ret = 0;
+	csp_packet_t *packet = NULL;
+
+	csp_conn_t *conn = csp_connect(CSP_PRIO_NORM, CSP_ID_ADCS, CSP_ADCS_SHELL_CMD,
+				       CSP_TIMEOUT_MSEC, CSP_O_NONE);
+	if (conn == NULL) {
+		HWTEST_LOG_ERR(log, "CSP Connection failed");
+		ret = -1;
+		goto end;
+	}
+
+	packet = csp_buffer_get(0);
+	if (packet == NULL) {
+		HWTEST_LOG_ERR(log, "Failed to get CSP buffer");
+		ret = -1;
+		goto cleanup;
+	}
+	packet->length = strlen(cmd) + 1;
+	memcpy(packet->data, cmd, packet->length);
+
+	csp_send(conn, packet);
+
+cleanup:
+	csp_close(conn);
+
+end:
+	return ret;
 }
 
 static int csp_get_zero_temp(float *temp, bool log)
@@ -152,10 +184,14 @@ int csp_test_init(void)
 	bool reply = false;
 	bool log = true;
 
+	LOG_INF("===[Init photo directory on Zero]===");
 	packet = csp_send_cmd_to_zero(CSP_INIT_DIR_ZERO, reply, log);
 	if (packet == NULL) {
 		ret = -1;
 	}
+
+	LOG_INF("===[Start ADCS syshk test]===");
+	ret = csp_send_cmd_to_adcs("hwtest syshk -1", log);
 
 	return ret;
 }
