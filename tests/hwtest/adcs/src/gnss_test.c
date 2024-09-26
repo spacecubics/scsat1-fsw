@@ -49,6 +49,8 @@ int gnss_test(struct gnss_hwmon_result *hwmon_ret, struct gnss_bestpos_result *p
 		pos_ret->week = pos_data.week;
 		pos_ret->seconds = pos_data.seconds;
 		pos_ret->receiver_status = pos_data.receiver_status;
+		pos_ret->reserved = pos_data.reserved;
+		pos_ret->receiver_version = pos_data.receiver_version;
 		memcpy(pos_ret->sol_stat, pos_data.sol_stat, sizeof(pos_ret->sol_stat));
 		memcpy(pos_ret->pos_type, pos_data.pos_type, sizeof(pos_ret->pos_type));
 		pos_ret->lat_deg = pos_data.lat_deg;
