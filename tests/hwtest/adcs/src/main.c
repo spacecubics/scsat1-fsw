@@ -26,7 +26,7 @@
 
 char last_cmd[32];
 
-K_THREAD_STACK_DEFINE(cmd_thread_stack, 2048);
+K_THREAD_STACK_DEFINE(cmd_thread_stack, 4096);
 static struct k_thread cmd_thread;
 static struct k_event exec_event;
 extern struct k_event loop_event;
