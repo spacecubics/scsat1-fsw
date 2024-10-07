@@ -14,6 +14,10 @@ config SCSAT1_MAIN_CAP_INTERVAL_SEC
 	help
 	  Interval (seconds) of capture frame command
 
+module = SCSAT1_MAIN
+module-str = SC-Sat1 Main Board
+source "subsys/logging/Kconfig.template.log_config"
+
 endmenu
 
 menu "Zephyr"

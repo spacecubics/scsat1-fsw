@@ -7,7 +7,7 @@
 #include <zephyr/kernel.h>
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(scbus);
+LOG_MODULE_REGISTER(scbus, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 /* Registers */
 #define SC_MAIN_SCBUS_BASE_ADDR (0x40300000) /* SC Bus Control */

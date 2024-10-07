@@ -8,6 +8,10 @@ config SCSAT1_ADCS_AUTO_RUN_HWTEST
 	help
 	  Enable auto run for HW test.
 
+module = SCSAT1_ADCS
+module-str = SC-Sat1 ADCS Board
+source "subsys/logging/Kconfig.template.log_config"
+
 endmenu
 
 menu "Zephyr"

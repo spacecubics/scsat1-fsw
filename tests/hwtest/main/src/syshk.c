@@ -14,7 +14,7 @@
 #include "syshk.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(syshk);
+LOG_MODULE_REGISTER(syshk, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 static uint32_t seq_counters[TLM_TYPE_NUM] = {0};
 

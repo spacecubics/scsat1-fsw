@@ -7,7 +7,7 @@
 #include "imu_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(imu_test);
+LOG_MODULE_REGISTER(imu_test, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 static void imu_print_imu_data(struct imu_data *data)
 {

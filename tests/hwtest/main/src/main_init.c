@@ -10,7 +10,7 @@
 #include "sysmon.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(main_init);
+LOG_MODULE_REGISTER(main_init, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 enum hwtest_mode test_mode;
 

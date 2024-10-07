@@ -14,7 +14,7 @@
 #include "csp_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(csp_test);
+LOG_MODULE_REGISTER(csp_test, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 #define CSP_TIMEOUT_MSEC   (100U)
 #define CSP_GET_TEMP_ZERO  (11U)

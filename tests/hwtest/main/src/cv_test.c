@@ -11,7 +11,7 @@
 #include "cv_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(cv_test);
+LOG_MODULE_REGISTER(cv_test, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 #define CV_INVALID_FLOAT (0.0f)
 #define CV_INVALID_UINT  (0U)

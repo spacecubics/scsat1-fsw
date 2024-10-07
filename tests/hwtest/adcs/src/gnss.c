@@ -10,7 +10,7 @@
 #include "gnss.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(gnss);
+LOG_MODULE_REGISTER(gnss, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define GNSS_WAKE_RETRY_COUNT  (200U)
 #define GNSS_HWMON_RETRY_COUNT (2000U)

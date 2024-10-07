@@ -8,7 +8,7 @@
 #include "cv.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(cv);
+LOG_MODULE_REGISTER(cv, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define CV_ADCS_ADDR (0x42)
 #define CV_RW_ADDR   (0x40)
