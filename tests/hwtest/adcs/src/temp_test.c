@@ -11,7 +11,7 @@
 #include "sysmon.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(temp_test);
+LOG_MODULE_REGISTER(temp_test, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define TEMP_INVLAID_FLOAT (0.0f)
 

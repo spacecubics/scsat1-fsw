@@ -8,7 +8,7 @@
 #include "mtq.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(mtq);
+LOG_MODULE_REGISTER(mtq, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 struct mtq_pwm_config {
 	uint8_t channel;

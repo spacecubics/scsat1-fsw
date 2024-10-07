@@ -16,7 +16,7 @@
 #include "version.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(syshk_test);
+LOG_MODULE_REGISTER(syshk_test, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 static uint8_t syshk_head = 0;
 uint8_t syshk_tail = 0;

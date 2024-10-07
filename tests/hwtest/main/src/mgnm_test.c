@@ -10,7 +10,7 @@
 #include "mgnm_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(mgnm_test);
+LOG_MODULE_REGISTER(mgnm_test, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 #define MGNM_INVALID_TEMP (0.0f)
 #define MGNM_INVALID_DATA (0U)

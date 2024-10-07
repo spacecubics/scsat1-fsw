@@ -11,7 +11,7 @@
 #include "imu.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(adcs_init);
+LOG_MODULE_REGISTER(adcs_init, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 int adcs_init(uint32_t *err_cnt)
 {

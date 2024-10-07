@@ -16,7 +16,7 @@
 #include "rw.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(loop_test);
+LOG_MODULE_REGISTER(loop_test, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 struct k_event loop_event;
 

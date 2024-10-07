@@ -8,9 +8,6 @@
 #include "mtq.h"
 #include "mgnm.h"
 
-#include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(mtq_test);
-
 static int print_mgnm(uint32_t sec)
 {
 	for (int i = 0; i < sec; i++) {

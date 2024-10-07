@@ -20,7 +20,7 @@
 #include "version.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(syshk_test);
+LOG_MODULE_REGISTER(syshk_test, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 extern struct k_event loop_event;
 extern enum hwtest_mode test_mode;

@@ -11,7 +11,7 @@
 #include "sunsens_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(sunsens_test);
+LOG_MODULE_REGISTER(sunsens_test, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 #define SUNSENS_INVALID_TMEP (0.0f)
 #define SUNSENS_INVALID_DATA (0U)

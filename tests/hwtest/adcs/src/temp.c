@@ -8,7 +8,7 @@
 #include "temp.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(temp);
+LOG_MODULE_REGISTER(temp, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define ADCS_TEMP_REG (0x00)
 

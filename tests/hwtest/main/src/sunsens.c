@@ -9,7 +9,7 @@
 #include "sunsens.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(sunsens);
+LOG_MODULE_REGISTER(sunsens, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 #define SUNSENS_SLAVE_ADDR     (0x05)
 #define SUNSENS_SAMPLE_SUN_CMD (0x00)

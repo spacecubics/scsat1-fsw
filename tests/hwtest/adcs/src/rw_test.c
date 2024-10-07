@@ -8,7 +8,7 @@
 #include "rw_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(rw_test);
+LOG_MODULE_REGISTER(rw_test, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 static void print_rw_status(enum rw_pos pos, uint32_t sec)
 {

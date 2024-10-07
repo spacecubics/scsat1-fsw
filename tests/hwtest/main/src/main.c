@@ -24,7 +24,7 @@
 #include "syshk_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(main);
+LOG_MODULE_REGISTER(main, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)

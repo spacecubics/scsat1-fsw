@@ -10,7 +10,7 @@
 #include "syshk.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(syshk);
+LOG_MODULE_REGISTER(syshk, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define CSP_TIMEOUT_MSEC (100U)
 #define SYSHK_PORT       (10U)

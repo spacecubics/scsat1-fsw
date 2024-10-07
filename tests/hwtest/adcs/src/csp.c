@@ -19,7 +19,7 @@
 #include "syshk.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(csp);
+LOG_MODULE_REGISTER(csp, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define ROUTER_STACK_SIZE (256U)
 #define SERVER_STACK_SIZE (1024U)

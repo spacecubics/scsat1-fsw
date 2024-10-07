@@ -9,7 +9,7 @@
 #include "version.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(sysmon);
+LOG_MODULE_REGISTER(sysmon, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 /* Registers */
 #define SC_MAIN_SYSREG_BASE_ADDR (0x4F000000) /* System Register */

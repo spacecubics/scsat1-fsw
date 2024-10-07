@@ -9,7 +9,7 @@
 #include "dstrx3_test.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(dstrx3_test);
+LOG_MODULE_REGISTER(dstrx3_test, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 static void dstrx3_print_hk(struct sc_dstrx3_hk *hk)
 {

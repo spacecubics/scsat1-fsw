@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell_uart.h>
-#include <zephyr/logging/log.h>
 #include "common.h"
 #include "csp.h"
 #include "wdog.h"
@@ -21,6 +20,9 @@
 #include "loop_test.h"
 #include "syshk_test.h"
 
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(adcs_main, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
+
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
 
@@ -30,8 +32,6 @@ K_THREAD_STACK_DEFINE(cmd_thread_stack, 4096);
 static struct k_thread cmd_thread;
 static struct k_event exec_event;
 extern struct k_event loop_event;
-
-LOG_MODULE_REGISTER(adcs_main);
 
 static void cmd_handler(void *p1, void *p2, void *p3)
 {

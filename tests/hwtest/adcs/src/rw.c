@@ -9,7 +9,7 @@
 #include "cv.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(rw);
+LOG_MODULE_REGISTER(rw, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define SC_RWM_BASE_ADDR    (0x50030000)
 #define SC_RWM_MENR_OFFSET  (0x0000)
