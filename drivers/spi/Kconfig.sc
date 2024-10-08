@@ -8,8 +8,12 @@ menuconfig SPI_SC_QSPI
 	help
 	  Enable Space Cubics QSPI driver.
 
+if SPI_SC_QSPI
+
 config SPI_SC_IDLE_TIMEOUT_MS
 	int "Timeout duration for waiting until the SPI Bus becomes idle.[ms]"
 	default 100
 	help
 	  Timeout duration for waiting until the SPI Bus becomes idle. [ms]
+
+endif

@@ -3,7 +3,7 @@
 # Copyright (c) 2023 Space Cubics,LLC
 # SPDX-License-Identifier: Apache-2.0
 
-config CAN_SCCAN
+menuconfig CAN_SCCAN
 	bool "Space Cubics CAN Driver"
 	default y
 	depends on DT_HAS_SC_CAN_ENABLED
