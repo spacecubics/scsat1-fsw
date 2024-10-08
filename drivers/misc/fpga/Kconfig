@@ -16,4 +16,8 @@ config SC_FPGASYS_INIT_PRIORITY
 	help
 	   FPGA System Register driver initialization priority.
 
+module = SC_FPGASYS
+module-str = Space Cubics FPGA System Register driver
+source "subsys/logging/Kconfig.template.log_config"
+
 endif

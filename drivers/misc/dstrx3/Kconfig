@@ -16,4 +16,8 @@ config SC_DSTRX3_INIT_PRIORITY
 	help
 	  DSTRX-3 Device driver initialization priority.
 
+module = SC_DSTRX3
+module-str = Space Cubics DSTRX-3 (S-Band Transceiver) driver
+source "subsys/logging/Kconfig.template.log_config"
+
 endif

@@ -9,7 +9,7 @@
 #include "sc_fpgasys.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(sc_fpgasys, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(sc_fpgasys, CONFIG_SC_FPGASYS_LOG_LEVEL);
 
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>

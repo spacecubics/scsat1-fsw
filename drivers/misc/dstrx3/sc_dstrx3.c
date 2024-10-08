@@ -7,7 +7,7 @@
 #define DT_DRV_COMPAT sc_dstrx3
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(sc_dstrx3, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(sc_dstrx3, CONFIG_SC_DSTRX3_LOG_LEVEL);
 
 #include <zephyr/irq.h>
 #include <zephyr/sys/byteorder.h>
