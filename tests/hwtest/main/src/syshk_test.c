@@ -95,6 +95,7 @@ static int send_adcs_syshk(void)
 		/* Send ADCS HK to Ground */
 		/* TODO: This is workaround for send ADCS telemetry to GND */
 		packet->id.dst = CSP_ID_GND;
+		packet->id.dport = SYSHK_PORT;
 		LOG_INF("Send ADCS HK (src:%d dst:%d)", packet->id.src, packet->id.dst);
 		csp_send_direct(&packet->id, packet, NULL);
 
