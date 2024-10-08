@@ -8,7 +8,7 @@
 
 #define LOG_LEVEL CONFIG_SPI_LOG_LEVEL
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(spi_sc);
+LOG_MODULE_REGISTER(spi_sc, CONFIG_SPI_LOG_LEVEL);
 
 #include <zephyr/drivers/spi.h>
 #include "spi_context.h"
