@@ -16,3 +16,5 @@
 #define CSP_ID_PICO      (14U)
 
 #define CSP_CAN_BITRATE (1000000U)
+
+#define CSP_TELEMETRY_ID_OFFSET (0U)
