@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_CSP
+	bool "Space Cubics CSP libraries"
+	depends on LIBCSP
+	default y
+	help
+	  Enable Space Cubics CSP libraries.
+
+if SC_LIB_CSP
+
+module = SC_LIB_CSP
+module-str = Space Cubics CSP libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
