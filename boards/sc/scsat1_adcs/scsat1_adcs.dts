@@ -118,7 +118,7 @@
 			spiclk_div = <0>;
 			data-capture-mode;
 
-			s25fl256l: s25fl256l@0 {
+			s25fl256l0: s25fl256l0@0 {
 				compatible = "jedec,spi-nor";
 				reg = <0>;
 				size = <DT_SIZE_M(256)>;
@@ -157,6 +157,28 @@
 			cpol = <0>;
 			cpha = <0>;
 			spiclk_div = <0>;
+			data-capture-mode;
+
+			s25fl256l1: s25fl256l1@0 {
+				compatible = "jedec,spi-nor";
+				reg = <0>;
+				size = <DT_SIZE_M(256)>;
+				spi-max-frequency = <12000000>;
+				status = "okay";
+				enter-4byte-addr = <1>;
+				jedec-id = [01 60 19];
+
+				partitions {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					storage_partition: partition@0 {
+						label = "storage_partition";
+						reg = <0x00000000 DT_SIZE_M(32)>;
+					};
+				};
+			};
 		};
 
 		spi2: spi@40200000 {
