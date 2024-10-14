@@ -15,3 +15,10 @@ manifest:
       url: https://github.com/libcsp/libcsp.git
       revision: develop
       path: modules/lib/libcsp
+
+    - name: littlefs
+      url: https://github.com/zephyrproject-rtos/littlefs.git
+      revision: zephyr
+      path: modules/fs/littlefs
+      groups:
+        - fs
