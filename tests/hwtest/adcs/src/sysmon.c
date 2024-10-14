@@ -7,6 +7,7 @@
 #include <zephyr/kernel.h>
 #include "sysmon.h"
 #include "version.h"
+#include "sc_fpgaconf.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sysmon, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -354,6 +355,7 @@ void sc_adcs_print_fpga_ids(void)
 	LOG_INF("* Boot CFG Memory   : %d",
 		SC_ADCS_SYSREG_CFGBOOTMEM(
 			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_CFGMEMCTL_OFFSET)));
+	LOG_INF("* FPGA Boot Status  : 0x%x", sc_fpgaconf_get_bootsts());
 	LOG_INF("* IP Version        : %08x",
 		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_VER_OFFSET));
 	LOG_INF("* Build Information : %08x",
