@@ -2,12 +2,70 @@
 #include <mem.h>
 
 /delete-node/ &hrmem;
+/delete-node/ &uartlite0;
 
 / {
 	soc {
 		hrmem: memory@0 {
 			compatible = "sc,hrmem";
 			reg = <0x00000000 DT_SIZE_K(32)>;
+		};
+
+		uartlite0: uartlite@4f010000 {
+			compatible = "xlnx,xps-uartlite-1.00.a";
+			interrupts = <0 0>;
+			reg = <0x4f010000 0x10000>;
+		};
+
+		spi0: spi@40000000 {
+			compatible = "sc,qspi";
+			interrupts = <2 0>;
+			reg = <0x40000000 0x1000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			slave-num = <1>;
+			cpol = <0>;
+			cpha = <0>;
+			spiclk_div = <0>;
+			data-capture-mode;
+
+			s25fl256l: s25fl256l@0 {
+				compatible = "jedec,spi-nor";
+				reg = <0>;
+				size = <DT_SIZE_M(256)>;
+				spi-max-frequency = <12000000>;
+				status = "okay";
+				enter-4byte-addr = <1>;
+				jedec-id = [01 60 19];
+
+				partitions {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+					golden_fpga: partition@0 {
+						reg = <0x00000000 DT_SIZE_M(8)>;
+					};
+					golden_fsw: partition@800000 {
+						reg = <0x00800000 (DT_SIZE_M(4))>;
+					};
+					update_fpga: partition@1000000 {
+						reg = <0x01000000 DT_SIZE_M(10)>;
+					};
+					update_fsw: partition@1A00000 {
+						reg = <0x01A00000 (DT_SIZE_M(4))>;
+					};
+				};
+			};
+		};
+
+		fpgasys: fpgasys@4f000000 {
+			compatible = "sc,fpgasys";
+			reg = <0x4f000000 0x10000>;
+		};
+
+		fpgaconf: fpgaconf@4f0f0000 {
+			compatible = "sc,fpgaconf";
+			reg = <0x4f0f0000 0x1000>;
 		};
 	};
 };
