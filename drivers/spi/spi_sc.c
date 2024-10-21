@@ -65,6 +65,10 @@ LOG_MODULE_REGISTER(spi_sc, CONFIG_SPI_LOG_LEVEL);
 /* QSPI Data Capture Mode Setting Register */
 #define SC_QSPI_DCMSR_DTCAPT BIT(0)
 
+/* TX/RX Buffer size */
+#define SC_QSPI_TX_BUFFER_SIZE (16U)
+#define SC_QSPI_RX_BUFFER_SIZE (16U)
+
 typedef void (*irq_init_func_t)(const struct device *dev);
 
 struct spi_sc_data {
@@ -112,12 +116,19 @@ static void spi_sc_isr(const struct device *dev)
 	}
 }
 
-static int spi_sc_send_tx_data(struct spi_context *ctx, const struct device *dev, uint8_t dfs)
+static int spi_sc_send_tx_data(struct spi_context *ctx, const struct device *dev, uint8_t dfs,
+			       uint32_t *tx_size)
 {
 	const struct spi_sc_cfg *cfg = dev->config;
 	int ret;
 
-	for (int i = 0; i < ctx->current_tx->len; i++) {
+	*tx_size = ctx->current_tx->len;
+
+	if (ctx->current_tx->len > SC_QSPI_TX_BUFFER_SIZE) {
+		*tx_size = SC_QSPI_TX_BUFFER_SIZE;
+	}
+
+	for (int i = 0; i < *tx_size; i++) {
 		sys_write32(ctx->tx_buf[i], cfg->base + SC_QSPI_TDR_OFFSET);
 		LOG_DBG("0x%02x sent", ctx->tx_buf[i]);
 
@@ -127,7 +138,7 @@ static int spi_sc_send_tx_data(struct spi_context *ctx, const struct device *dev
 		}
 	}
 
-	spi_context_update_tx(ctx, dfs, ctx->current_tx->len);
+	spi_context_update_tx(ctx, dfs, *tx_size);
 end:
 	return ret;
 }
@@ -150,8 +161,12 @@ static int spi_sc_read_rx_data(struct spi_context *ctx, const struct device *dev
 	int ret = 0;
 	uint8_t byte;
 
+	if (size > SC_QSPI_RX_BUFFER_SIZE) {
+		size = SC_QSPI_RX_BUFFER_SIZE;
+	}
+
 	if (!cfg->data_capture_mode) {
-		ret = spi_sc_request_rx_data(dev, ctx->current_rx->len);
+		ret = spi_sc_request_rx_data(dev, size);
 		if (ret < 0) {
 			LOG_ERR("Failed to request the RX data. (%d)", ret);
 			goto end;
@@ -220,8 +235,7 @@ static int spi_sc_xfer(struct spi_context *ctx, const struct device *dev, uint8_
 		LOG_DBG("rx buf count %d len %d", ctx->rx_count, ctx->rx_len);
 
 		if (spi_context_tx_buf_on(ctx)) {
-			last_tx_size = ctx->current_tx->len;
-			ret = spi_sc_send_tx_data(ctx, dev, dfs);
+			ret = spi_sc_send_tx_data(ctx, dev, dfs, &last_tx_size);
 			if (ret < 0) {
 				LOG_ERR("Failed to send the TX data. (%d)", ret);
 				goto end;
