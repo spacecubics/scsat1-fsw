@@ -93,7 +93,7 @@ static int spi_sc_wait_for_idle(const struct device *dev)
 		LOG_ERR("Waiting for the 'SPICTRLDN' interrupt, but it timed out. (%d)", ret);
 	}
 
-	return 0;
+	return ret;
 }
 
 static void spi_sc_isr(const struct device *dev)
