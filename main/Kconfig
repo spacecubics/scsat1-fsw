@@ -2,6 +2,10 @@ mainmenu "SC-Sat1 Main Board"
 
 menu "Application"
 
+module = SCSAT1_MAIN
+module-str = SC-Sat1 Main Board
+source "subsys/logging/Kconfig.template.log_config"
+
 endmenu
 
 menu "Zephyr"
