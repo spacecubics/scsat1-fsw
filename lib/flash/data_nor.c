@@ -49,3 +49,50 @@ int datafs_init(void)
 end:
 	return ret;
 }
+
+int update_boot_count(const char *fname)
+{
+	uint32_t boot_count = 0;
+	struct fs_file_t file;
+	int ret;
+
+	fs_file_t_init(&file);
+
+	ret = fs_open(&file, fname, FS_O_CREATE | FS_O_RDWR);
+	if (ret < 0) {
+		LOG_ERR("Faild to open the boot count file %s (%d)", fname, ret);
+		goto end;
+	}
+
+	ret = fs_read(&file, &boot_count, sizeof(boot_count));
+	if (ret < 0) {
+		LOG_ERR("Faild to read the boot count file %s (%d)", fname, ret);
+		goto close;
+	}
+	LOG_INF("%s read count:%u (bytes: %d)", fname, boot_count, ret);
+
+	ret = fs_seek(&file, 0, FS_SEEK_SET);
+	if (ret < 0) {
+		LOG_ERR("Faild to seek the boot count file %s (%d)", fname, ret);
+		goto close;
+	}
+
+	boot_count++;
+	ret = fs_write(&file, &boot_count, sizeof(boot_count));
+	if (ret < 0) {
+		LOG_ERR("Faild to write the boot count file %s (%d)", fname, ret);
+		goto close;
+	}
+
+	LOG_INF("%s write new boot count %u: (bytes: %d]", fname, boot_count, ret);
+
+close:
+	ret = fs_close(&file);
+	if (ret < 0) {
+		LOG_ERR("Faild to close the boot count file %s (%d)", fname, ret);
+		goto close;
+	}
+
+end:
+	return ret;
+}

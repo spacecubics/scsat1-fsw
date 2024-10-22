@@ -7,3 +7,4 @@
 #pragma once
 
 int datafs_init(void);
+int update_boot_count(const char *fname);
