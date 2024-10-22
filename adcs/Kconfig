@@ -2,6 +2,10 @@ mainmenu "SC-Sat1 ADCS Board"
 
 menu "Application"
 
+module = SCSAT1_ADCS
+module-str = SC-Sat1 ADCS Board
+source "subsys/logging/Kconfig.template.log_config"
+
 endmenu
 
 menu "Zephyr"

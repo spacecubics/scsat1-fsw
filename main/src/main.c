@@ -5,12 +5,15 @@
  */
 
 #include <zephyr/kernel.h>
-#include <csp/csp.h>
+#include "csp.h"
 
 int main(void)
 {
-	csp_init();
+	sc_csp_init();
 
-	printk("Hello World! %s\n", CONFIG_BOARD);
+	while (true) {
+		k_sleep(K_SECONDS(1));
+	}
+
 	return 0;
 }
