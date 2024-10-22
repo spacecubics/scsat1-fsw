@@ -19,12 +19,14 @@
 #include "adcs_init.h"
 #include "loop_test.h"
 #include "syshk_test.h"
+#include "data_nor.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(adcs_main, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 #define CMD_HANDLER_PRIO (0U)
 #define CMD_EXEC_EVENT   (1U)
+#define BOOT_COUNT_FILE  CONFIG_SC_LIB_FLASH_DATA_STORE_MNT_POINT "/boot.count"
 
 char last_cmd[32];
 
@@ -133,11 +135,15 @@ int main(void)
 
 	printk("This is for HW test program for %s\n", CONFIG_BOARD);
 
+	datafs_init();
+
 	start_kick_wdt_thread();
 
 	sc_adcs_print_fpga_ids();
 
 	k_event_init(&exec_event);
+
+	update_boot_count(BOOT_COUNT_FILE);
 
 	ret = csp_enable();
 	if (ret < 0) {
