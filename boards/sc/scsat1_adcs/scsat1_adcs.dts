@@ -220,6 +220,11 @@
 			compatible = "sc,fpgaconf";
 			reg = <0x4f0f0000 0x1000>;
 		};
+
+		fpgamon: fpgamon@4f040000 {
+			compatible = "sc,fpgamon";
+			reg = <0x4f040000 0x1000>;
+		};
 	};
 };
 
