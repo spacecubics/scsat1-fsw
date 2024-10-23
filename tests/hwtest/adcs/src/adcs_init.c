@@ -6,7 +6,7 @@
 
 #include <zephyr/kernel.h>
 #include "pwrctrl_adcs.h"
-#include "sysmon.h"
+#include "sc_fpgamon.h"
 #include "gnss.h"
 #include "imu.h"
 
@@ -18,7 +18,7 @@ int adcs_init(uint32_t *err_cnt)
 	int ret;
 	int all_ret = 0;
 
-	ret = sc_adcs_bhm_enable();
+	ret = sc_bhm_enable();
 	if (ret < 0) {
 		LOG_ERR("Failed to enable the BHM. (%d)", ret);
 		(*err_cnt)++;
@@ -56,7 +56,7 @@ int adcs_off(uint32_t *err_cnt)
 	int ret;
 	int all_ret = 0;
 
-	ret = sc_adcs_bhm_disable();
+	ret = sc_bhm_disable();
 	if (ret < 0) {
 		LOG_ERR("Failed to disble the BHM. (%d)", ret);
 		(*err_cnt)++;

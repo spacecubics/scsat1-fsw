@@ -7,7 +7,7 @@
 #include <zephyr/kernel.h>
 #include "common.h"
 #include "pwrctrl_main.h"
-#include "sysmon.h"
+#include "sc_fpgamon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main_init, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -28,7 +28,7 @@ int main_init(enum hwtest_mode mode, uint32_t *err_cnt)
 
 	test_mode = mode;
 
-	ret = sc_main_bhm_enable();
+	ret = sc_bhm_enable();
 	if (ret < 0) {
 		LOG_ERR("Failed to enable the BHM. (%d)", ret);
 		(*err_cnt)++;
@@ -70,7 +70,7 @@ int main_off(uint32_t *err_cnt)
 	int ret;
 	int all_ret = 0;
 
-	ret = sc_main_bhm_disable();
+	ret = sc_bhm_disable();
 	if (ret < 0) {
 		LOG_ERR("Failed to disable the BHM. (%d)", ret);
 		(*err_cnt)++;

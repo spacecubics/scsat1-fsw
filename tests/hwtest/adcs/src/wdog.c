@@ -5,7 +5,7 @@
  */
 
 #include <zephyr/kernel.h>
-#include "sysmon.h"
+#include "sc_fpgamon.h"
 
 #define WDT_THREAD_STACK_SIZE (256U)
 #define WDT_THREAD_PRIORITY   (0U)
@@ -17,7 +17,7 @@ static void *kick_watchdog_timer(void *p1, void *p2, void *p3)
 	ARG_UNUSED(p3);
 
 	while (true) {
-		sc_adcs_kick_wdt_timer();
+		sc_kick_wdt_timer();
 		k_sleep(K_SECONDS(1));
 	}
 
