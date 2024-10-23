@@ -10,7 +10,6 @@
 #include "common.h"
 #include "csp.h"
 #include "wdog.h"
-#include "sysmon.h"
 #include "temp_test.h"
 #include "cv_test.h"
 #include "imu_test.h"

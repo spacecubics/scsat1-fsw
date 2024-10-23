@@ -8,7 +8,7 @@
 #include "common.h"
 #include "cv.h"
 #include "cv_test.h"
-#include "sysmon.h"
+#include "sc_fpgamon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(cv_test, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -37,7 +37,7 @@ static int cv_obc_test(struct adcs_cv_test_result *cv_ret, uint32_t *err_cnt, bo
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(obc_pos_list); i++) {
-		ret = sc_adcs_bhm_get_obc_cv(obc_pos_list[i], &cv);
+		ret = sc_bhm_get_obc_cv(obc_pos_list[i], &cv);
 		if (ret < 0) {
 			cv_ret->obc_cv[i].data = CV_INVALID_UINT;
 			HWTEST_LOG_ERR(log, "%s: Failed", obc_pos_name[i]);
@@ -70,7 +70,7 @@ static int cv_xadc_test(struct adcs_cv_test_result *cv_ret, uint32_t *err_cnt, b
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(xadc_pos_list); i++) {
-		ret = sc_adcs_bhm_get_xadc_cv(xadc_pos_list[i], &cv);
+		ret = sc_bhm_get_xadc_cv(xadc_pos_list[i], &cv);
 		if (ret < 0) {
 			cv_ret->xadc_cv[i].data = CV_INVALID_FLOAT;
 			HWTEST_LOG_ERR(log, "%s: Failed", xadc_pos_name[i]);

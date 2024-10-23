@@ -8,7 +8,7 @@
 #include "common.h"
 #include "temp.h"
 #include "temp_test.h"
-#include "sysmon.h"
+#include "sc_fpgamon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(temp_test, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -32,7 +32,7 @@ static int temp_obc_test(struct adcs_temp_test_result *temp_ret, uint32_t *err_c
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(obc_pos_list); i++) {
-		ret = sc_adcs_bhm_get_obc_temp(obc_pos_list[i], &temp);
+		ret = sc_bhm_get_obc_temp(obc_pos_list[i], &temp);
 		if (ret < 0) {
 			temp_ret->obc_temp[i].data = TEMP_INVLAID_FLOAT;
 			HWTEST_LOG_ERR(log, "%s Temperature: Failed", obc_pos_name[i]);
@@ -54,7 +54,7 @@ static int temp_xadc_test(struct adcs_temp_test_result *temp_ret, uint32_t *err_
 	int ret;
 	float temp;
 
-	ret = sc_adcs_bhm_get_xadc_temp(&temp);
+	ret = sc_bhm_get_xadc_temp(&temp);
 	if (ret < 0) {
 		temp_ret->xadc_temp.data = TEMP_INVLAID_FLOAT;
 		HWTEST_LOG_ERR(log, "OBC XADC Temperature: Failed");
