@@ -1,0 +1,23 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_FPGAMON
+	bool "Space Cubics FPGA System Monitor Register driver"
+	default y
+	depends on DT_HAS_SC_FPGAMON_ENABLED
+	help
+	  Enable Space Cubics FPGA System Monitor Register driver.
+
+if SC_FPGAMON
+
+config SC_FPGAMON_INIT_PRIORITY
+	int "Init priority"
+	default 50
+	help
+	   FPGA System Monitor Register driver initialization priority.
+
+module = SC_FPGAMON
+module-str = Space Cubics FPGA System Monitor Register driver
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
