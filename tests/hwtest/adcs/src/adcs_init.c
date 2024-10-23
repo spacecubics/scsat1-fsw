@@ -5,7 +5,7 @@
  */
 
 #include <zephyr/kernel.h>
-#include "pwrctrl.h"
+#include "pwrctrl_adcs.h"
 #include "sysmon.h"
 #include "gnss.h"
 #include "imu.h"

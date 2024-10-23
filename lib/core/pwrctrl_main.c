@@ -6,7 +6,7 @@
 
 #include <zephyr/kernel.h>
 #include "sc_dstrx3.h"
-#include "pwrctrl.h"
+#include "pwrctrl_main.h"
 
 /* Registers */
 #define SC_MAIN_SYSREG_BASE_ADDR (0x4F000000)

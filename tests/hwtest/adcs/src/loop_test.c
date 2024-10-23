@@ -8,7 +8,7 @@
 #include <zephyr/kernel.h>
 #include "common.h"
 #include "loop_test.h"
-#include "pwrctrl.h"
+#include "pwrctrl_adcs.h"
 #include "temp_test.h"
 #include "cv_test.h"
 #include "imu_test.h"

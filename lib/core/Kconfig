@@ -1,0 +1,10 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_SCSAT1_MAIN
+rsource "Kconfig.main"
+endif
+
+if BOARD_SCSAT1_ADCS
+rsource "Kconfig.adcs"
+endif
