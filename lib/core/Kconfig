@@ -1,6 +1,34 @@
 # Copyright (c) 2024 Space Cubics, LLC.
 # SPDX-License-Identifier: Apache-2.0
 
+menuconfig SC_LIB_CORE
+	bool "Space Cubics Core libraries"
+	default y
+	help
+	  Enable Space Cubics Core libraries.
+
+if SC_LIB_CORE
+
+config SC_LIB_CORE_WDOG_KICK_INTERVAL_SEC
+	int "Watchdog timer kicking interval (seconds)"
+	default 60
+	help
+	  Watchdog timer kicking interval (seconds).
+
+config SC_LIB_CORE_WDOG_THREAD_PRIORITY
+	int "Watchdog timer kicking thread priority"
+	default 0
+	help
+	  Watchdog timer kicking thread priority.
+
+config SC_LIB_CORE_WDOG_THREAD_STACK_SIZE
+	int "Watchdog timer kicking thread stack size"
+	default 256
+	help
+	  Watchdog timer kicking thread stack size.
+
+endif
+
 if BOARD_SCSAT1_MAIN
 rsource "Kconfig.main"
 endif
