@@ -23,6 +23,9 @@
 #include "loop_test.h"
 #include "syshk_test.h"
 #include "data_nor.h"
+#include "sc_fpgaconf.h"
+#include "sc_fpgasys.h"
+#include "version.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(main, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -37,6 +40,17 @@ K_THREAD_STACK_DEFINE(cmd_thread_stack, 2048);
 static struct k_thread cmd_thread;
 static struct k_event exec_event;
 extern struct k_event loop_event;
+
+static void sc_main_print_fpga_ids(void)
+{
+	LOG_INF("* FSW Version       : %s", MAIN_HWTEST_VERSION);
+	LOG_INF("* Boot CFG Memory   : %d", sc_get_boot_cfgmem());
+	LOG_INF("* FPGA Boot Status  : 0x%x", sc_fpgaconf_get_bootsts());
+	LOG_INF("* IP Version        : %08x", sc_get_fpga_ip_ver());
+	LOG_INF("* Build Information : %08x", sc_get_fpga_build_hash());
+	LOG_INF("* Device DNA 1      : %08x", sc_get_fpga_dna_1());
+	LOG_INF("* Device DNA 2      : %08x",sc_get_fpga_dna_2());
+}
 
 static void cmd_handler(void *p1, void *p2, void *p3)
 {

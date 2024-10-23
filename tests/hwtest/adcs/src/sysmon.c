@@ -6,8 +6,6 @@
 
 #include <zephyr/kernel.h>
 #include "sysmon.h"
-#include "version.h"
-#include "sc_fpgaconf.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sysmon, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -347,23 +345,6 @@ void sc_adcs_kick_wdt_timer(void)
 
 	reg = sys_read32(SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_WDOG_CTRL_OFFSET);
 	sys_write32(reg, SC_ADCS_SYSMON_BASE_ADDR + SC_ADCS_SYSMON_WDOG_CTRL_OFFSET);
-}
-
-void sc_adcs_print_fpga_ids(void)
-{
-	LOG_INF("* FSW Version       : %s", ADCS_HWTEST_VERSION);
-	LOG_INF("* Boot CFG Memory   : %d",
-		SC_ADCS_SYSREG_CFGBOOTMEM(
-			sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_CFGMEMCTL_OFFSET)));
-	LOG_INF("* FPGA Boot Status  : 0x%x", sc_fpgaconf_get_bootsts());
-	LOG_INF("* IP Version        : %08x",
-		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_VER_OFFSET));
-	LOG_INF("* Build Information : %08x",
-		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_BUILDINFO_OFFSET));
-	LOG_INF("* Device DNA 1      : %08x",
-		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA1_OFFSET));
-	LOG_INF("* Device DNA 2      : %08x",
-		sys_read32(SC_ADCS_SYSREG_BASE_ADDR + SC_ADCS_SYSREG_DNA2_OFFSET));
 }
 
 int sc_adcs_bhm_enable(void)
