@@ -78,6 +78,26 @@ void sc_select_codemem(enum sc_codemem mem)
 	sys_write32(SCOBCA1_SYSREG_MAGIC | mem, SCOBCA1_SYSREG_CODEMSEL);
 }
 
+uint32_t sc_get_fpga_ip_ver(void)
+{
+	return sys_read32(SCOBCA1_SYSREG_VER);
+}
+
+uint32_t sc_get_fpga_build_hash(void)
+{
+	return sys_read32(SCOBCA1_SYSREG_BUILDINFO);
+}
+
+uint32_t sc_get_fpga_dna_1(void)
+{
+	return sys_read32(SCOBCA1_SYSREG_DNA1);
+}
+
+uint32_t sc_get_fpga_dna_2(void)
+{
+	return sys_read32(SCOBCA1_SYSREG_DNA1);
+}
+
 static int sc_fpgasys_init(void)
 {
 	return 0;

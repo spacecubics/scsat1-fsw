@@ -18,6 +18,10 @@ enum sc_cfgmem {
 	SC_CFG_MEM_1 = 1,
 };
 
+uint32_t sc_get_fpga_ip_ver(void);
+uint32_t sc_get_fpga_build_hash(void);
+uint32_t sc_get_fpga_dna_1(void);
+uint32_t sc_get_fpga_dna_2(void);
 enum sc_cfgmem sc_get_boot_cfgmem(void);
 enum sc_cfgmem sc_get_cfgmem(void);
 int sc_select_cfgmem(enum sc_cfgmem);

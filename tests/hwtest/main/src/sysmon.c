@@ -6,14 +6,11 @@
 
 #include <zephyr/kernel.h>
 #include "sysmon.h"
-#include "version.h"
-#include "sc_fpgaconf.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sysmon, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 /* Registers */
-#define SC_MAIN_SYSREG_BASE_ADDR (0x4F000000) /* System Register */
 #define SC_MAIN_SYSMON_BASE_ADDR (0x4F040000) /* Systemo Monitor */
 #define SC_MAIN_GPT_BASE_ADDR    (0x4F050000) /* General Purpose Timer */
 
@@ -335,23 +332,6 @@ void sc_main_kick_wdt_timer(void)
 
 	reg = sys_read32(SC_MAIN_SYSMON_BASE_ADDR + SC_MAIN_SYSMON_WDOG_CTRL_OFFSET);
 	sys_write32(reg, SC_MAIN_SYSMON_BASE_ADDR + SC_MAIN_SYSMON_WDOG_CTRL_OFFSET);
-}
-
-void sc_main_print_fpga_ids(void)
-{
-	LOG_INF("* FSW Version       : %s", MAIN_HWTEST_VERSION);
-	LOG_INF("* Boot CFG Memory   : %d",
-		SC_MAIN_SYSREG_CFGBOOTMEM(
-			sys_read32(SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_SYSREG_CFGMEMCTL_OFFSET)));
-	LOG_INF("* FPGA Boot Status  : 0x%x", sc_fpgaconf_get_bootsts());
-	LOG_INF("* IP Version        : %08x",
-		sys_read32(SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_SYSREG_VER_OFFSET));
-	LOG_INF("* Build Information : %08x",
-		sys_read32(SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_SYSREG_BUILDINFO_OFFSET));
-	LOG_INF("* Device DNA 1      : %08x",
-		sys_read32(SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_SYSREG_DNA1_OFFSET));
-	LOG_INF("* Device DNA 2      : %08x",
-		sys_read32(SC_MAIN_SYSREG_BASE_ADDR + SC_MAIN_SYSREG_DNA2_OFFSET));
 }
 
 int sc_main_bhm_enable(void)
