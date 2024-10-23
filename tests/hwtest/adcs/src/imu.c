@@ -6,7 +6,7 @@
 
 #include <zephyr/drivers/spi.h>
 #include <zephyr/sys/byteorder.h>
-#include "pwrctrl.h"
+#include "pwrctrl_adcs.h"
 #include "imu.h"
 
 #include <zephyr/logging/log.h>

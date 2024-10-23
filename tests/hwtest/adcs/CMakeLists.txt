@@ -10,7 +10,6 @@ project(scsat1-adcs)
 
 target_sources(app PRIVATE src/main.c)
 target_sources(app PRIVATE src/wdog.c)
-target_sources(app PRIVATE src/pwrctrl.c)
 target_sources(app PRIVATE src/sysmon.c)
 target_sources(app PRIVATE src/temp.c)
 target_sources(app PRIVATE src/temp_test.c)

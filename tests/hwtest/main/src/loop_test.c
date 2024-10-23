@@ -7,7 +7,7 @@
 #include <zephyr/kernel.h>
 #include "common.h"
 #include "loop_test.h"
-#include "pwrctrl.h"
+#include "pwrctrl_main.h"
 #include "temp_test.h"
 #include "cv_test.h"
 #include "csp_test.h"

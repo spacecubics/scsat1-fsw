@@ -7,7 +7,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "pwrctrl.h"
+#include "pwrctrl_adcs.h"
 
 #define RW_MAX_POTENTION  (0x7F)
 #define RW_HALF_POTENTION (0x40)

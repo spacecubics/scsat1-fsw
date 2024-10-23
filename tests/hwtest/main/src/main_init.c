@@ -6,7 +6,7 @@
 
 #include <zephyr/kernel.h>
 #include "common.h"
-#include "pwrctrl.h"
+#include "pwrctrl_main.h"
 #include "sysmon.h"
 
 #include <zephyr/logging/log.h>

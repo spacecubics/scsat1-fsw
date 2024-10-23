@@ -3,6 +3,7 @@
 
 menu "Space Cubics Libraries"
 
+rsource "core/Kconfig"
 rsource "flash/Kconfig"
 
 endmenu
