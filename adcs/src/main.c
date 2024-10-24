@@ -6,9 +6,12 @@
 
 #include <zephyr/kernel.h>
 #include "csp.h"
+#include "wdog.h"
 
 int main(void)
 {
+	start_kick_wdt_thread();
+
 	sc_csp_init();
 
 	while (true) {
