@@ -10,3 +10,4 @@ project(scsat1-main)
 
 target_sources(app PRIVATE src/main.c)
 target_sources(app PRIVATE src/csp.c)
+target_sources(app PRIVATE src/cmd/handler.c)

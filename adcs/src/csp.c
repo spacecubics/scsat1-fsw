@@ -10,6 +10,7 @@
 #include <csp/drivers/can_zephyr.h>
 #include <zephyr/device.h>
 #include "sc_csp.h"
+#include "cmd/handler.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(csp, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -20,8 +21,6 @@ LOG_MODULE_REGISTER(csp, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 #define SERVER_PRIO       (0U)
 
 static csp_iface_t *can_iface = NULL;
-
-void server();
 
 static void *router_task(void *param)
 {
@@ -38,7 +37,7 @@ static void *server_task(void *p1, void *p2, void *p3)
 	ARG_UNUSED(p2);
 	ARG_UNUSED(p3);
 
-	server();
+	csp_cmd_handler();
 
 	return NULL; }
 
@@ -58,38 +57,6 @@ static void server_start(void)
 }
 
 extern csp_conf_t csp_conf;
-
-void server(void)
-{
-	LOG_INF("Server task started");
-
-	csp_socket_t sock = {0};
-
-	csp_bind(&sock, CSP_ANY);
-
-	csp_listen(&sock, 10);
-
-	while (true) {
-
-		csp_conn_t *conn;
-		if ((conn = csp_accept(&sock, 10000)) == NULL) {
-			continue;
-		}
-
-		csp_packet_t *packet;
-		while ((packet = csp_read(conn, 50)) != NULL) {
-			switch (csp_conn_dport(conn)) {
-			default:
-				csp_service_handler(packet);
-				break;
-			}
-		}
-
-		csp_close(conn);
-	}
-
-	return;
-}
 
 int sc_csp_init(void)
 {
