@@ -5,9 +5,12 @@
  */
 
 #include <csp/csp.h>
+#include "pwrctrl.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
+
+#define CSP_PORT_ADCS_PWRCTRL (12U)
 
 void csp_cmd_handler(void)
 {
@@ -29,6 +32,9 @@ void csp_cmd_handler(void)
 		csp_packet_t *packet;
 		while ((packet = csp_read(conn, 50)) != NULL) {
 			switch (csp_conn_dport(conn)) {
+			case CSP_PORT_ADCS_PWRCTRL:
+				csp_pwrctrl_handler(packet);
+				break;
 			default:
 				csp_service_handler(packet);
 				break;
