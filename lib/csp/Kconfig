@@ -42,7 +42,7 @@ config SC_LIB_CSP_FILE_THREAD_STACK_SIZE
 
 config SC_LIB_CSP_MAX_FILE_WORK
 	int "MAX number of file operation work"
-	default 10
+	default 50
 	help
 	  MAX number of file operation work.
 
@@ -64,6 +64,18 @@ config SC_LIB_CSP_UPLOAD_MAX_SESSION
 	help
 	  Maximum session number for upload.
 	  It must be the same as or smaller than CONFIG_ZVFS_OPEN_MAX.
+
+config SC_LIB_CSP_UPLOAD_DATA_LEN
+	int "Data length for upload"
+	default 200
+	help
+	  Data length for upload.
+
+config CS_LIB_CSP_UPLOAD_DATA_REPLY_ENTRY
+	int "Entry number of upload data command reply"
+	default 20
+	help
+	  Entry number of upload data command reply.
 
 module = SC_LIB_CSP
 module-str = Space Cubics CSP libraries
