@@ -8,6 +8,7 @@ zephyr_library_sources_ifdef(CONFIG_SC_LIB_CSP file.c)
 zephyr_library_sources_ifdef(CONFIG_SC_LIB_CSP flash.c)
 zephyr_library_sources_ifdef(CONFIG_SC_LIB_CSP eps.c)
 zephyr_library_sources_ifdef(CONFIG_SC_LIB_CSP sys.c)
+zephyr_library_sources_ifdef(CONFIG_SC_LIB_CSP upload.c)
 
 zephyr_include_directories(.)
 

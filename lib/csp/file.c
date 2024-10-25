@@ -10,6 +10,7 @@
 #include "file.h"
 #include "sc_csp.h"
 #include "reply.h"
+#include "upload.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(file, CONFIG_SC_LIB_CSP_LOG_LEVEL);
@@ -30,8 +31,9 @@ struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 #define FILE_REMOVE_CMD_SIZE (1U) /* without file name length */
 
 /* Command ID */
-#define FILE_INFO_CMD   (0U)
-#define FILE_REMOVE_CMD (1U)
+#define FILE_INFO_CMD        (0U)
+#define FILE_REMOVE_CMD      (1U)
+#define FILE_UPLOAD_OPEN_CMD (2U)
 
 /* Command argument offset */
 #define FILE_CRC_OFFSET   (1U)
@@ -215,6 +217,9 @@ static void csp_file_work(struct k_work *work)
 		break;
 	case FILE_REMOVE_CMD:
 		csp_file_remove_cmd(command_id, packet);
+		break;
+	case FILE_UPLOAD_OPEN_CMD:
+		csp_file_upload_open_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);

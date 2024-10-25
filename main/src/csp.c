@@ -13,6 +13,7 @@
 #include "sc_csp.h"
 #include "flash.h"
 #include "file.h"
+#include "upload.h"
 #include "cmd/handler.h"
 
 #include <zephyr/logging/log.h>
@@ -112,6 +113,7 @@ int sc_csp_init(void)
 
 	csp_flash_handler_init();
 	csp_file_handler_init();
+	csp_upload_handler_init();
 end:
 	return ret;
 }
