@@ -6,6 +6,34 @@ module = SCSAT1_ADCS
 module-str = SC-Sat1 ADCS Board
 source "subsys/logging/Kconfig.template.log_config"
 
+menu "Thread"
+
+config SCSAT1_ADCS_CSP_ROUTER_THREAD_PRIORITY
+	int "CSP router thread priority"
+	default 0
+	help
+	  CSP router thread priority.
+
+config SCSAT1_ADCS_CSP_ROUTER_THREAD_STACK_SIZE
+	int "CSP router thread stack size"
+	default 256
+	help
+	  CSP router thread stack size.
+
+config SCSAT1_ADCS_CSP_SERVER_THREAD_PRIORITY
+	int "CSP server thread priority"
+	default 0
+	help
+	  CSP server thread priority.
+
+config SCSAT1_ADCS_CSP_SERVER_THREAD_STACK_SIZE
+	int "CSP server thread stack size"
+	default 1024
+	help
+	  CSP server thread stack size.
+
+endmenu
+
 endmenu
 
 menu "Zephyr"

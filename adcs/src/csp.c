@@ -15,11 +15,6 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(csp, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
-#define ROUTER_STACK_SIZE (256U)
-#define SERVER_STACK_SIZE (1024U)
-#define ROUTER_PRIO       (0U)
-#define SERVER_PRIO       (0U)
-
 static csp_iface_t *can_iface = NULL;
 
 static void *router_task(void *param)
@@ -41,10 +36,10 @@ static void *server_task(void *p1, void *p2, void *p3)
 
 	return NULL; }
 
-K_THREAD_DEFINE(router_id, ROUTER_STACK_SIZE, router_task, NULL, NULL, NULL, ROUTER_PRIO, 0,
-		K_TICKS_FOREVER);
-K_THREAD_DEFINE(server_id, SERVER_STACK_SIZE, server_task, NULL, NULL, NULL, SERVER_PRIO, 0,
-		K_TICKS_FOREVER);
+K_THREAD_DEFINE(router_id, CONFIG_SCSAT1_ADCS_CSP_ROUTER_THREAD_STACK_SIZE, router_task, NULL, NULL,
+		NULL, CONFIG_SCSAT1_ADCS_CSP_ROUTER_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
+K_THREAD_DEFINE(server_id, CONFIG_SCSAT1_ADCS_CSP_SERVER_THREAD_STACK_SIZE, server_task, NULL, NULL,
+		NULL, CONFIG_SCSAT1_ADCS_CSP_SERVER_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
 
 static void router_start(void)
 {
