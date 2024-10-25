@@ -58,6 +58,13 @@ config SC_LIB_CSP_CRC_CALC_SLEEP_MSEC
 	help
 	  Sleep time for CRC32 calculation (msec).
 
+config SC_LIB_CSP_UPLOAD_MAX_SESSION
+	int "Maximum session number for upload"
+	default ZVFS_OPEN_MAX
+	help
+	  Maximum session number for upload.
+	  It must be the same as or smaller than CONFIG_ZVFS_OPEN_MAX.
+
 module = SC_LIB_CSP
 module-str = Space Cubics CSP libraries
 source "subsys/logging/Kconfig.template.log_config"
