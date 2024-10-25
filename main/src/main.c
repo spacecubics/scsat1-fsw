@@ -7,10 +7,13 @@
 #include <zephyr/kernel.h>
 #include "csp.h"
 #include "wdog.h"
+#include "data_nor.h"
 
 int main(void)
 {
 	start_kick_wdt_thread();
+
+	datafs_init();
 
 	sc_csp_init();
 
