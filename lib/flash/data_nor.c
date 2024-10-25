@@ -10,10 +10,10 @@
 #include <zephyr/device.h>
 #include <zephyr/fs/fs.h>
 #include <zephyr/fs/littlefs.h>
-#include <zephyr/logging/log.h>
 #include <zephyr/storage/flash_map.h>
 
-LOG_MODULE_REGISTER(lfs);
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(data_nor, CONFIG_SC_LIB_FLASH_LOG_LEVEL);
 
 FS_LITTLEFS_DECLARE_DEFAULT_CONFIG(storage);
 static struct fs_mount_t lfs_storage_mnt = {
