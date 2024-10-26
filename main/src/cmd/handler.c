@@ -6,8 +6,10 @@
 
 #include <csp/csp.h>
 #include "pwrctrl.h"
+#include "file.h"
 
 #define CSP_PORT_MAIN_PWRCTRL (12U)
+#define CSP_PORT_MAIN_FILE    (13U)
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -34,6 +36,9 @@ void csp_cmd_handler(void)
 			switch (csp_conn_dport(conn)) {
 			case CSP_PORT_MAIN_PWRCTRL:
 				csp_pwrctrl_handler(packet);
+				break;
+			case CSP_PORT_MAIN_FILE:
+				csp_file_handler(packet);
 				break;
 			default:
 				csp_service_handler(packet);
