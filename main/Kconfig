@@ -28,7 +28,7 @@ config SCSAT1_MAIN_CSP_SERVER_THREAD_PRIORITY
 
 config SCSAT1_MAIN_CSP_SERVER_THREAD_STACK_SIZE
 	int "CSP server thread stack size"
-	default 1024
+	default 2048
 	help
 	  CSP server thread stack size.
 
