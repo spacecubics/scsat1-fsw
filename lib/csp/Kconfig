@@ -10,6 +10,12 @@ menuconfig SC_LIB_CSP
 
 if SC_LIB_CSP
 
+config SC_LIB_CSP_FILE_NAME_MAX_LEN
+	int "File name max length for csp commands"
+	default 64
+	help
+	  File name max length for csp commands
+
 module = SC_LIB_CSP
 module-str = Space Cubics CSP libraries
 source "subsys/logging/Kconfig.template.log_config"
