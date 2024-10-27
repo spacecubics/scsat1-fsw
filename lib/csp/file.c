@@ -14,11 +14,13 @@
 LOG_MODULE_REGISTER(file, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 
 /* Command size */
-#define FILE_CMD_MIN_SIZE  (1U)
-#define FILE_INFO_CMD_SIZE (1U) /* without file name length */
+#define FILE_CMD_MIN_SIZE    (1U)
+#define FILE_INFO_CMD_SIZE   (1U) /* without file name length */
+#define FILE_REMOVE_CMD_SIZE (1U) /* without file name length */
 
 /* Command ID */
-#define FILE_INFO_CMD (0U)
+#define FILE_INFO_CMD   (0U)
+#define FILE_REMOVE_CMD (1U)
 
 /* Command argument offset */
 #define FILE_FNAME_OFFSET (1U)
@@ -85,6 +87,29 @@ end:
 	return ret;
 }
 
+static int csp_file_remove_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret = 0;
+	char fname[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN];
+
+	if (packet->length != FILE_REMOVE_CMD_SIZE + CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN) {
+		LOG_ERR("Invalide command size: %d", packet->length);
+		ret = -EINVAL;
+		goto end;
+	}
+
+	strncpy(fname, &packet->data[FILE_FNAME_OFFSET], CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN);
+	fname[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN - 1] = '\0';
+
+	LOG_INF("File remove command (fname: %s)", fname);
+
+	ret = fs_unlink(fname);
+
+end:
+	csp_send_std_reply(packet, command_id, ret);
+	return ret;
+}
+
 int csp_file_handler(csp_packet_t *packet)
 {
 	int ret;
@@ -106,6 +131,9 @@ int csp_file_handler(csp_packet_t *packet)
 	switch (command_id) {
 	case FILE_INFO_CMD:
 		csp_file_info_cmd(command_id, packet);
+		break;
+	case FILE_REMOVE_CMD:
+		csp_file_remove_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
