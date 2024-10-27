@@ -16,8 +16,9 @@
 LOG_MODULE_REGISTER(upload, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 
 /* Command size */
-#define UPLOAD_OPEN_CMD_SIZE (3U)  /* without file name length */
-#define UPLOAD_DATA_CMD_SIZE (11U) /* without data length */
+#define UPLOAD_OPEN_CMD_SIZE  (3U)  /* without file name length */
+#define UPLOAD_DATA_CMD_SIZE  (11U) /* without data length */
+#define UPLOAD_CLOSE_CMD_SIZE (3U)
 
 /* Command argument offset */
 #define UPLOAD_SID_OFFSET   (1U)
@@ -140,6 +141,21 @@ static void csp_stack_upload_data_reply(struct session_entry *session, uint8_t c
 	session->reply_count++;
 }
 
+static void csp_send_upload_close_reply(csp_packet_t *packet, uint8_t command_id, int err_code,
+					uint16_t session_id)
+{
+	struct upload_close_reply_telemetry tlm;
+
+	tlm.telemetry_id = command_id;
+	tlm.error_code = sys_cpu_to_le32(err_code);
+	tlm.session_id = sys_cpu_to_le16(session_id);
+
+	memcpy(packet->data, &tlm, sizeof(tlm));
+	packet->length = sizeof(tlm);
+
+	csp_sendto_reply(packet, packet, CSP_O_SAME);
+}
+
 static int csp_open_upload_file(uint16_t session_id, const char *fname)
 {
 	struct session_entry *session;
@@ -189,6 +205,29 @@ static int csp_write_upload_file(struct session_entry *session, uint32_t offset,
 	if (ret < 0) {
 		LOG_ERR("Faild to write the upload file %s (%d)", session->fname, ret);
 	}
+
+end:
+	return ret;
+}
+
+static int csp_close_upload_file(uint16_t session_id)
+{
+	struct session_entry *session;
+	int ret;
+
+	session = search_used_session(session_id);
+	if (session == NULL) {
+		LOG_ERR("This session ID is not used (%d)", session_id);
+		ret = -ENOENT;
+		goto end;
+	}
+
+	ret = fs_close(&session->file);
+	if (ret < 0) {
+		LOG_ERR("Faild to close the upload file %s (%d)", session->fname, ret);
+	}
+
+	release_session(session);
 
 end:
 	return ret;
@@ -277,5 +316,27 @@ end:
 		csp_send_upload_data_err_reply(packet, command_id, ret, session_id, offset, size);
 	}
 
+	return ret;
+}
+
+int csp_file_upload_close_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret = 0;
+	uint16_t session_id = 0;
+
+	if (packet->length != UPLOAD_CLOSE_CMD_SIZE) {
+		LOG_ERR("Invalide command size: %d", packet->length);
+		ret = -EINVAL;
+		goto end;
+	}
+
+	session_id = sys_le16_to_cpu(*(uint16_t *)&packet->data[UPLOAD_SID_OFFSET]);
+
+	LOG_INF("Upload (CLOSE) command (session_id: %d)", session_id);
+
+	ret = csp_close_upload_file(session_id);
+
+end:
+	csp_send_upload_close_reply(packet, command_id, ret, session_id);
 	return ret;
 }
