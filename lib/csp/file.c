@@ -31,10 +31,11 @@ struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 #define FILE_REMOVE_CMD_SIZE (1U) /* without file name length */
 
 /* Command ID */
-#define FILE_INFO_CMD        (0U)
-#define FILE_REMOVE_CMD      (1U)
-#define FILE_UPLOAD_OPEN_CMD (2U)
-#define FILE_UPLOAD_DATA_CMD (3U)
+#define FILE_INFO_CMD         (0U)
+#define FILE_REMOVE_CMD       (1U)
+#define FILE_UPLOAD_OPEN_CMD  (2U)
+#define FILE_UPLOAD_DATA_CMD  (3U)
+#define FILE_UPLOAD_CLOSE_CMD (4U)
 
 /* Command argument offset */
 #define FILE_CRC_OFFSET   (1U)
@@ -224,6 +225,9 @@ static void csp_file_work(struct k_work *work)
 		break;
 	case FILE_UPLOAD_DATA_CMD:
 		csp_file_upload_data_cmd(command_id, packet);
+		break;
+	case FILE_UPLOAD_CLOSE_CMD:
+		csp_file_upload_close_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);

@@ -27,6 +27,13 @@ struct upload_data_reply_telemetry {
 	struct upload_data_reply_entry entry[CONFIG_CS_LIB_CSP_UPLOAD_DATA_REPLY_ENTRY];
 } __attribute__((__packed__));
 
+struct upload_close_reply_telemetry {
+	uint8_t telemetry_id;
+	uint32_t error_code;
+	uint16_t session_id;
+} __attribute__((__packed__));
+
 void csp_upload_handler_init(void);
 int csp_file_upload_open_cmd(uint8_t command_id, csp_packet_t *packet);
 int csp_file_upload_data_cmd(uint8_t command_id, csp_packet_t *packet);
+int csp_file_upload_close_cmd(uint8_t command_id, csp_packet_t *packet);
