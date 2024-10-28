@@ -15,9 +15,11 @@ LOG_MODULE_REGISTER(pwrctrl, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 /* Command size */
 #define PWRCTRL_CMD_MIN_SIZE   (1U)
 #define PWRCTRL_ONOFF_CMD_SIZE (3U)
+#define PWRCTRL_CYCLE_CMD_SIZE (1U)
 
 /* Command ID */
 #define PWRCTRL_ONOFF_CMD (0U)
+#define PWRCTRL_CYCLE_CMD (1U)
 
 /* Command argument offset */
 #define PWRCTRL_TARGET_OFFSET (1U)
@@ -51,6 +53,23 @@ end:
 	return ret;
 }
 
+static int csp_power_cycle_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret = 0;
+
+	if (packet->length != PWRCTRL_CYCLE_CMD_SIZE) {
+		LOG_ERR("Invalide command size: %d", packet->length);
+		ret = -EINVAL;
+		goto end;
+	}
+
+	sc_main_power_cycle_req();
+
+end:
+	csp_send_std_reply(packet, command_id, ret);
+	return ret;
+}
+
 int csp_pwrctrl_handler(csp_packet_t *packet)
 {
 	int ret;
@@ -72,6 +91,9 @@ int csp_pwrctrl_handler(csp_packet_t *packet)
 	switch (command_id) {
 	case PWRCTRL_ONOFF_CMD:
 		csp_power_control_onoff_cmd(command_id, packet);
+		break;
+	case PWRCTRL_CYCLE_CMD:
+		csp_power_cycle_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
