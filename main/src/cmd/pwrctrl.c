@@ -72,7 +72,7 @@ end:
 
 int csp_pwrctrl_handler(csp_packet_t *packet)
 {
-	int ret;
+	int ret = 0;
 	uint8_t command_id;
 
 	if (packet == NULL) {
@@ -82,8 +82,9 @@ int csp_pwrctrl_handler(csp_packet_t *packet)
 
 	if (packet->length < PWRCTRL_CMD_MIN_SIZE) {
 		LOG_ERR("Invalide command size: %d", packet->length);
-		ret = -EINVAL;
-		goto free;
+		command_id = CSP_UNKNOWN_CMD_CODE;
+		ret = -EMSGSIZE;
+		goto reply;
 	}
 
 	command_id = packet->data[CSP_COMMAND_ID_OFFSET];
@@ -97,12 +98,16 @@ int csp_pwrctrl_handler(csp_packet_t *packet)
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
+		command_id = CSP_UNKNOWN_CMD_CODE;
 		ret = -EINVAL;
 		break;
 	}
 
-free:
-	csp_buffer_free(packet);
+reply:
+	if (ret < 0) {
+		csp_send_std_reply(packet, command_id, ret);
+		csp_buffer_free(packet);
+	}
 
 end:
 	return ret;
