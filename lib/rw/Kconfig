@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_RW
+	bool "Space Cubics Reaction Wheel libraries"
+	default y
+	depends on BOARD_SCSAT1_ADCS
+	help
+	  Enable Space Cubics Reaction Wheel libraries.
+
+if SC_LIB_RW
+
+module = SC_LIB_RW
+module-str = Space Cubics Reaction Wheel libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif

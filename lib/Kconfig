@@ -11,5 +11,6 @@ rsource "mgnm/Kconfig"
 rsource "mtq/Kconfig"
 rsource "gnss/Kconfig"
 rsource "imu/Kconfig"
+rsource "rw/Kconfig"
 
 endmenu
