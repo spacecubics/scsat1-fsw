@@ -6,7 +6,7 @@
 
 #include <zephyr/kernel.h>
 #include "common.h"
-#include "cv.h"
+#include "cv_main.h"
 #include "sc_fpgamon.h"
 #include "cv_test.h"
 

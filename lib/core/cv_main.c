@@ -6,10 +6,10 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/i2c.h>
-#include "cv.h"
+#include "cv_main.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(cv, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
+LOG_MODULE_REGISTER(cv, CONFIG_SC_LIB_CORE_MAIN_LOG_LEVEL);
 
 #define CV_ADDR (0x42)
 
