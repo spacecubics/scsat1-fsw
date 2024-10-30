@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_IMU
+	bool "Space Cubics IMU libraries"
+	default y
+	depends on BOARD_SCSAT1_ADCS
+	help
+	  Enable Space Cubics IMU libraries.
+
+if SC_LIB_IMU
+
+module = SC_LIB_IMU
+module-str = Space Cubics IMU libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
