@@ -1,0 +1,18 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_MTQ
+	bool "Space Cubics Magnetic Torquer libraries"
+	default y
+	depends on DT_HAS_SC_I2C_ENABLED
+	depends on BOARD_SCSAT1_MAIN
+	help
+	  Enable Space Cubics Magnetic Torquer libraries.
+
+if SC_LIB_MTQ
+
+module = SC_LIB_MTQ
+module-str = Space Cubics Magnetic Torquer libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
