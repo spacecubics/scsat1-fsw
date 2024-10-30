@@ -6,7 +6,7 @@
 
 #include <zephyr/sys/util.h>
 #include "common.h"
-#include "temp.h"
+#include "temp_main.h"
 #include "temp_test.h"
 #include "sc_fpgamon.h"
 
