@@ -1,0 +1,18 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_MGNM
+	bool "Space Cubics Magnetometer libraries"
+	default y
+	depends on DT_HAS_SC_I2C_ENABLED
+	depends on BOARD_SCSAT1_MAIN
+	help
+	  Enable Space Cubics Magnetometer libraries.
+
+if SC_LIB_MGNM
+
+module = SC_LIB_MGNM
+module-str = Space Cubics Magnetometer libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
