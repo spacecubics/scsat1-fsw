@@ -6,7 +6,7 @@
 
 #include <zephyr/drivers/i2c.h>
 #include "rw.h"
-#include "cv.h"
+#include "cv_adcs.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(rw, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
