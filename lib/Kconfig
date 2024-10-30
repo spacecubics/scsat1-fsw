@@ -9,5 +9,6 @@ rsource "csp/Kconfig"
 rsource "sunsens/Kconfig"
 rsource "mgnm/Kconfig"
 rsource "mtq/Kconfig"
+rsource "gnss/Kconfig"
 
 endmenu

@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_GNSS
+	bool "Space Cubics GNSS libraries"
+	default y
+	depends on BOARD_SCSAT1_ADCS
+	help
+	  Enable Space Cubics GNSS libraries.
+
+if SC_LIB_GNSS
+
+module = SC_LIB_GNSS
+module-str = Space Cubics GNSS libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
