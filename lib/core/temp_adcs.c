@@ -5,10 +5,10 @@
  */
 
 #include <zephyr/drivers/i2c.h>
-#include "temp.h"
+#include "temp_adcs.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(temp, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
+LOG_MODULE_REGISTER(temp, CONFIG_SC_LIB_CORE_ADCS_LOG_LEVEL);
 
 #define ADCS_TEMP_REG (0x00)
 
