@@ -9,7 +9,7 @@
 #include "mgnm.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(mgnm, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
+LOG_MODULE_REGISTER(mgnm, CONFIG_SC_LIB_MGNM_LOG_LEVEL);
 
 #define MGNM_SLAVE_ADDR  (0x30)
 #define MGNM_XOUTL_REG   (0x00)

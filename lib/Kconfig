@@ -7,5 +7,6 @@ rsource "core/Kconfig"
 rsource "flash/Kconfig"
 rsource "csp/Kconfig"
 rsource "sunsens/Kconfig"
+rsource "mgnm/Kconfig"
 
 endmenu

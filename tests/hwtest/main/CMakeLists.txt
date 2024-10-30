@@ -9,7 +9,6 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(scsat1-main)
 
 target_sources(app PRIVATE src/main.c)
-target_sources(app PRIVATE src/mgnm.c )
 target_sources(app PRIVATE src/mgnm_test.c )
 target_sources(app PRIVATE src/temp_test.c)
 target_sources(app PRIVATE src/cv_test.c)
