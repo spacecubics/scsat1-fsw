@@ -10,7 +10,7 @@
 #include "imu.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(imu, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
+LOG_MODULE_REGISTER(imu, CONFIG_SC_LIB_IMU_LOG_LEVEL);
 
 #define IMU_STD_DATA_SIZE    (19U)
 #define IMU_EXT_DATA_SIZE    (26U)
