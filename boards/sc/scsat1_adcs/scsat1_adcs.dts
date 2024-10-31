@@ -225,6 +225,11 @@
 			compatible = "sc,fpgamon";
 			reg = <0x4f040000 0x1000>;
 		};
+
+		fpgahrmem: fpgahrmem@40500000 {
+			compatible = "sc,fpgahrmem";
+			reg = <0x40500000 0x1000>;
+		};
 	};
 };
 
