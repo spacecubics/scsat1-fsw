@@ -20,6 +20,7 @@ LOG_MODULE_REGISTER(sc_fpgamon, CONFIG_SC_FPGAMON_LOG_LEVEL);
 #define SCOBCA1_GPTMR_BASE  (0x4F050000)
 
 #define SCOBCA1_SYSMON_WDOG_CTRL     (SCOBCA1_SYSMON_BASE + 0x0000)
+#define SCOBCA1_SYSMON_SEM_ECCOUNT   (SCOBCA1_SYSMON_BASE + 0x0044)
 #define SCOBCA1_SYSMON_XADC_TEMP     (SCOBCA1_SYSMON_BASE + 0x1000)
 #define SCOBCA1_SYSMON_XADC_VCCINT   (SCOBCA1_SYSMON_BASE + 0x1010)
 #define SCOBCA1_SYSMON_XADC_VCCAUX   (SCOBCA1_SYSMON_BASE + 0x1020)
@@ -55,6 +56,9 @@ LOG_MODULE_REGISTER(sc_fpgamon, CONFIG_SC_FPGAMON_LOG_LEVEL);
 #define SCOBCA1_GPTMR_HITOCR1 (SCOBCA1_GPTMR_BASE + 0x0210)
 #define SCOBCA1_GPTMR_HITOCR2 (SCOBCA1_GPTMR_BASE + 0x0214)
 #define SCOBCA1_GPTMR_HITOCR3 (SCOBCA1_GPTMR_BASE + 0x0218)
+
+/* SEM Error Correction Count Register */
+#define SCOBCA1_SYSMON_SEMCCOUNT(x) (((x) & GENMASK(15, 0)))
 
 /* BHM Initialization Access Control Register */
 #define SCOBCA1_SYSMON_INIT_REQ     BIT(16)
@@ -397,6 +401,16 @@ end:
 
 int sc_bhm_disable(void)
 {
+	return 0;
+}
+
+int sc_sem_get_error_count(uint16_t *count)
+{
+	uint32_t val;
+
+	val = sys_read32(SCOBCA1_SYSMON_SEM_ECCOUNT);
+	*count = SCOBCA1_SYSMON_SEMCCOUNT(val);
+
 	return 0;
 }
 
