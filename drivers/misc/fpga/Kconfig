@@ -4,3 +4,4 @@
 rsource "Kconfig.conf"
 rsource "Kconfig.sys"
 rsource "Kconfig.mon"
+rsource "Kconfig.hrmem"

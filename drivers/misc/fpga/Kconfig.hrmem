@@ -1,0 +1,23 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_FPGAHRMEM
+	bool "Space Cubics FPGA HRMEM Control Register driver"
+	default y
+	depends on DT_HAS_SC_FPGAHRMEM_ENABLED
+	help
+	  Enable Space Cubics FPGA HRMEM Control Register driver.
+
+if SC_FPGAHRMEM
+
+config SC_FPGAHRMEM_INIT_PRIORITY
+	int "Init priority"
+	default 50
+	help
+	   FPGA HRMEM Control Register driver initialization priority.
+
+module = SC_FPGAHRMEM
+module-str = Space Cubics FPGA HRMEM Control Register driver
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
