@@ -42,3 +42,4 @@ int sc_bhm_get_obc_temp(enum obc_temp_pos pos, float *temp);
 int sc_bhm_get_xadc_temp(float *temp);
 int sc_bhm_get_obc_cv(enum obc_cv_pos pos, int32_t *cv);
 int sc_bhm_get_xadc_cv(enum xadc_cv_pos pos, float *cv);
+int sc_sem_get_error_count(uint16_t *count);
