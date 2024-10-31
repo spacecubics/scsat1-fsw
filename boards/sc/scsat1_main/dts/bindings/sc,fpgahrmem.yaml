@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+
+description: Space Cubics FPGA HRMEM Control Register
+
+compatible: "sc,fpgahrmem"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
