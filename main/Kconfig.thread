@@ -1,0 +1,27 @@
+menu "Thread"
+
+config SCSAT1_MAIN_CSP_ROUTER_THREAD_PRIORITY
+	int "CSP router thread priority"
+	default 0
+	help
+	  CSP router thread priority.
+
+config SCSAT1_MAIN_CSP_ROUTER_THREAD_STACK_SIZE
+	int "CSP router thread stack size"
+	default 1024
+	help
+	  CSP router thread stack size.
+
+config SCSAT1_MAIN_CSP_SERVER_THREAD_PRIORITY
+	int "CSP server thread priority"
+	default 0
+	help
+	  CSP server thread priority.
+
+config SCSAT1_MAIN_CSP_SERVER_THREAD_STACK_SIZE
+	int "CSP server thread stack size"
+	default 2048
+	help
+	  CSP server thread stack size.
+
+endmenu
