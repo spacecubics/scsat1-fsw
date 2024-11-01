@@ -20,7 +20,7 @@ static int cv_obc_test(struct main_cv_test_result *cv_ret, uint32_t *err_cnt, bo
 {
 	int ret;
 	int all_ret = 0;
-	uint32_t cv;
+	int32_t cv;
 	enum obc_cv_pos obc_pos_list[] = {
 		OBC_1V0_SHUNT,      OBC_1V0_BUS,      OBC_1V8_SHUNT,      OBC_1V8_BUS,
 		OBC_3V3_SHUNT,      OBC_3V3_BUS,      OBC_3V3_SYSA_SHUNT, OBC_3V3_SYSA_BUS,
@@ -90,7 +90,7 @@ static int cv_ioboard_test(struct main_cv_test_result *cv_ret, uint32_t *err_cnt
 {
 	int ret;
 	int all_ret = 0;
-	uint32_t cv;
+	int32_t cv;
 	enum io_cv_pos io_pos_list[] = {
 		IO_PDU_O4_3V3_SHUNT, IO_PDU_O4_3V3_BUS, IO_VDD_3V3_SYS_SHUNT,
 		IO_VDD_3V3_SYS_BUS,  IO_VDD_3V3_SHUNT,  IO_VDD_3V3_BUS,
