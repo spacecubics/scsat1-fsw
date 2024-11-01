@@ -17,4 +17,4 @@ enum io_cv_pos {
 	IO_VDD_3V3_BUS,
 };
 
-int get_ioboard_cv(enum io_cv_pos pos, uint32_t *cv);
+int get_ioboard_cv(enum io_cv_pos pos, int32_t *cv);

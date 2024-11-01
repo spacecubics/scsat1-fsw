@@ -114,7 +114,7 @@ static int convert_cv(enum io_cv_pos pos, uint16_t raw, int32_t *cv)
 	return ret;
 }
 
-int get_ioboard_cv(enum io_cv_pos pos, uint32_t *cv)
+int get_ioboard_cv(enum io_cv_pos pos, int32_t *cv)
 {
 	int ret;
 	uint8_t data[2];
