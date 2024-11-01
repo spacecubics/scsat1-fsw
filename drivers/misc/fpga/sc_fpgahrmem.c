@@ -27,6 +27,8 @@ LOG_MODULE_REGISTER(sc_fpgahrmem, CONFIG_SC_FPGAHRMEM_LOG_LEVEL);
 
 #define SCOBCA1_HRMEM_ECCCOLEN  BIT(0)
 #define SCOBCA1_HRMEM_MEMSCRBEN BIT(0)
+#define SCOBCA1_HRMEM_ATRDE1ERRCNT(x)  (((x) & GENMASK(31, 16)) >> 16)
+#define SCOBCA1_HRMEM_BUSRDE1ERRCNT(x) (((x) & GENMASK(15, 0)))
 
 void sc_hrmem_enable_ecc_collect(void)
 {
@@ -46,6 +48,17 @@ void sc_hrmem_enable_memory_scrub(void)
 void sc_hrmem_disable_memory_scrub(void)
 {
 	sys_clear_bits(SCOBCA1_HRMEM_MEMSCRCTRLR, SCOBCA1_HRMEM_MEMSCRBEN);
+}
+
+int sc_hrmem_get_ecc_error_count(uint16_t *by_auto, uint16_t *by_bus)
+{
+	uint32_t val;
+
+	val = sys_read32(SCOBCA1_HRMEM_ECC1ERRCNTR);
+	*by_auto = SCOBCA1_HRMEM_ATRDE1ERRCNT(val);
+	*by_bus = SCOBCA1_HRMEM_BUSRDE1ERRCNT(val);
+
+	return 0;
 }
 
 static int sc_fpgahrmem_init(void)
