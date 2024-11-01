@@ -26,5 +26,5 @@ enum rw_cv_pos {
 	ADCS_VDD_12V_DRVZ_BUS,
 };
 
-int get_adcs_cv(enum adcs_cv_pos pos, uint32_t *cv);
+int get_adcs_cv(enum adcs_cv_pos pos, int32_t *cv);
 int get_rw_cv(enum rw_cv_pos pos, float *cv);

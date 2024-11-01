@@ -196,7 +196,7 @@ static int convert_rw_cv(enum rw_cv_pos pos, uint16_t raw, float *cv)
 	return ret;
 }
 
-int get_adcs_cv(enum adcs_cv_pos pos, uint32_t *cv)
+int get_adcs_cv(enum adcs_cv_pos pos, int32_t *cv)
 {
 	int ret;
 	uint8_t data[2];
