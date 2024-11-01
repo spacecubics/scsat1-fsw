@@ -15,6 +15,9 @@
 #define CSP_ID_ZERO      (12U)
 #define CSP_ID_PICO      (14U)
 
+#define CSP_TLM_ID_SYSHK (0U)
+#define CSP_PORT_TLM     (10U)
+
 #define CSP_CAN_BITRATE (1000000U)
 
 #define CSP_TELEMETRY_ID_OFFSET (0U)

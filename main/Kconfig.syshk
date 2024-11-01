@@ -1,0 +1,21 @@
+menu "System HK"
+
+config SCSAT1_MAIN_SYSHK_INHIBIT_PERIOD_SEC
+	int "Inhibit period for not sending System HK after startup (sec)"
+	default 600
+	help
+	  Inhibit period for not sending System HK after startup (sec).
+
+config SCSAT1_MAIN_SYSHK_INTERVAL_SEC
+	int "Interval for sending System HK (sec)"
+	default 10
+	help
+	  Interval for sending System HK (sec).
+
+config SCSAT1_MAIN_CSP_CONN_TIMEOUT_MSEC
+	int "Timeout for CSP connect (msec)"
+	default 500
+	help
+	  Timeout for CSP connect (msec).
+
+endmenu

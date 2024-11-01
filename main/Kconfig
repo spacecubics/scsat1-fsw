@@ -11,6 +11,7 @@ source "subsys/logging/Kconfig.template.log_config"
 endmenu
 
 rsource "Kconfig.thread"
+rsource "Kconfig.syshk"
 
 endmenu
 
