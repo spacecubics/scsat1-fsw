@@ -10,6 +10,7 @@
 #include "data_nor.h"
 #include "fram.h"
 #include "pwrctrl_main.h"
+#include "syshk.h"
 
 int main(void)
 {
@@ -22,6 +23,8 @@ int main(void)
 	sc_csp_init();
 
 	sc_main_power_enable(PDU_O1_PWR);
+
+	start_send_syshk();
 
 	while (true) {
 		k_sleep(K_SECONDS(1));

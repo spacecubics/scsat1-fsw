@@ -24,4 +24,16 @@ config SCSAT1_MAIN_CSP_SERVER_THREAD_STACK_SIZE
 	help
 	  CSP server thread stack size.
 
+config SCSAT1_MAIN_SEND_SYSHK_THREAD_PRIORITY
+	int "Send System HK thread priority"
+	default 1
+	help
+	  Send System HK thread priority
+
+config SCSAT1_MAIN_SEND_SYSHK_THREAD_STACK_SIZE
+	int "Send System HK thread stack size"
+	default 1024
+	help
+	  Send for System HK thread stack size.
+
 endmenu
