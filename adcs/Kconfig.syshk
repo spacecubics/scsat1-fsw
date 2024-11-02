@@ -18,4 +18,10 @@ config SCSAT1_ADCS_CSP_CONN_TIMEOUT_MSEC
 	help
 	  Timeout for CSP connect (msec).
 
+config SCSAT1_ADCS_AUTO_SYSHK_DOWNLINK
+	bool "Whether to automatically downlink System HK"
+	default n
+	help
+	  Whether to automatically downlink System HK.
+
 endmenu

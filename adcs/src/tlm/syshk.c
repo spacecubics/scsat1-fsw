@@ -28,6 +28,10 @@ static void send_syshk(struct k_work *work)
 	csp_conn_t *conn;
 	csp_packet_t *packet;
 
+	if (!IS_ENABLED(CONFIG_SCSAT1_ADCS_AUTO_SYSHK_DOWNLINK)) {
+		goto end;
+	}
+
 	conn = csp_connect(CSP_PRIO_NORM, CSP_ID_GND, CSP_PORT_TLM,
 			   CONFIG_SCSAT1_ADCS_CSP_CONN_TIMEOUT_MSEC, CSP_O_NONE);
 	if (conn == NULL) {
