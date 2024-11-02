@@ -6,4 +6,10 @@
 
 #pragma once
 
-int csp_cmd_handler();
+struct csp_stat {
+	uint16_t received_command_count;
+	uint8_t last_csp_port;
+	uint8_t last_command_id;
+};
+
+void csp_cmd_handler(void);
