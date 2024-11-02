@@ -7,6 +7,7 @@
 #include <zephyr/kernel.h>
 #include "sc_fpgamon.h"
 #include "temp.h"
+#include "cv.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(monitor, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -23,4 +24,5 @@ void start_monitor(void)
 
 	sc_bhm_enable();
 	start_temp_monitor();
+	start_cv_monitor();
 }

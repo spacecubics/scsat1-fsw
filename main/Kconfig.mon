@@ -6,9 +6,21 @@ config SCSAT1_MAIN_MON_TEMP_INTERVAL_MSEC
 	help
 	  Monitor interval for Temperature (sec).
 
+config SCSAT1_MAIN_MON_CV_INTERVAL_MSEC
+	int "Monitor interval for Current Voltage (msec)"
+	default 1000
+	help
+	  Monitor interval for Current Voltage (sec).
+
 config SCSAT1_MAIN_MON_TEMP_DELAY_MSEC
 	int "Delay time before starting the monitoring (msec)."
 	default 200
+	help
+	  Delay time before starting the initial monitoring (msec).
+
+config SCSAT1_MAIN_MON_CV_DELAY_MSEC
+	int "Delay time before starting the monitoring (msec)."
+	default 400
 	help
 	  Delay time before starting the initial monitoring (msec).
 

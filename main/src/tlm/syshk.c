@@ -10,6 +10,7 @@
 #include "sc_csp.h"
 #include "syshk.h"
 #include "temp.h"
+#include "cv.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -19,14 +20,17 @@ struct k_work_q syshk_workq;
 
 ZBUS_CHAN_DEFINE(temp_chan, struct temp_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
 		 ZBUS_MSG_INIT(0));
+ZBUS_CHAN_DEFINE(cv_chan, struct cv_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub), ZBUS_MSG_INIT(0));
 ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
 #define SYSHK_TEMP_BLOCK_SIZE (50U)
+#define SYSHK_CV_BLOCK_SIZE   (105U)
 
 struct syshk_tlm {
 	uint8_t telemetry_id;
 	uint32_t seq_num;
 	uint8_t temp_block[SYSHK_TEMP_BLOCK_SIZE];
+	uint8_t cv_block[SYSHK_CV_BLOCK_SIZE];
 } __attribute__((__packed__));
 
 static struct syshk_tlm syshk = {.telemetry_id = CSP_TLM_ID_SYSHK, .seq_num = 0};
@@ -56,6 +60,33 @@ static void copy_temp_to_syshk(struct temp_msg *msg)
 	}
 }
 
+static void copy_cv_to_syshk(struct cv_msg *msg)
+{
+	int pos;
+	uint8_t *cv_block = syshk.cv_block;
+
+	for (pos = 0; pos < OBC_CV_POS_NUM; pos++) {
+		memcpy(cv_block, &msg->obc[pos].status, sizeof(msg->obc[pos].status));
+		cv_block += sizeof(msg->obc[pos].status);
+		memcpy(cv_block, &msg->obc[pos].cv, sizeof(msg->obc[pos].cv));
+		cv_block += sizeof(msg->obc[pos].cv);
+	}
+
+	for (pos = 0; pos < OBC_XADC_CV_POS_NUM; pos++) {
+		memcpy(cv_block, &msg->xadc[pos].status, sizeof(msg->xadc[pos].status));
+		cv_block += sizeof(msg->xadc[pos].status);
+		memcpy(cv_block, &msg->xadc[pos].cv, sizeof(msg->xadc[pos].cv));
+		cv_block += sizeof(msg->xadc[pos].cv);
+	}
+
+	for (pos = 0; pos < IO_CV_POS_NUM; pos++) {
+		memcpy(cv_block, &msg->io[pos].status, sizeof(msg->io[pos].status));
+		cv_block += sizeof(msg->io[pos].status);
+		memcpy(cv_block, &msg->io[pos].cv, sizeof(msg->io[pos].cv));
+		cv_block += sizeof(msg->io[pos].cv);
+	}
+}
+
 static void syshk_sub_task(void *sub)
 {
 	const struct zbus_channel *chan;
@@ -63,6 +94,7 @@ static void syshk_sub_task(void *sub)
 	const struct zbus_observer *subscriber = sub;
 
 	struct temp_msg temp_msg;
+	struct cv_msg cv_msg;
 
 	LOG_INF("Start the system HK Subscribing thread");
 
@@ -72,6 +104,11 @@ static void syshk_sub_task(void *sub)
 				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
 			LOG_DBG("Subscribe TEMP msg %d byte", sizeof(temp_msg));
 			copy_temp_to_syshk(&temp_msg);
+		} else if (&cv_chan == chan) {
+			zbus_chan_read(chan, &cv_msg,
+				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
+			LOG_DBG("Subscribe CV msg %d byte", sizeof(cv_msg));
+			copy_cv_to_syshk(&cv_msg);
 		} else {
 			LOG_ERR("Wrong channel %p!", chan);
 			continue;
