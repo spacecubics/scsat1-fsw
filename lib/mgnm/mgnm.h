@@ -9,8 +9,9 @@
 #include <stdint.h>
 
 enum mgnm_pos {
-	MGNM_POS_X_PLUS,
+	MGNM_POS_X_PLUS = 0,
 	MGNM_POS_X_MINUS,
+	MGNM_POS_NUM,
 };
 
 struct magnet_field {
