@@ -12,6 +12,7 @@ endmenu
 
 rsource "Kconfig.thread"
 rsource "Kconfig.syshk"
+rsource "Kconfig.mon"
 
 endmenu
 
