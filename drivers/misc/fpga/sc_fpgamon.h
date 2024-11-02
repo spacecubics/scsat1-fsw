@@ -9,13 +9,14 @@
 #include <stdint.h>
 
 enum obc_temp_pos {
-	OBC_TEMP_1,
+	OBC_TEMP_1 = 0,
 	OBC_TEMP_2,
 	OBC_TEMP_3,
+	OBC_TEMP_POS_NUM,
 };
 
 enum obc_cv_pos {
-	OBC_1V0_SHUNT,
+	OBC_1V0_SHUNT = 0,
 	OBC_1V0_BUS,
 	OBC_1V8_SHUNT,
 	OBC_1V8_BUS,
@@ -27,12 +28,14 @@ enum obc_cv_pos {
 	OBC_3V3_SYSB_BUS,
 	OBC_3V3_IO_SHUNT,
 	OBC_3V3_IO_BUS,
+	OBC_CV_POS_NUM
 };
 
 enum xadc_cv_pos {
-	OBC_XADC_VCCINT,
+	OBC_XADC_VCCINT = 0,
 	OBC_XADC_VCCAUX,
 	OBC_XADC_VCCBRAM,
+	OBC_XADC_CV_POS_NUM,
 };
 
 void sc_kick_wdt_timer(void);

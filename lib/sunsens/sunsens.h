@@ -9,8 +9,9 @@
 #include <stdint.h>
 
 enum sunsens_pos {
-	SUNSENS_POS_Y_PLUS,
+	SUNSENS_POS_Y_PLUS = 0,
 	SUNSENS_POS_Y_MINUS,
+	SUNSENS_POS_NUM,
 };
 
 struct sunsens_data {
