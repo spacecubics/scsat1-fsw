@@ -9,6 +9,7 @@
 #include <csp/csp.h>
 #include "sc_csp.h"
 #include "syshk.h"
+#include "system.h"
 #include "temp.h"
 #include "cv.h"
 
@@ -18,22 +19,60 @@ LOG_MODULE_REGISTER(syshk, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 K_THREAD_STACK_DEFINE(syshk_workq_stack, CONFIG_SCSAT1_MAIN_SEND_SYSHK_THREAD_STACK_SIZE);
 struct k_work_q syshk_workq;
 
+ZBUS_CHAN_DEFINE(system_chan, struct system_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
+		 ZBUS_MSG_INIT(0));
 ZBUS_CHAN_DEFINE(temp_chan, struct temp_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
 		 ZBUS_MSG_INIT(0));
 ZBUS_CHAN_DEFINE(cv_chan, struct cv_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub), ZBUS_MSG_INIT(0));
 ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
-#define SYSHK_TEMP_BLOCK_SIZE (50U)
-#define SYSHK_CV_BLOCK_SIZE   (105U)
+#define SYSHK_SYSTEM_BLOCK_SIZE (33U)
+#define SYSHK_TEMP_BLOCK_SIZE   (50U)
+#define SYSHK_CV_BLOCK_SIZE     (105U)
 
 struct syshk_tlm {
 	uint8_t telemetry_id;
 	uint32_t seq_num;
+	uint8_t system_block[SYSHK_SYSTEM_BLOCK_SIZE];
 	uint8_t temp_block[SYSHK_TEMP_BLOCK_SIZE];
 	uint8_t cv_block[SYSHK_CV_BLOCK_SIZE];
 } __attribute__((__packed__));
 
 static struct syshk_tlm syshk = {.telemetry_id = CSP_TLM_ID_SYSHK, .seq_num = 0};
+
+static void copy_system_to_syshk(struct system_msg *msg)
+{
+	uint8_t *system_block = syshk.system_block;
+
+	memcpy(system_block, &msg->wall_clock, sizeof(msg->wall_clock));
+	system_block += sizeof(msg->wall_clock);
+	memcpy(system_block, &msg->sysup_time, sizeof(msg->sysup_time));
+	system_block += sizeof(msg->sysup_time);
+	memcpy(system_block, &msg->sw_version, sizeof(msg->sw_version));
+	system_block += sizeof(msg->sw_version);
+	memcpy(system_block, &msg->boot_count, sizeof(msg->boot_count));
+	system_block += sizeof(msg->boot_count);
+	memcpy(system_block, &msg->power_status, sizeof(msg->power_status));
+	system_block += sizeof(msg->power_status);
+	memcpy(system_block, &msg->fpga_version, sizeof(msg->fpga_version));
+	system_block += sizeof(msg->fpga_version);
+	memcpy(system_block, &msg->fpga_config_bank, sizeof(msg->fpga_config_bank));
+	system_block += sizeof(msg->fpga_config_bank);
+	memcpy(system_block, &msg->fpga_fallback_state, sizeof(msg->fpga_fallback_state));
+	system_block += sizeof(msg->fpga_fallback_state);
+	memcpy(system_block, &msg->received_command_count, sizeof(msg->received_command_count));
+	system_block += sizeof(msg->received_command_count);
+	memcpy(system_block, &msg->last_csp_port, sizeof(msg->last_csp_port));
+	system_block += sizeof(msg->last_csp_port);
+	memcpy(system_block, &msg->last_command_id, sizeof(msg->last_command_id));
+	system_block += sizeof(msg->last_command_id);
+	memcpy(system_block, &msg->ecc_error_count_by_auto, sizeof(msg->ecc_error_count_by_auto));
+	system_block += sizeof(msg->ecc_error_count_by_auto);
+	memcpy(system_block, &msg->ecc_error_count_by_bus, sizeof(msg->ecc_error_count_by_bus));
+	system_block += sizeof(msg->ecc_error_count_by_bus);
+	memcpy(system_block, &msg->sem_error_count, sizeof(msg->sem_error_count));
+	system_block += sizeof(msg->sem_error_count);
+}
 
 static void copy_temp_to_syshk(struct temp_msg *msg)
 {
@@ -93,13 +132,19 @@ static void syshk_sub_task(void *sub)
 
 	const struct zbus_observer *subscriber = sub;
 
+	struct system_msg system_msg;
 	struct temp_msg temp_msg;
 	struct cv_msg cv_msg;
 
 	LOG_INF("Start the system HK Subscribing thread");
 
 	while (!zbus_sub_wait(subscriber, &chan, K_FOREVER)) {
-		if (&temp_chan == chan) {
+		if (&system_chan == chan) {
+			zbus_chan_read(chan, &system_msg,
+				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
+			LOG_DBG("Subscribe SYSTEM msg %d byte", sizeof(system_msg));
+			copy_system_to_syshk(&system_msg);
+		} else if (&temp_chan == chan) {
 			zbus_chan_read(chan, &temp_msg,
 				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
 			LOG_DBG("Subscribe TEMP msg %d byte", sizeof(temp_msg));

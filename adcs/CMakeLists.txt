@@ -8,6 +8,7 @@ set(BOARD_ROOT ${CMAKE_CURRENT_LIST_DIR}/..)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(scsat1-adcs)
 
+zephyr_include_directories(src/cmd)
 zephyr_include_directories(src/tlm)
 zephyr_include_directories(src/mon)
 
@@ -19,3 +20,4 @@ target_sources(app PRIVATE src/tlm/syshk.c)
 target_sources(app PRIVATE src/mon/monitor.c)
 target_sources(app PRIVATE src/mon/temp.c)
 target_sources(app PRIVATE src/mon/cv.c)
+target_sources(app PRIVATE src/mon/system.c)
