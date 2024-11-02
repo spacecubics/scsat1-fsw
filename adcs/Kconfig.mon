@@ -1,0 +1,15 @@
+menu "Monitoring"
+
+config SCSAT1_ADCS_MON_TEMP_INTERVAL_MSEC
+	int "Monitor interval for Temperature (msec)"
+	default 1000
+	help
+	  Monitor interval for Temperature (sec).
+
+config SCSAT1_ADCS_MON_TEMP_DELAY_MSEC
+	int "Delay time before starting the monitoring (msec)."
+	default 200
+	help
+	  Delay time before starting the initial monitoring (msec).
+
+endmenu

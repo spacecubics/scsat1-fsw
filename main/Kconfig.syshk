@@ -24,4 +24,16 @@ config SCSAT1_MAIN_AUTO_SYSHK_DOWNLINK
 	help
 	  Whether to automatically downlink System HK.
 
+config SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE
+	int "The notification queue's size for System HK"
+	default 2
+	help
+	  The notification queue's size for System HK.
+
+config SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC
+	int "Timeout for ZBUS reading from channel (msec)"
+	default 10
+	help
+	  Timeout for ZBUS reading from channel (msec).
+
 endmenu

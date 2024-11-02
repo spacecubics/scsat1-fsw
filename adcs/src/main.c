@@ -10,6 +10,7 @@
 #include "data_nor.h"
 #include "fram.h"
 #include "syshk.h"
+#include "monitor.h"
 
 int main(void)
 {
@@ -20,6 +21,8 @@ int main(void)
 	sc_fram_update_boot_count();
 
 	sc_csp_init();
+
+	start_monitor();
 
 	start_send_syshk();
 

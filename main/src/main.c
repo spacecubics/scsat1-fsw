@@ -11,6 +11,7 @@
 #include "fram.h"
 #include "pwrctrl_main.h"
 #include "syshk.h"
+#include "monitor.h"
 
 int main(void)
 {
@@ -23,6 +24,8 @@ int main(void)
 	sc_csp_init();
 
 	sc_main_power_enable(PDU_O1_PWR);
+
+	start_monitor();
 
 	start_send_syshk();
 
