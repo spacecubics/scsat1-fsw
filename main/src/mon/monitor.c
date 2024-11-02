@@ -6,6 +6,7 @@
 
 #include <zephyr/kernel.h>
 #include "sc_fpgamon.h"
+#include "system.h"
 #include "temp.h"
 #include "cv.h"
 
@@ -23,6 +24,7 @@ void start_monitor(void)
 	k_thread_name_set(&monitor_workq.thread, "monitor_workq");
 
 	sc_bhm_enable();
+	start_system_monitor();
 	start_temp_monitor();
 	start_cv_monitor();
 }
