@@ -12,6 +12,7 @@
 #include "pwrctrl_main.h"
 #include "syshk.h"
 #include "monitor.h"
+#include "eps.h"
 
 int main(void)
 {
@@ -22,6 +23,7 @@ int main(void)
 	sc_fram_update_boot_count();
 
 	sc_csp_init();
+	csp_time_sync_from_eps();
 
 	sc_main_power_enable(PDU_O1_PWR);
 

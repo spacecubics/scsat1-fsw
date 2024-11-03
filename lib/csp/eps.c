@@ -13,8 +13,8 @@
 LOG_MODULE_REGISTER(eps, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 
 #define CSP_PORT_EPS_GET_TIME (8U)
-#define CSP_EPS_GET_TIME_SIZE (5U)
-#define CSP_EPS_TIME_OFFSET   (1U)
+#define CSP_EPS_GET_TIME_SIZE (6U)
+#define CSP_EPS_TIME_OFFSET   (2U)
 
 int csp_time_sync_from_eps(void)
 {
