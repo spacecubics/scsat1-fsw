@@ -11,3 +11,6 @@
 
 int sc_fram_write(uint8_t mem_no, uint32_t mem_addr, uint32_t size, uint8_t *val);
 int sc_fram_read(uint8_t mem_no, uint32_t mem_addr, uint32_t size, uint8_t *val);
+int sc_fram_clear_boot_count(void);
+int sc_fram_update_boot_count(void);
+int sc_fram_get_boot_count(uint8_t *boot_count);
