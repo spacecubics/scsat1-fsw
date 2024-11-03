@@ -91,6 +91,7 @@ int sc_csp_init(void)
 	can_iface2->netmask = csp_id_get_host_bits();
 
 	csp_rtable_set(CSP_ID_GND, csp_id_get_host_bits(), can_iface1, CSP_NO_VIA_ADDRESS);
+	csp_rtable_set(CSP_ID_EPS, csp_id_get_host_bits(), can_iface1, CSP_NO_VIA_ADDRESS);
 	csp_rtable_set(CSP_ID_ADCS, csp_id_get_host_bits(), can_iface2, CSP_NO_VIA_ADDRESS);
 	csp_rtable_set(CSP_ID_ZERO, csp_id_get_host_bits(), can_iface2, CSP_NO_VIA_ADDRESS);
 	csp_rtable_set(CSP_ID_PICO, csp_id_get_host_bits(), can_iface2, CSP_NO_VIA_ADDRESS);
