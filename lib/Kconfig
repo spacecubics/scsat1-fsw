@@ -5,6 +5,7 @@ menu "Space Cubics Libraries"
 
 rsource "core/Kconfig"
 rsource "flash/Kconfig"
+rsource "fram/Kconfig"
 rsource "csp/Kconfig"
 rsource "sunsens/Kconfig"
 rsource "mgnm/Kconfig"
