@@ -155,7 +155,7 @@ int get_mgnm_magnet(enum mgnm_pos pos, struct magnet_field *magnet)
 	uint8_t data;
 	uint8_t out_low_regs[] = {MGNM_XOUTL_REG, MGNM_YOUTL_REG, MGNM_ZOUTL_REG};
 	uint8_t out_hi_regs[] = {MGNM_XOUTH_REG, MGNM_YOUTH_REG, MGNM_ZOUTH_REG};
-	uint32_t out_data[3] = {0};
+	uint16_t out_data[3] = {0};
 
 	const struct device *dev = get_mgnm_device(pos);
 	if (dev == NULL) {
