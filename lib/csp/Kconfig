@@ -16,6 +16,18 @@ config SC_LIB_CSP_FILE_NAME_MAX_LEN
 	help
 	  File name max length for csp commands
 
+config SC_LIB_CSP_CONN_TIMEOUT_MSEC
+	int "Timeout for CSP connect (msec)"
+	default 500
+	help
+	  Timeout for CSP connect (msec).
+
+config SC_LIB_CSP_READ_TIMEOUT_MSEC
+	int "Timeout for CSP read (msec)"
+	default 100
+	help
+	  Timeout for CSP read (msec).
+
 module = SC_LIB_CSP
 module-str = Space Cubics CSP libraries
 source "subsys/logging/Kconfig.template.log_config"
