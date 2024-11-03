@@ -15,9 +15,9 @@ enum mgnm_pos {
 };
 
 struct magnet_field {
-	uint32_t x_out;
-	uint32_t y_out;
-	uint32_t z_out;
+	uint16_t x_out;
+	uint16_t y_out;
+	uint16_t z_out;
 };
 
 int start_mgnm_temp_measurement(enum mgnm_pos pos);
