@@ -12,6 +12,7 @@
 #include "system.h"
 #include "temp.h"
 #include "cv.h"
+#include "mgnm_mon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -24,11 +25,14 @@ ZBUS_CHAN_DEFINE(system_chan, struct system_msg, NULL, NULL, ZBUS_OBSERVERS(sysh
 ZBUS_CHAN_DEFINE(temp_chan, struct temp_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
 		 ZBUS_MSG_INIT(0));
 ZBUS_CHAN_DEFINE(cv_chan, struct cv_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub), ZBUS_MSG_INIT(0));
+ZBUS_CHAN_DEFINE(mgnm_chan, struct mgnm_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
+		 ZBUS_MSG_INIT(0));
 ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
 #define SYSHK_SYSTEM_BLOCK_SIZE (33U)
 #define SYSHK_TEMP_BLOCK_SIZE   (50U)
 #define SYSHK_CV_BLOCK_SIZE     (105U)
+#define SYSHK_MGNM_BLOCK_SIZE   (24U)
 
 struct syshk_tlm {
 	uint8_t telemetry_id;
@@ -36,6 +40,7 @@ struct syshk_tlm {
 	uint8_t system_block[SYSHK_SYSTEM_BLOCK_SIZE];
 	uint8_t temp_block[SYSHK_TEMP_BLOCK_SIZE];
 	uint8_t cv_block[SYSHK_CV_BLOCK_SIZE];
+	uint8_t mgnm_block[SYSHK_MGNM_BLOCK_SIZE];
 } __attribute__((__packed__));
 
 static struct syshk_tlm syshk = {.telemetry_id = CSP_TLM_ID_SYSHK, .seq_num = 0};
@@ -126,6 +131,26 @@ static void copy_cv_to_syshk(struct cv_msg *msg)
 	}
 }
 
+static void copy_mgnm_to_syshk(struct mgnm_msg *msg)
+{
+	int pos;
+	uint8_t *mgnm_block = syshk.mgnm_block;
+
+	for (pos = 0; pos < MGNM_POS_NUM; pos++) {
+		memcpy(mgnm_block, &msg->magnet[pos].status, sizeof(msg->magnet[pos].status));
+		mgnm_block += sizeof(msg->magnet[pos].status);
+		memcpy(mgnm_block, &msg->magnet[pos].data, sizeof(msg->magnet[pos].data));
+		mgnm_block += sizeof(msg->magnet[pos].data);
+	}
+
+	for (pos = 0; pos < MGNM_POS_NUM; pos++) {
+		memcpy(mgnm_block, &msg->temp[pos].status, sizeof(msg->temp[pos].status));
+		mgnm_block += sizeof(msg->temp[pos].status);
+		memcpy(mgnm_block, &msg->temp[pos].data, sizeof(msg->temp[pos].data));
+		mgnm_block += sizeof(msg->temp[pos].data);
+	}
+}
+
 static void syshk_sub_task(void *sub)
 {
 	const struct zbus_channel *chan;
@@ -135,6 +160,7 @@ static void syshk_sub_task(void *sub)
 	struct system_msg system_msg;
 	struct temp_msg temp_msg;
 	struct cv_msg cv_msg;
+	struct mgnm_msg mgnm_msg;
 
 	LOG_INF("Start the system HK Subscribing thread");
 
@@ -154,6 +180,11 @@ static void syshk_sub_task(void *sub)
 				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
 			LOG_DBG("Subscribe CV msg %d byte", sizeof(cv_msg));
 			copy_cv_to_syshk(&cv_msg);
+		} else if (&mgnm_chan == chan) {
+			zbus_chan_read(chan, &mgnm_msg,
+				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
+			LOG_DBG("Subscribe MGNM msg %d byte", sizeof(mgnm_msg));
+			copy_mgnm_to_syshk(&mgnm_msg);
 		} else {
 			LOG_ERR("Wrong channel %p!", chan);
 			continue;
