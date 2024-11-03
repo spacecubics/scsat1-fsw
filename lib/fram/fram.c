@@ -51,6 +51,7 @@ LOG_MODULE_REGISTER(fram, CONFIG_SC_LIB_FRAM_LOG_LEVEL);
 #define QSPI_SPI_MODE_QUAD               (0x00020000)
 
 #define REG_READ_RETRY(count) (count)
+#define FRAM_BOOT_COUNT_ADDR  (0x000000)
 
 static bool assert32(uint32_t addr, uint32_t exp, uint32_t retry)
 {
@@ -467,5 +468,56 @@ int sc_fram_read(uint8_t mem_no, uint32_t mem_addr, uint32_t size, uint8_t *val)
 	}
 
 end:
+	return ret;
+}
+
+int sc_fram_clear_boot_count(void)
+{
+	int ret;
+	uint8_t boot_count = 0;
+
+	ret = sc_fram_write(SC_FRAM_MEM0, FRAM_BOOT_COUNT_ADDR, sizeof(boot_count), &boot_count);
+	if (ret < 0) {
+		LOG_ERR("Faild to clear the boot count (%d)", ret);
+	}
+
+	return ret;
+}
+
+int sc_fram_update_boot_count(void)
+{
+	int ret;
+	uint8_t boot_count;
+
+	ret = sc_fram_read(SC_FRAM_MEM0, FRAM_BOOT_COUNT_ADDR, sizeof(boot_count), &boot_count);
+	if (ret < 0) {
+		LOG_ERR("Faild to read the boot count (%d)", ret);
+		goto end;
+	}
+	LOG_INF("FRAM read boot count:%u", boot_count);
+
+	boot_count++;
+
+	ret = sc_fram_write(SC_FRAM_MEM0, FRAM_BOOT_COUNT_ADDR, sizeof(boot_count), &boot_count);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the boot count (%d)", ret);
+		goto end;
+	}
+
+	LOG_INF("FRAM write new boot count %u", boot_count);
+
+end:
+	return ret;
+}
+
+int sc_fram_get_boot_count(uint8_t *boot_count)
+{
+	int ret;
+
+	ret = sc_fram_read(SC_FRAM_MEM0, FRAM_BOOT_COUNT_ADDR, sizeof(*boot_count), boot_count);
+	if (ret < 0) {
+		LOG_ERR("Faild to get the boot count (%d)", ret);
+	}
+
 	return ret;
 }
