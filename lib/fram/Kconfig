@@ -1,0 +1,16 @@
+# Copyright (c) 2024 Space Cubics, LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig SC_LIB_FRAM
+	bool "Space Cubics F-RAM libraries"
+	default y
+	help
+	  Enable Space Cubics F-RAM libraries.
+
+if SC_LIB_FRAM
+
+module = SC_LIB_FRAM
+module-str = Space Cubics F-RAM libraries
+source "subsys/logging/Kconfig.template.log_config"
+
+endif
