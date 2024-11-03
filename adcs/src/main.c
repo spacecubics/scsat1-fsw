@@ -8,12 +8,15 @@
 #include "csp.h"
 #include "wdog.h"
 #include "data_nor.h"
+#include "fram.h"
 
 int main(void)
 {
 	start_kick_wdt_thread();
 
 	datafs_init();
+
+	sc_fram_update_boot_count();
 
 	sc_csp_init();
 
