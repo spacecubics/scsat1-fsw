@@ -6,4 +6,5 @@
 
 #pragma once
 
+void send_syshk_to_ground(void);
 void start_send_syshk(void);

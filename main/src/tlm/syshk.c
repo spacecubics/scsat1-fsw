@@ -226,14 +226,10 @@ static void syshk_sub_task(void *sub)
 K_THREAD_DEFINE(syshk_sub_task_id, CONFIG_SCSAT1_MAIN_SUB_SYSHK_THREAD_STACK_SIZE, syshk_sub_task,
 		&syshk_sub, NULL, NULL, CONFIG_SCSAT1_MAIN_SUB_SYSHK_THREAD_PRIORITY, 0, 0);
 
-static void send_syshk(struct k_work *work)
+void send_syshk_to_ground(void)
 {
 	csp_conn_t *conn;
 	csp_packet_t *packet;
-
-	if (!IS_ENABLED(CONFIG_SCSAT1_MAIN_AUTO_SYSHK_DOWNLINK)) {
-		goto end;
-	}
 
 	conn = csp_connect(CSP_PRIO_NORM, CSP_ID_GND, CSP_PORT_TLM,
 			   CONFIG_SCSAT1_MAIN_CSP_CONN_TIMEOUT_MSEC, CSP_O_NONE);
@@ -259,6 +255,15 @@ close:
 	csp_close(conn);
 
 end:
+}
+
+static void send_syshk(struct k_work *work)
+{
+	ARG_UNUSED(work);
+
+	if (IS_ENABLED(CONFIG_SCSAT1_MAIN_AUTO_SYSHK_DOWNLINK)) {
+		send_syshk_to_ground();
+	}
 }
 
 static K_WORK_DEFINE(syshk_work, send_syshk);
