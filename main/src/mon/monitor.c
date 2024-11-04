@@ -10,6 +10,7 @@
 #include "temp.h"
 #include "cv.h"
 #include "mgnm_mon.h"
+#include "sunsens_mon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(monitor, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -29,4 +30,5 @@ void start_monitor(void)
 	start_temp_monitor();
 	start_cv_monitor();
 	start_mgnm_monitor();
+	start_sunsens_monitor();
 }

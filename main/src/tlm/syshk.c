@@ -13,6 +13,7 @@
 #include "temp.h"
 #include "cv.h"
 #include "mgnm_mon.h"
+#include "sunsens_mon.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -27,12 +28,15 @@ ZBUS_CHAN_DEFINE(temp_chan, struct temp_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_su
 ZBUS_CHAN_DEFINE(cv_chan, struct cv_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub), ZBUS_MSG_INIT(0));
 ZBUS_CHAN_DEFINE(mgnm_chan, struct mgnm_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
 		 ZBUS_MSG_INIT(0));
+ZBUS_CHAN_DEFINE(sunsens_chan, struct sunsens_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
+		 ZBUS_MSG_INIT(0));
 ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
-#define SYSHK_SYSTEM_BLOCK_SIZE (33U)
-#define SYSHK_TEMP_BLOCK_SIZE   (50U)
-#define SYSHK_CV_BLOCK_SIZE     (105U)
-#define SYSHK_MGNM_BLOCK_SIZE   (24U)
+#define SYSHK_SYSTEM_BLOCK_SIZE  (33U)
+#define SYSHK_TEMP_BLOCK_SIZE    (50U)
+#define SYSHK_CV_BLOCK_SIZE      (105U)
+#define SYSHK_MGNM_BLOCK_SIZE    (24U)
+#define SYSHK_SUNSENS_BLOCK_SIZE (28U)
 
 struct syshk_tlm {
 	uint8_t telemetry_id;
@@ -41,6 +45,7 @@ struct syshk_tlm {
 	uint8_t temp_block[SYSHK_TEMP_BLOCK_SIZE];
 	uint8_t cv_block[SYSHK_CV_BLOCK_SIZE];
 	uint8_t mgnm_block[SYSHK_MGNM_BLOCK_SIZE];
+	uint8_t sunsens_block[SYSHK_SUNSENS_BLOCK_SIZE];
 } __attribute__((__packed__));
 
 static struct syshk_tlm syshk = {.telemetry_id = CSP_TLM_ID_SYSHK, .seq_num = 0};
@@ -151,6 +156,26 @@ static void copy_mgnm_to_syshk(struct mgnm_msg *msg)
 	}
 }
 
+static void copy_sunsens_to_syshk(struct sunsens_msg *msg)
+{
+	int pos;
+	uint8_t *sunsens_block = syshk.sunsens_block;
+
+	for (pos = 0; pos < SUNSENS_POS_NUM; pos++) {
+		memcpy(sunsens_block, &msg->sun[pos].status, sizeof(msg->sun[pos].status));
+		sunsens_block += sizeof(msg->sun[pos].status);
+		memcpy(sunsens_block, &msg->sun[pos].data, sizeof(msg->sun[pos].data));
+		sunsens_block += sizeof(msg->sun[pos].data);
+	}
+
+	for (pos = 0; pos < SUNSENS_POS_NUM; pos++) {
+		memcpy(sunsens_block, &msg->temp[pos].status, sizeof(msg->temp[pos].status));
+		sunsens_block += sizeof(msg->temp[pos].status);
+		memcpy(sunsens_block, &msg->temp[pos].data, sizeof(msg->temp[pos].data));
+		sunsens_block += sizeof(msg->temp[pos].data);
+	}
+}
+
 static void syshk_sub_task(void *sub)
 {
 	const struct zbus_channel *chan;
@@ -161,6 +186,7 @@ static void syshk_sub_task(void *sub)
 	struct temp_msg temp_msg;
 	struct cv_msg cv_msg;
 	struct mgnm_msg mgnm_msg;
+	struct sunsens_msg sunsens_msg;
 
 	LOG_INF("Start the system HK Subscribing thread");
 
@@ -185,6 +211,11 @@ static void syshk_sub_task(void *sub)
 				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
 			LOG_DBG("Subscribe MGNM msg %d byte", sizeof(mgnm_msg));
 			copy_mgnm_to_syshk(&mgnm_msg);
+		} else if (&sunsens_chan == chan) {
+			zbus_chan_read(chan, &sunsens_msg,
+				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
+			LOG_DBG("Subscribe SUN msg %d byte", sizeof(sunsens_msg));
+			copy_sunsens_to_syshk(&sunsens_msg);
 		} else {
 			LOG_ERR("Wrong channel %p!", chan);
 			continue;
