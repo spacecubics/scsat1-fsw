@@ -36,4 +36,16 @@ config SCSAT1_MAIN_SEND_SYSHK_THREAD_STACK_SIZE
 	help
 	  Send for System HK thread stack size.
 
+config SCSAT1_MAIN_MONITOR_THREAD_PRIORITY
+	int "Monitor thread priority"
+	default 2
+	help
+	  Monitor thread priority
+
+config SCSAT1_MAIN_MONITOR_THREAD_STACK_SIZE
+	int "Monitor thread stack size"
+	default 1024
+	help
+	  Monitor thread stack size.
+
 endmenu
