@@ -10,6 +10,7 @@
 #include "pwrctrl.h"
 #include "file.h"
 #include "flash.h"
+#include "tlm.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -17,6 +18,7 @@ LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 #define CSP_PORT_ADCS_PWRCTRL (12U)
 #define CSP_PORT_ADCS_FILE    (13U)
 #define CSP_PORT_ADCS_FLASH   (14U)
+#define CSP_PORT_ADCS_TLM     (15U)
 
 struct csp_stat csp_stat = {0};
 
@@ -61,6 +63,9 @@ void csp_cmd_handler(void)
 				break;
 			case CSP_PORT_ADCS_FLASH:
 				csp_flash_handler(packet);
+				break;
+			case CSP_PORT_ADCS_TLM:
+				csp_tlm_handler(packet);
 				break;
 			default:
 				csp_service_handler(packet);

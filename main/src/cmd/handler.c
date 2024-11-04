@@ -10,10 +10,12 @@
 #include "pwrctrl.h"
 #include "file.h"
 #include "flash.h"
+#include "tlm.h"
 
 #define CSP_PORT_MAIN_PWRCTRL (12U)
 #define CSP_PORT_MAIN_FILE    (13U)
 #define CSP_PORT_MAIN_FLASH   (14U)
+#define CSP_PORT_MAIN_TLM     (15U)
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -61,6 +63,9 @@ void csp_cmd_handler(void)
 				break;
 			case CSP_PORT_MAIN_FLASH:
 				csp_flash_handler(packet);
+				break;
+			case CSP_PORT_MAIN_TLM:
+				csp_tlm_handler(packet);
 				break;
 			default:
 				csp_service_handler(packet);
