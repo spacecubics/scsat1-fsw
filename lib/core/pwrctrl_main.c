@@ -63,3 +63,8 @@ void sc_main_dstrx3_io_power_disable(void)
 	sc_dstrx3_disable_hk(dev);
 	sc_main_power_disable(DSTRX_IO_PWR);
 }
+
+uint8_t sc_main_get_power_status(void)
+{
+	return (uint8_t)sys_read32(SC_MAIN_MAIN_BASE_ADDR + SC_MAIN_PCR_OFFSET);
+}

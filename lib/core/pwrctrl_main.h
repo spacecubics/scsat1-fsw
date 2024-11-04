@@ -20,3 +20,4 @@ void sc_main_power_disable(uint8_t target_bit);
 void sc_main_power_cycle_req(void);
 void sc_main_dstrx3_io_power_enable(void);
 void sc_main_dstrx3_io_power_disable(void);
+uint8_t sc_main_get_power_status(void);

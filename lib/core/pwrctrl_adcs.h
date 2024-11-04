@@ -26,3 +26,4 @@ void sc_adcs_imu_reset_release(void);
 void sc_adcs_motor_enable(uint8_t target_bit);
 void sc_adcs_motor_disable(uint8_t target_bit);
 void sc_adcs_power_cycle_req(void);
+uint8_t sc_adcs_get_power_status(void);
