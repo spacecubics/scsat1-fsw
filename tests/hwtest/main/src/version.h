@@ -6,4 +6,4 @@
 
 #pragma once
 
-#define MAIN_HWTEST_VERSION "0.2.4"
+#define MAIN_HWTEST_VERSION "0.3.0"
