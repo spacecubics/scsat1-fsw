@@ -9,6 +9,7 @@
 #include "wdog.h"
 #include "data_nor.h"
 #include "fram.h"
+#include "pwrctrl_main.h"
 
 int main(void)
 {
@@ -19,6 +20,8 @@ int main(void)
 	sc_fram_update_boot_count();
 
 	sc_csp_init();
+
+	sc_main_power_enable(PDU_O1_PWR);
 
 	while (true) {
 		k_sleep(K_SECONDS(1));
