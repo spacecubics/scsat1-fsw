@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <csp/csp.h>
+#include <csp/csp_id.h>
 #include <csp/drivers/can_zephyr.h>
 #include <zephyr/device.h>
 #include <zephyr/shell/shell_uart.h>
@@ -105,7 +106,6 @@ void server(void)
 int csp_enable(void)
 {
 	int ret;
-	const char *rtable = "2 CAN2,12 CAN2,14 CAN2";
 	const char *ifname1 = "CAN1";
 	const char *ifname2 = "CAN2";
 	const struct device *can1 = DEVICE_DT_GET(DT_NODELABEL(can0));
@@ -135,11 +135,9 @@ int csp_enable(void)
 		goto end;
 	}
 
-	ret = csp_rtable_load(rtable);
-	if (ret < 1) {
-		csp_print("csp_rtable_load(%s) failed, error: %d\n", rtable, ret);
-		goto end;
-	}
+	csp_rtable_set(CSP_ID_ADCS, csp_id_get_host_bits(), can_iface2, CSP_NO_VIA_ADDRESS);
+	csp_rtable_set(CSP_ID_ZERO, csp_id_get_host_bits(), can_iface2, CSP_NO_VIA_ADDRESS);
+	csp_rtable_set(CSP_ID_PICO, csp_id_get_host_bits(), can_iface2, CSP_NO_VIA_ADDRESS);
 
 	LOG_INF("Connection table");
 	csp_conn_print_table();
