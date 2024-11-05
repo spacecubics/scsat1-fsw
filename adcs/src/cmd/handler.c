@@ -11,6 +11,7 @@
 #include "file.h"
 #include "flash.h"
 #include "tlm.h"
+#include "sys.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -19,6 +20,7 @@ LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 #define CSP_PORT_ADCS_FILE    (13U)
 #define CSP_PORT_ADCS_FLASH   (14U)
 #define CSP_PORT_ADCS_TLM     (15U)
+#define CSP_PORT_ADCS_SYSTEM  (16U)
 
 struct csp_stat csp_stat = {0};
 
@@ -66,6 +68,9 @@ void csp_cmd_handler(void)
 				break;
 			case CSP_PORT_ADCS_TLM:
 				csp_tlm_handler(packet);
+				break;
+			case CSP_PORT_ADCS_SYSTEM:
+				csp_system_handler(packet);
 				break;
 			default:
 				csp_service_handler(packet);
