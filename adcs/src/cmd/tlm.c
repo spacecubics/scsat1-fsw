@@ -22,7 +22,7 @@ LOG_MODULE_REGISTER(tlm, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 int csp_tlm_handler(csp_packet_t *packet)
 {
-	int ret;
+	int ret = 0;
 	uint8_t command_id;
 
 	if (packet == NULL) {
