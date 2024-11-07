@@ -8,6 +8,7 @@
 #include "sc_csp.h"
 #include "reply.h"
 #include "fram.h"
+#include "sys.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sys_handler, CONFIG_SC_LIB_CSP_LOG_LEVEL);
@@ -70,4 +71,16 @@ free:
 
 end:
 	return ret;
+}
+
+void csp_system_update_stat(csp_packet_t *packet, struct csp_stat *stat)
+{
+	stat->received_command_count++;
+	stat->last_csp_port = packet->id.dport;
+
+	if (packet->length > 0) {
+		stat->last_command_id = packet->data[CSP_COMMAND_ID_OFFSET];
+	} else {
+		stat->last_command_id = CSP_UNKNOWN_CMD_CODE;
+	}
 }

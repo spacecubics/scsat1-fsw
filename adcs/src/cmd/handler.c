@@ -24,18 +24,6 @@ LOG_MODULE_REGISTER(handler, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 struct csp_stat csp_stat = {0};
 
-static void update_csp_stat(csp_packet_t *packet)
-{
-	csp_stat.received_command_count++;
-	csp_stat.last_csp_port = packet->id.dport;
-
-	if (packet->length > 0) {
-		csp_stat.last_command_id = packet->data[CSP_COMMAND_ID_OFFSET];
-	} else {
-		csp_stat.last_command_id = CSP_UNKNOWN_CMD_CODE;
-	}
-}
-
 void csp_cmd_handler(void)
 {
 	LOG_INF("CSP command handler task started");
@@ -55,7 +43,7 @@ void csp_cmd_handler(void)
 
 		csp_packet_t *packet;
 		while ((packet = csp_read(conn, 50)) != NULL) {
-			update_csp_stat(packet);
+			csp_system_update_stat(packet, &csp_stat);
 			switch (csp_conn_dport(conn)) {
 			case CSP_PORT_ADCS_PWRCTRL:
 				csp_pwrctrl_handler(packet);
