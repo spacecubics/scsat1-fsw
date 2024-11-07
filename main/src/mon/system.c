@@ -10,6 +10,7 @@
 #include "system.h"
 #include "handler.h"
 #include "fram.h"
+#include "sys.h"
 #include "pwrctrl_main.h"
 #include "sc_fpgaconf.h"
 #include "sc_fpgahrmem.h"
