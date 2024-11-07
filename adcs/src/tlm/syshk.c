@@ -28,7 +28,7 @@ ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_ADCS_SYSHK_SUB_QUEUE_SIZE);
 
 #define SYSHK_SYSTEM_BLOCK_SIZE (33U)
 #define SYSHK_TEMP_BLOCK_SIZE   (35U)
-#define SYSHK_CV_BLOCK_SIZE     (135U)
+#define SYSHK_CV_BLOCK_SIZE     (105U)
 
 struct syshk_tlm {
 	uint8_t telemetry_id;
@@ -123,13 +123,6 @@ static void copy_cv_to_syshk(struct cv_msg *msg)
 		cv_block += sizeof(msg->adcs[pos].status);
 		memcpy(cv_block, &msg->adcs[pos].cv, sizeof(msg->adcs[pos].cv));
 		cv_block += sizeof(msg->adcs[pos].cv);
-	}
-
-	for (pos = 0; pos < ADCS_RW_CV_POS_NUM; pos++) {
-		memcpy(cv_block, &msg->rw[pos].status, sizeof(msg->rw[pos].status));
-		cv_block += sizeof(msg->rw[pos].status);
-		memcpy(cv_block, &msg->rw[pos].cv, sizeof(msg->rw[pos].cv));
-		cv_block += sizeof(msg->rw[pos].cv);
 	}
 }
 

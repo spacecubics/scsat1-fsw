@@ -23,7 +23,6 @@ struct cv_msg {
 	struct cv_int32_entry obc[OBC_CV_POS_NUM];
 	struct cv_float_entry xadc[OBC_XADC_CV_POS_NUM];
 	struct cv_int32_entry adcs[ADCS_CV_POS_NUM];
-	struct cv_float_entry rw[ADCS_RW_CV_POS_NUM];
 };
 
 void start_cv_monitor(void);

@@ -35,10 +35,6 @@ static void cv_monitor(struct k_work *work)
 		ADCS_VDD_3V3_IMU_SHUNT, ADCS_VDD_3V3_IMU_BUS,   ADCS_VDD_3V3_GPS_SHUNT,
 		ADCS_VDD_3V3_GPS_BUS,   ADCS_VDD_3V3_DRV_SHUNT, ADCS_VDD_3V3_DRV_BUS,
 	};
-	enum rw_cv_pos rw_pos_list[] = {
-		ADCS_VDD_12V_DRVX_SHUNT, ADCS_VDD_12V_DRVX_BUS,   ADCS_VDD_12V_DRVY_SHUNT,
-		ADCS_VDD_12V_DRVY_BUS,   ADCS_VDD_12V_DRVZ_SHUNT, ADCS_VDD_12V_DRVZ_BUS,
-	};
 
 	for (pos = 0; pos < ARRAY_SIZE(obc_pos_list); pos++) {
 		msg.obc[pos].status = sc_bhm_get_obc_cv(obc_pos_list[pos], &msg.obc[pos].cv);
@@ -58,13 +54,6 @@ static void cv_monitor(struct k_work *work)
 		msg.adcs[pos].status = get_adcs_cv(adcs_pos_list[pos], &msg.adcs[pos].cv);
 		if (msg.adcs[pos].status < 0) {
 			msg.adcs[pos].cv = CV_INVALID_INT;
-		}
-	}
-
-	for (pos = 0; pos < ARRAY_SIZE(rw_pos_list); pos++) {
-		msg.rw[pos].status = get_rw_cv(rw_pos_list[pos], &msg.rw[pos].cv);
-		if (msg.rw[pos].status < 0) {
-			msg.rw[pos].cv = CV_INVALID_INT;
 		}
 	}
 
