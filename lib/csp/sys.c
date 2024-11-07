@@ -75,6 +75,11 @@ end:
 
 void csp_system_update_stat(csp_packet_t *packet, struct csp_stat *stat)
 {
+	/* Pings from the EPS are not counted */
+	if (packet->id.src != CSP_ID_GND) {
+		goto end;
+	}
+
 	stat->received_command_count++;
 	stat->last_csp_port = packet->id.dport;
 
@@ -83,4 +88,7 @@ void csp_system_update_stat(csp_packet_t *packet, struct csp_stat *stat)
 	} else {
 		stat->last_command_id = CSP_UNKNOWN_CMD_CODE;
 	}
+
+end:
+	return;
 }
