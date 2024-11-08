@@ -28,6 +28,24 @@ config SC_LIB_CSP_READ_TIMEOUT_MSEC
 	help
 	  Timeout for CSP read (msec).
 
+config SC_LIB_CSP_FILE_THREAD_PRIORITY
+	int "File operation thread priority"
+	default 3
+	help
+	  File operation thread priority
+
+config SC_LIB_CSP_FILE_THREAD_STACK_SIZE
+	int "File operation thread stack size"
+	default 4096
+	help
+	  File operation thread stack size.
+
+config SC_LIB_CSP_MAX_FILE_WORK
+	int "MAX number of file operation work"
+	default 10
+	help
+	  MAX number of file operation work.
+
 module = SC_LIB_CSP
 module-str = Space Cubics CSP libraries
 source "subsys/logging/Kconfig.template.log_config"

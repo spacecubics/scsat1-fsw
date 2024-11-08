@@ -13,6 +13,16 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(file, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 
+K_THREAD_STACK_DEFINE(file_workq_stack, CONFIG_SC_LIB_CSP_FILE_THREAD_STACK_SIZE);
+
+struct file_work {
+	struct k_work work;
+	csp_packet_t *packet;
+};
+
+struct k_work_q file_workq;
+struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
+
 /* Command size */
 #define FILE_CMD_MIN_SIZE    (1U)
 #define FILE_INFO_CMD_SIZE   (1U) /* without file name length */
@@ -24,6 +34,20 @@ LOG_MODULE_REGISTER(file, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 
 /* Command argument offset */
 #define FILE_FNAME_OFFSET (1U)
+
+static struct file_work *csp_get_file_work(void)
+{
+	struct file_work *file_work;
+
+	for (int i = 0; i < CONFIG_SC_LIB_CSP_MAX_FILE_WORK; i++) {
+		file_work = &file_works[i];
+		if (!k_work_is_pending(&file_work->work)) {
+			return file_work;
+		}
+	}
+
+	return NULL;
+}
 
 static int csp_get_file_info(const char *fname, struct fs_dirent *entry)
 {
@@ -110,19 +134,26 @@ end:
 	return ret;
 }
 
-int csp_file_handler(csp_packet_t *packet)
+static void csp_file_work(struct k_work *work)
 {
-	int ret;
+	int ret = 0;
 	uint8_t command_id;
+	struct file_work *file_work;
+	csp_packet_t *packet;
+
+	file_work = CONTAINER_OF(work, struct file_work, work);
+	packet = file_work->packet;
 
 	if (packet == NULL) {
 		ret = -EINVAL;
+		command_id = CSP_UNKNOWN_CMD_CODE;
 		goto end;
 	}
 
 	if (packet->length < FILE_CMD_MIN_SIZE) {
 		LOG_ERR("Invalide command size: %d", packet->length);
 		ret = -EINVAL;
+		command_id = CSP_UNKNOWN_CMD_CODE;
 		goto free;
 	}
 
@@ -138,12 +169,45 @@ int csp_file_handler(csp_packet_t *packet)
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
 		ret = -EINVAL;
+		command_id = CSP_UNKNOWN_CMD_CODE;
 		break;
 	}
 
 free:
-	csp_buffer_free(packet);
+	if (ret < 0) {
+		csp_send_std_reply(packet, command_id, ret);
+	}
+
+end:
+	return;
+}
+
+int csp_file_handler(csp_packet_t *packet)
+{
+	int ret = 0;
+	struct file_work *file_work;
+
+	file_work = csp_get_file_work();
+	if (file_work == NULL) {
+		LOG_ERR("File operation work queue is busy");
+		ret = -EBUSY;
+		goto end;
+	}
+
+	file_work->packet = packet;
+	k_work_submit_to_queue(&file_workq, &file_work->work);
 
 end:
 	return ret;
+}
+
+void csp_file_handler_init(void)
+{
+	k_work_queue_start(&file_workq, file_workq_stack, K_THREAD_STACK_SIZEOF(file_workq_stack),
+			   CONFIG_SC_LIB_CSP_FILE_THREAD_PRIORITY, NULL);
+	k_thread_name_set(&file_workq.thread, "file_workq");
+
+	for (int i = 0; i < CONFIG_SC_LIB_CSP_MAX_FILE_WORK; i++) {
+		k_work_init(&file_works[i].work, csp_file_work);
+	}
 }
