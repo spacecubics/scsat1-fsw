@@ -17,4 +17,5 @@ struct file_info_telemetry {
 	char file_name[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN];
 } __attribute__((__packed__));
 
+void csp_file_handler_init(void);
 int csp_file_handler(csp_packet_t *packet);
