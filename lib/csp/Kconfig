@@ -46,6 +46,18 @@ config SC_LIB_CSP_MAX_FILE_WORK
 	help
 	  MAX number of file operation work.
 
+config SC_LIB_CSP_CRC_CHUNK_SIZE
+	int "Chunk size for CRC32 calculation"
+	default 256
+	help
+	  Chunk size for CRC 32 calculation.
+
+config SC_LIB_CSP_CRC_CALC_SLEEP_MSEC
+	int "Sleep time for CRC32 calculation (msec)"
+	default 20
+	help
+	  Sleep time for CRC32 calculation (msec).
+
 module = SC_LIB_CSP
 module-str = Space Cubics CSP libraries
 source "subsys/logging/Kconfig.template.log_config"

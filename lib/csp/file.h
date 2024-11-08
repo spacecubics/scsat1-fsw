@@ -14,6 +14,7 @@ struct file_info_telemetry {
 	uint32_t error_code;
 	uint8_t entry_type;
 	uint32_t file_size;
+	uint32_t crc32;
 	char file_name[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN];
 } __attribute__((__packed__));
 
