@@ -25,6 +25,8 @@ static struct fs_mount_t lfs_storage_mnt = {
 
 struct fs_mount_t *mountpoint = &lfs_storage_mnt;
 
+K_MUTEX_DEFINE(data_nor_mutex);
+
 int datafs_init(void)
 {
 	struct fs_statvfs sbuf;
@@ -92,6 +94,51 @@ close:
 		LOG_ERR("Faild to close the boot count file %s (%d)", fname, ret);
 		goto close;
 	}
+
+end:
+	return ret;
+}
+
+/*
+ * The NOR flash for data storage has two banks, but currently,
+ * only one bank is usable. Therefore, Erase will only support
+ * the bank in use.
+ */
+int data_nor_erase(uint8_t id)
+{
+	int ret;
+	const struct flash_area *flash = NULL;
+	size_t size;
+
+	/*
+	 * Since erasing the Configuration Flash memory is not a frequently performed operation,
+	 * it will adopt a specification that uniformly disallows concurrent execution,
+	 * regardless of differences in banks or partitions.
+	 */
+	ret = k_mutex_lock(&data_nor_mutex, K_NO_WAIT);
+	if (ret != 0) {
+		goto end;
+	}
+
+	ret = flash_area_open(id, &flash);
+	if (ret < 0) {
+		LOG_ERR("Failed to open the partition (id:%d)", id);
+		goto unlock;
+	}
+
+	size = flash->fa_size;
+
+	ret = flash_area_erase(flash, 0, size);
+	if (ret < 0) {
+		LOG_ERR("Failed to erase the partition (id:%d)", id);
+	} else {
+		LOG_INF("Finish to erase the partition (id:%d, size:%d)", id, size);
+	}
+
+	flash_area_close(flash);
+
+unlock:
+	k_mutex_unlock(&data_nor_mutex);
 
 end:
 	return ret;

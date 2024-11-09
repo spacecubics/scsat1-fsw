@@ -8,3 +8,4 @@
 
 int datafs_init(void);
 int update_boot_count(const char *fname);
+int data_nor_erase(uint8_t id);
