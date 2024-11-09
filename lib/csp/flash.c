@@ -10,22 +10,26 @@
 #include "sc_csp.h"
 #include "reply.h"
 #include "config_nor.h"
+#include "data_nor.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 
 /* Command size */
-#define FLASH_CMD_MIN_SIZE       (1U)
-#define FLASH_ERASE_CFG_CMD_SIZE (11U)
+#define FLASH_CMD_MIN_SIZE        (1U)
+#define FLASH_ERASE_CFG_CMD_SIZE  (11U)
+#define FLASH_ERASE_DATA_CMD_SIZE (2U)
 
 /* Command ID */
-#define FLASH_CFG_ERASE_CMD (0U)
+#define FLASH_CFG_ERASE_CMD  (0U)
+#define FLASH_DATA_ERASE_CMD (1U)
 
 /* Command argument offset */
 #define FLASH_CFG_BANK_OFFSET (1U)
 #define FLASH_CFG_PID_OFFET   (2U)
 #define FLASH_CFG_OFST_OFFSET (3U)
 #define FLASH_CFG_SIZE_OFFSET (7U)
+#define FLASH_DATA_PID_OFFET  (1U)
 
 #define UNKOWN_COMMAND_ID (0xFF)
 
@@ -66,6 +70,28 @@ end:
 	return ret;
 }
 
+static int csp_flash_data_erase_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret;
+	uint8_t partition_id;
+
+	if (packet->length != FLASH_ERASE_DATA_CMD_SIZE) {
+		LOG_ERR("Invalide command size: %d", packet->length);
+		ret = -EMSGSIZE;
+		goto end;
+	}
+
+	partition_id = packet->data[FLASH_DATA_PID_OFFET];
+
+	LOG_INF("Data NOR erase command (partition_id: %d)", partition_id);
+
+	ret = data_nor_erase(partition_id);
+
+end:
+	csp_send_std_reply(packet, command_id, ret);
+	return ret;
+}
+
 static void csp_flash_work_handler(struct k_work *item)
 {
 	uint8_t command_id;
@@ -77,6 +103,9 @@ static void csp_flash_work_handler(struct k_work *item)
 	switch (command_id) {
 	case FLASH_CFG_ERASE_CMD:
 		csp_flash_cfg_erase_cmd(command_id, packet);
+		break;
+	case FLASH_DATA_ERASE_CMD:
+		csp_flash_data_erase_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
