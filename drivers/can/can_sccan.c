@@ -779,7 +779,7 @@ static void sc_can_isr(const struct device *dev)
 		/* SC CAN does not distinguish between BIT0 and 1 errors,
 		 * so it counts on BIT0. */
 		CAN_STATS_BIT0_ERROR_INC(dev);
-		sc_can_tx_done(dev, SCCAN_BITER);
+		sc_can_tx_done(dev, -SCCAN_BITER);
 	}
 	if (isr & SCCAN_STFER) {
 	}
@@ -797,7 +797,7 @@ static void sc_can_isr(const struct device *dev)
 	if (isr & SCCAN_RCVDN) {
 	}
 	if (isr & SCCAN_TXFOVF) {
-		sc_can_tx_done(dev, SCCAN_TXFOVF);
+		sc_can_tx_done(dev, -SCCAN_TXFOVF);
 	}
 	if (isr & SCCAN_TXHBOVF) {
 		/* TX High Priority Buffer is not used yet */
