@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/crc.h>
 #include <csp/csp.h>
@@ -11,6 +12,8 @@
 #include "sc_csp.h"
 #include "reply.h"
 #include "upload.h"
+#include "sc_fpgaconf.h"
+#include "sc_fpgasys.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(file, CONFIG_SC_LIB_CSP_LOG_LEVEL);
@@ -26,9 +29,10 @@ struct k_work_q file_workq;
 struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 
 /* Command size */
-#define FILE_CMD_MIN_SIZE    (1U)
-#define FILE_INFO_CMD_SIZE   (2U) /* without file name length */
-#define FILE_REMOVE_CMD_SIZE (1U) /* without file name length */
+#define FILE_CMD_MIN_SIZE         (1U)
+#define FILE_INFO_CMD_SIZE        (2U)  /* without file name length */
+#define FILE_REMOVE_CMD_SIZE      (1U)  /* without file name length */
+#define FILE_COPY_TO_CFG_CMD_SIZE (15U) /* without file name length */
 
 /* Command ID */
 #define FILE_INFO_CMD         (0U)
@@ -36,11 +40,18 @@ struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 #define FILE_UPLOAD_OPEN_CMD  (2U)
 #define FILE_UPLOAD_DATA_CMD  (3U)
 #define FILE_UPLOAD_CLOSE_CMD (4U)
+#define FILE_COPY_TO_CFG_CMD  (5U)
 
 /* Command argument offset */
 #define FILE_CRC_OFFSET        (1U)
 #define FILE_FNAME_OFFSET      (2U)
 #define FILE_RM_FNAME_OFFSET   (1U)
+#define FILE_COPY_FNAME_OFFSET (1U)
+#define FILE_SRC_OFT_OFFSET    FILE_COPY_FNAME_OFFSET + CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN
+#define FILE_COPY_SIZE_OFFSET  FILE_SRC_OFT_OFFSET + (4U)
+#define FILE_COPY_BANK_OFFSET  FILE_COPY_SIZE_OFFSET + (4U)
+#define FILE_DST_PRT_OFFSET    FILE_COPY_BANK_OFFSET + (1U)
+#define FILE_DST_OFT_OFFSET    FILE_DST_PRT_OFFSET + (1U)
 
 static struct file_work *csp_get_file_work(void)
 {
@@ -107,6 +118,99 @@ static int csp_calc_crc32(const char *fname, size_t size, uint32_t *crc32)
 	fs_close(&file);
 
 	LOG_INF("CRC32: 0x%08x", *crc32);
+
+end:
+	return ret;
+}
+
+static int copy_file_to_cfg(const char *src_file, off_t src_offset, size_t size, uint8_t bank,
+			    uint8_t partition_id, off_t dst_offset)
+{
+	int ret;
+	const struct flash_area *flash = NULL;
+	struct fs_file_t file;
+	struct fs_dirent entry;
+	uint8_t buffer[CONFIG_SC_LIB_CSP_COPY_CHUNK_SIZE];
+	size_t remainig_size;
+	size_t read_size;
+	off_t offset = dst_offset;
+
+	ret = fs_stat(src_file, &entry);
+	if (ret < 0) {
+		LOG_ERR("Faild to get the file info %s (%d)", src_file, ret);
+		goto end;
+	}
+
+	fs_file_t_init(&file);
+
+	if (entry.size < size) {
+		LOG_ERR("Invalide copy size: %d", size);
+		ret = -EINVAL;
+		goto close;
+	}
+
+	ret = fs_open(&file, src_file, FS_O_READ);
+	if (ret < 0) {
+		LOG_ERR("Faild to open the src file %s (%d)", src_file, ret);
+		goto end;
+	}
+
+	ret = fs_seek(&file, src_offset, FS_SEEK_SET);
+	if (ret < 0) {
+		LOG_ERR("Faild to seek the upload file %s (%ld) (%d)", src_file, src_offset, ret);
+		goto close;
+	}
+
+	ret = sc_select_cfgmem(bank);
+	if (ret < 0) {
+		LOG_ERR("Faild to select the config mem (%d) (%d)", bank, ret);
+		goto close;
+	}
+
+	ret = flash_area_open(partition_id, &flash);
+	if (ret < 0) {
+		LOG_ERR("Failed to open flash area (%d)", partition_id);
+		goto close;
+	}
+
+	if (size > 0) {
+		remainig_size = size;
+	} else {
+		remainig_size = entry.size;
+	}
+
+	while (remainig_size) {
+
+		if (remainig_size < sizeof(buffer)) {
+			read_size = remainig_size;
+		} else {
+			read_size = sizeof(buffer);
+		}
+
+		read_size = fs_read(&file, buffer, read_size);
+		if (read_size < 0) {
+			LOG_ERR("Failed to read from src file %s (%d)", src_file, read_size);
+			break;
+		}
+
+		ret = flash_area_write(flash, offset, buffer, sizeof(buffer));
+		if (ret < 0) {
+			LOG_ERR("Failed to write to NOR flash (%ld) (%d)", offset, ret);
+			break;
+		}
+
+		offset += read_size;
+		remainig_size -= read_size;
+
+		k_sleep(K_MSEC(CONFIG_SC_LIB_CSP_COPY_SLEEP_MSEC));
+	}
+
+	flash_area_close(flash);
+
+	LOG_INF("Finish to copy from %s to MEM%d:%d", src_file, bank, partition_id);
+
+close:
+	fs_close(&file);
 
 end:
 	return ret;
@@ -188,6 +292,41 @@ end:
 	csp_send_std_reply(packet, command_id, ret);
 	return ret;
 }
+static int csp_file_copy_to_cfg_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret = 0;
+	char src_file[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN];
+	off_t src_offset;
+	size_t size;
+	uint8_t bank;
+	uint8_t partition_id;
+	off_t dst_offset;
+
+	if (packet->length != FILE_COPY_TO_CFG_CMD_SIZE + CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN) {
+		LOG_ERR("Invalide command size: %d", packet->length);
+		ret = -EINVAL;
+		goto end;
+	}
+
+	strncpy(src_file, &packet->data[FILE_COPY_FNAME_OFFSET],
+		CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN);
+	src_file[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN - 1] = '\0';
+	src_offset = sys_le32_to_cpu(*(uint32_t *)&packet->data[FILE_SRC_OFT_OFFSET]);
+	size = sys_le32_to_cpu(*(uint32_t *)&packet->data[FILE_COPY_SIZE_OFFSET]);
+	bank = packet->data[FILE_COPY_BANK_OFFSET];
+	partition_id = packet->data[FILE_DST_PRT_OFFSET];
+	dst_offset = sys_le32_to_cpu(*(uint32_t *)&packet->data[FILE_DST_OFT_OFFSET]);
+
+	LOG_INF("File copy to config mem command (src: %s) (src offset: %ld) (size: %d) (dst bank: "
+		"%d) (dst partition: %d) (dst offste: %ld)",
+		src_file, src_offset, size, bank, partition_id, dst_offset);
+
+	ret = copy_file_to_cfg(src_file, src_offset, size, bank, partition_id, dst_offset);
+
+end:
+	csp_send_std_reply(packet, command_id, ret);
+	return ret;
+}
 
 static void csp_file_work(struct k_work *work)
 {
@@ -229,6 +368,9 @@ static void csp_file_work(struct k_work *work)
 		break;
 	case FILE_UPLOAD_CLOSE_CMD:
 		csp_file_upload_close_cmd(command_id, packet);
+		break;
+	case FILE_COPY_TO_CFG_CMD:
+		csp_file_copy_to_cfg_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);

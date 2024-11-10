@@ -77,6 +77,18 @@ config CS_LIB_CSP_UPLOAD_DATA_REPLY_ENTRY
 	help
 	  Entry number of upload data command reply.
 
+config SC_LIB_CSP_COPY_CHUNK_SIZE
+	int "Copy size from file to Configuration NOR flash"
+	default 256
+	help
+	  Copy size from file to Configuration NOR flash.
+
+config SC_LIB_CSP_COPY_SLEEP_MSEC
+	int "Sleep time for copy from file to COnfiguration NOR flash (msec)"
+	default 20
+	help
+	  Sleep time for copy from file to COnfiguration NOR flash (msec)
+
 module = SC_LIB_CSP
 module-str = Space Cubics CSP libraries
 source "subsys/logging/Kconfig.template.log_config"
