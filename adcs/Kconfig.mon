@@ -8,31 +8,31 @@ config SCSAT1_ADCS_MON_SYSTEM_INTERVAL_MSEC
 
 config SCSAT1_ADCS_MON_TEMP_INTERVAL_MSEC
 	int "Monitor interval for Temperature (msec)"
-	default 1000
+	default 5000
 	help
 	  Monitor interval for Temperature (sec).
 
 config SCSAT1_ADCS_MON_CV_INTERVAL_MSEC
 	int "Monitor interval for CV (msec)"
-	default 1000
+	default 5000
 	help
 	  Monitor interval for CV (sec).
 
 config SCSAT1_ADCS_MON_SYSTEM_DELAY_MSEC
 	int "Delay time before starting the monitoring (msec)."
-	default 100
+	default 500
 	help
 	  Delay time before starting the initial monitoring (msec).
 
 config SCSAT1_ADCS_MON_TEMP_DELAY_MSEC
 	int "Delay time before starting the monitoring (msec)."
-	default 200
+	default 1500
 	help
 	  Delay time before starting the initial monitoring (msec).
 
 config SCSAT1_ADCS_MON_CV_DELAY_MSEC
 	int "Delay time before starting the monitoring (msec)."
-	default 400
+	default 2500
 	help
 	  Delay time before starting the initial monitoring (msec).
 
