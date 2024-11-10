@@ -12,4 +12,6 @@ zephyr_library_sources_ifdef(CONFIG_SC_LIB_CSP upload.c)
 
 zephyr_include_directories(.)
 
+set(CSP_BUFFER_COUNT 50 CACHE STRING "Number of total packet buffers")
+set(CSP_QFIFO_LEN 50 CACHE STRING "Length of incoming queue for router task")
 zephyr_link_libraries(libcsp)
