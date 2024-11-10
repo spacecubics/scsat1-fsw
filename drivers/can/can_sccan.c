@@ -803,7 +803,6 @@ static void sc_can_isr(const struct device *dev)
 		/* TX High Priority Buffer is not used yet */
 	}
 	if (isr & SCCAN_ARBLST) {
-		sc_can_tx_done(dev, SCCAN_ARBLST);
 	}
 	if (isr & SCCAN_TRNSDN) {
 		sc_can_tx_done(dev, 0);
