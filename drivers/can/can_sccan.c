@@ -52,8 +52,8 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 #define SCCAN_CANEN BIT(0)
 
 /* CAN Error Count Register */
-#define SCCAN_RXECNT(x) (((x)&GENMASK(15, 8)) >> 8)
-#define SCCAN_TXECNT(x) (((x)&GENMASK(7, 0)))
+#define SCCAN_RXECNT(x) (((x) & GENMASK(15, 8)) >> 8)
+#define SCCAN_TXECNT(x) (((x) & GENMASK(7, 0)))
 
 /* CAN Bit Timing Setting Register */
 #define SCCAN_BTSR_SJW(x) ((x) << 7)
@@ -65,7 +65,7 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 #define SCCAN_TXFFL              BIT(6)
 #define SCCAN_TXHBFL             BIT(5)
 #define SCCAN_TXFNEP             BIT(4)
-#define SCCAN_ESTS(x)            (((x)&GENMASK(3, 2)) >> 2)
+#define SCCAN_ESTS(x)            (((x) & GENMASK(3, 2)) >> 2)
 #define SCCAN_EWRN               BIT(1)
 #define SCCAN_BBUSY              BIT(0)
 #define SCCAN_ESTS_CAN_DISABLE   (0U)
@@ -94,9 +94,9 @@ LOG_MODULE_REGISTER(sc_can, CONFIG_CAN_LOG_LEVEL);
 	 SCCAN_TXFOVFENB | SCCAN_TXHBOVFENB | SCCAN_ARBLSTENB | SCCAN_TRNSDNENB)
 
 /* CAN Controller IP Version Register */
-#define SCCAN_VER_MAJOR(x) (((x)&0xff000000) >> 24)
-#define SCCAN_VER_MINOR(x) (((x)&0x00ff0000) >> 16)
-#define SCCAN_VER_PATCH(x) (((x)&0x0000ffff) >> 0)
+#define SCCAN_VER_MAJOR(x) (((x) & 0xff000000) >> 24)
+#define SCCAN_VER_MINOR(x) (((x) & 0x00ff0000) >> 16)
+#define SCCAN_VER_PATCH(x) (((x) & 0x0000ffff) >> 0)
 
 /* CAN Interrupt Status Register */
 #define SCCAN_BUSOFF  BIT(13)
@@ -437,8 +437,8 @@ static void sc_can_set_acceptance_filter(const struct sc_can_cfg *config, int fi
  * "Acceptance filer" to SC CAN controller.
  */
 static int sc_can_add_acceptance_filter(const struct device *dev, int filter_id,
-					 can_rx_callback_t cb, void *cb_arg,
-					 const struct can_filter *filter)
+					can_rx_callback_t cb, void *cb_arg,
+					const struct can_filter *filter)
 {
 	const struct sc_can_cfg *config = dev->config;
 	struct sc_can_data *data = dev->data;
@@ -527,8 +527,8 @@ static void sc_can_rx_cb(const struct device *dev, struct can_frame *frame)
 		}
 
 		if (can_frame_matches_filter(frame, &data->rx_filters[filter_id].rx_filter)) {
-			data->rx_filters[filter_id].rx_cb(
-				dev, frame, data->rx_filters[filter_id].rx_cb_arg);
+			data->rx_filters[filter_id].rx_cb(dev, frame,
+							  data->rx_filters[filter_id].rx_cb_arg);
 			LOG_DBG("Filter matched. ID: %d", filter_id);
 		}
 	}
@@ -539,7 +539,7 @@ static void sc_can_rx_cb(const struct device *dev, struct can_frame *frame)
 static void sc_can_rx_isr(const struct device *dev)
 {
 	const struct sc_can_cfg *config = dev->config;
-	struct can_frame frame = { 0 };
+	struct can_frame frame = {0};
 
 	sc_can_get_idr_and_dlc(config, &frame);
 
@@ -560,7 +560,7 @@ static void sc_can_get_error_count(const struct sc_can_cfg *config, struct can_b
 }
 
 static void _sc_can_get_state(const struct device *dev, enum can_state *state,
-			    struct can_bus_err_cnt *err_cnt)
+			      struct can_bus_err_cnt *err_cnt)
 {
 	const struct sc_can_cfg *config = dev->config;
 	uint32_t status_reg;
@@ -770,7 +770,8 @@ static void sc_can_isr(const struct device *dev)
 		 * However we plan to improve the Interrupt Status Register.
 		 * Now, when an ACK error occurs, stop the CAN control.
 		 */
-		LOG_ERR("ACK error has occurred. Since there is no one on the CAN bus, will stop the CAN.");
+		LOG_ERR("ACK error has occurred. Since there is no one on the CAN bus, will stop "
+			"the CAN.");
 		CAN_STATS_ACK_ERROR_INC(dev);
 		sc_can_stop(dev);
 	}
@@ -1032,7 +1033,6 @@ static void sc_can_remove_rx_filter(const struct device *dev, int filter_id)
 		goto unlock;
 	}
 
-
 	LOG_DBG("Filter removed. ID: %d", filter_id);
 
 unlock:
@@ -1117,14 +1117,14 @@ static const struct can_driver_api sc_can_driver_api = {
 	 *     It shall be programmed to compensate the delay times of the actual network,
 	 *     rounded up to the nearest integer time quantum.
 	 *   - Phase_Seg1 shall be programmable to be 1, 2, 3, . . ., 8 or more time quanta long.
-	 *   - Phase_Seg2 shall be programmed to the maximum of Phase_Seg1 and the information processing
-	 *     time.
+	 *   - Phase_Seg2 shall be programmed to the maximum of Phase_Seg1 and the information
+	 * processing time.
 	 *   - SJW shall be programmable between 1 and the minimum of Phase_Seg1 and 4.
 	 *
-	 *   In a CAN implementation, Prop_Seg and Phase_Seg1 do not need to be programmable separately;
-	 *   it is sufficient to program the sum of Prop_Seg and Phase_Seg1.
-	 *   The total number of time quanta in a bit time shall be programmable at least from 8 to 25.
-	 * In this driver:
+	 *   In a CAN implementation, Prop_Seg and Phase_Seg1 do not need to be programmable
+	 * separately; it is sufficient to program the sum of Prop_Seg and Phase_Seg1. The total
+	 * number of time quanta in a bit time shall be programmable at least from 8 to 25. In this
+	 * driver:
 	 *  - SJW
 	 *    set to 1 - 4.
 	 *  - prop_seg
@@ -1136,22 +1136,21 @@ static const struct can_driver_api sc_can_driver_api = {
 	 *  - prescaler
 	 *    SC CAN IP core have 16 bit register value for set the prescaler. so set to 0x1000.
 	 */
-	.timing_min = { .sjw = 0x1,
-			.prop_seg = 0x01,
-			.phase_seg1 = 0x01,
-			.phase_seg2 = 0x01,
-			.prescaler = 0x01 },
-	.timing_max = { .sjw = 0x4,
-			.prop_seg = 0x08,
-			.phase_seg1 = 0x08,
-			.phase_seg2 = 0x08,
-			.prescaler = 0x1000 }
-};
+	.timing_min = {.sjw = 0x1,
+		       .prop_seg = 0x01,
+		       .phase_seg1 = 0x01,
+		       .phase_seg2 = 0x01,
+		       .prescaler = 0x01},
+	.timing_max = {.sjw = 0x4,
+		       .prop_seg = 0x08,
+		       .phase_seg1 = 0x08,
+		       .phase_seg2 = 0x08,
+		       .prescaler = 0x1000}};
 
 #define SCCAN_INIT(n)                                                                              \
 	static void sc_can_##n##_irq_init(const struct device *dev);                               \
 	static struct sc_can_tx_cb_data tx_cb_data_list_##n[DT_INST_PROP(n, tx_fifo_depth)];       \
-	static struct sc_can_rx_filters rx_filters_##n[DT_INST_PROP(n, max_filter)];          \
+	static struct sc_can_rx_filters rx_filters_##n[DT_INST_PROP(n, max_filter)];               \
 	static const struct sc_can_cfg sc_can_cfg_##n = {                                          \
 		.common = CAN_DT_DRIVER_CONFIG_INST_GET(n, 0, 1000000),                            \
 		.reg_addr = DT_INST_REG_ADDR(n),                                                   \
@@ -1166,7 +1165,7 @@ static const struct can_driver_api sc_can_driver_api = {
 		.tx_cb_data_list = tx_cb_data_list_##n,                                            \
 		.tx_head = 0,                                                                      \
 		.tx_tail = 0,                                                                      \
-		.rx_filters = rx_filters_##n,                                            \
+		.rx_filters = rx_filters_##n,                                                      \
 		.state = CAN_STATE_STOPPED,                                                        \
 	};                                                                                         \
 	CAN_DEVICE_DT_INST_DEFINE(n, sc_can_init, NULL, &sc_can_data_##n, &sc_can_cfg_##n,         \
