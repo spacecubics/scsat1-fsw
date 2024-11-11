@@ -9,6 +9,18 @@ menuconfig SC_LIB_FLASH
 
 if SC_LIB_FLASH
 
+config SC_LIB_FLASH_CRC_CHUNK_SIZE
+	int "Chunk size for calculate CRC32"
+	default 256
+	help
+	  Chunk size for calculate CRC32.
+
+config SC_LIB_FLASH_CRC_SLEEP_MSEC
+	int "Sleep time for calculate CRC32 (msec)"
+	default 20
+	help
+	  Sleep time for calculate CRC32 (msec).
+
 config SC_LIB_FLASH_DATA
 	bool "Enable Data Store Flash Memory"
 	default y
