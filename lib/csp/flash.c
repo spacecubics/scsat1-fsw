@@ -7,6 +7,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/byteorder.h>
 #include <csp/csp.h>
+#include "flash.h"
 #include "sc_csp.h"
 #include "reply.h"
 #include "config_nor.h"
@@ -19,10 +20,12 @@ LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 #define FLASH_CMD_MIN_SIZE        (1U)
 #define FLASH_ERASE_CFG_CMD_SIZE  (11U)
 #define FLASH_ERASE_DATA_CMD_SIZE (2U)
+#define FLASH_CALC_CRC_CMD_SIZE   (11U)
 
 /* Command ID */
 #define FLASH_CFG_ERASE_CMD  (0U)
 #define FLASH_DATA_ERASE_CMD (1U)
+#define FLASH_CALC_CRC_CMD   (2U)
 
 /* Command argument offset */
 #define FLASH_CFG_BANK_OFFSET (1U)
@@ -40,6 +43,23 @@ struct flash_work_msg {
 };
 
 static struct flash_work_msg flash_work_msg;
+
+static void csp_send_crc_reply(csp_packet_t *packet, uint8_t command_id, int err_code, uint8_t bank,
+			       uint8_t id, uint32_t crc32)
+{
+	struct cfg_crc_telemetry tlm;
+
+	tlm.telemetry_id = command_id;
+	tlm.error_code = sys_cpu_to_le32(err_code);
+	tlm.bank = bank;
+	tlm.partition_id = id;
+	tlm.crc32 = sys_cpu_to_le32(crc32);
+
+	memcpy(packet->data, &tlm, sizeof(tlm));
+	packet->length = sizeof(tlm);
+
+	csp_sendto_reply(packet, packet, CSP_O_SAME);
+}
 
 static int csp_flash_cfg_erase_cmd(uint8_t command_id, csp_packet_t *packet)
 {
@@ -92,6 +112,37 @@ end:
 	return ret;
 }
 
+static int csp_flash_calc_crc_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret;
+	uint8_t bank = 0;
+	uint8_t partition_id = 0;
+	off_t offset = 0;
+	size_t size = 0;
+	uint32_t crc32 = 0;
+
+	if (packet->length != FLASH_CALC_CRC_CMD_SIZE) {
+		LOG_ERR("Invalide command size: %d", packet->length);
+		ret = -EMSGSIZE;
+		goto end;
+	}
+
+	bank = packet->data[FLASH_CFG_BANK_OFFSET];
+	partition_id = packet->data[FLASH_CFG_PID_OFFET];
+	offset = sys_le32_to_cpu(*(uint32_t *)&packet->data[FLASH_CFG_OFST_OFFSET]);
+	size = sys_le32_to_cpu(*(uint32_t *)&packet->data[FLASH_CFG_SIZE_OFFSET]);
+
+	LOG_INF("Calculate CRC32 command (bank: %d) (partition_id: %d) (offset: %ld) (size: %d)",
+		bank, partition_id, offset, size);
+
+	ret = sc_config_nor_calc_crc(bank, partition_id, offset, size, &crc32);
+
+end:
+	csp_send_crc_reply(packet, command_id, ret, bank, partition_id, crc32);
+
+	return ret;
+}
+
 static void csp_flash_work_handler(struct k_work *item)
 {
 	uint8_t command_id;
@@ -106,6 +157,9 @@ static void csp_flash_work_handler(struct k_work *item)
 		break;
 	case FLASH_DATA_ERASE_CMD:
 		csp_flash_data_erase_cmd(command_id, packet);
+		break;
+	case FLASH_CALC_CRC_CMD:
+		csp_flash_calc_crc_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
