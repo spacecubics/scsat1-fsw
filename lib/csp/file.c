@@ -38,8 +38,9 @@ struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 #define FILE_UPLOAD_CLOSE_CMD (4U)
 
 /* Command argument offset */
-#define FILE_CRC_OFFSET   (1U)
-#define FILE_FNAME_OFFSET (2U)
+#define FILE_CRC_OFFSET        (1U)
+#define FILE_FNAME_OFFSET      (2U)
+#define FILE_RM_FNAME_OFFSET   (1U)
 
 static struct file_work *csp_get_file_work(void)
 {
@@ -176,7 +177,7 @@ static int csp_file_remove_cmd(uint8_t command_id, csp_packet_t *packet)
 		goto end;
 	}
 
-	strncpy(fname, &packet->data[FILE_FNAME_OFFSET], CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN);
+	strncpy(fname, &packet->data[FILE_RM_FNAME_OFFSET], CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN);
 	fname[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN - 1] = '\0';
 
 	LOG_INF("File remove command (fname: %s)", fname);
