@@ -9,3 +9,4 @@
 #include <stdint.h>
 
 int sc_config_nor_erase(uint8_t bank, uint8_t id, off_t offset, size_t size);
+int sc_config_nor_calc_crc(uint8_t bank, uint8_t id, off_t offset, size_t size, uint32_t *crc32);
