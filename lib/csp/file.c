@@ -397,6 +397,7 @@ int csp_file_handler(csp_packet_t *packet)
 	if (file_work == NULL) {
 		LOG_ERR("File operation work queue is busy");
 		ret = -EBUSY;
+		csp_buffer_free(packet);
 		goto end;
 	}
 
