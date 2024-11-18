@@ -7,6 +7,7 @@
 #include <zephyr/kernel.h>
 #include "csp.h"
 #include "wdog.h"
+#include "config_nor.h"
 #include "data_nor.h"
 #include "fram.h"
 #include "pwrctrl_main.h"
@@ -19,6 +20,7 @@ int main(void)
 	start_kick_wdt_thread();
 
 	datafs_init();
+	sc_config_nor_set_addr_mode();
 
 	sc_fram_update_boot_count();
 

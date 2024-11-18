@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <zephyr/drivers/spi.h>
 #include <zephyr/kernel.h>
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/crc.h>
@@ -12,6 +13,18 @@
 LOG_MODULE_REGISTER(config_nor, CONFIG_SC_LIB_FLASH_LOG_LEVEL);
 
 #include "sc_fpgasys.h"
+
+#define SC_SPI_NOR_CMD_WREN (0x06)
+#define SC_SPI_NOR_CMD_4BA  (0xB7)
+#define SC_SPI_NOR_BANK_NUM (2U)
+#define SC_SPI_NOR_MAX_FREQ (12000000U)
+
+static struct spi_config nor_config = {
+	.slave = 0,
+	.frequency = SC_SPI_NOR_MAX_FREQ,
+	.operation = SPI_OP_MODE_MASTER | SPI_LINES_SINGLE | SPI_WORD_SET(8),
+};
+const struct device *nor_dev = DEVICE_DT_GET(DT_NODELABEL(spi0));
 
 K_MUTEX_DEFINE(sc_config_nor_mutex);
 
@@ -129,4 +142,43 @@ unlock:
 
 end:
 	return ret;
+}
+
+void sc_config_nor_set_addr_mode(void)
+{
+	int ret;
+	uint8_t txbuf[1];
+	struct spi_buf tx_buf[1];
+	struct spi_buf_set tx_set = {.buffers = tx_buf, .count = 1};
+
+	for (uint8_t bank = 0; bank < SC_SPI_NOR_BANK_NUM; bank++) {
+
+		ret = sc_select_cfgmem(bank);
+		if (ret < 0) {
+			LOG_ERR("Failed to select the config memory (bank:%d)", bank);
+			continue;
+		}
+
+		/* Write Enable */
+		txbuf[0] = SC_SPI_NOR_CMD_WREN;
+		tx_buf[0].buf = txbuf;
+		tx_buf[0].len = 1;
+
+		ret = spi_transceive(nor_dev, &nor_config, &tx_set, NULL);
+		if (ret < 0) {
+			LOG_ERR("Failed to SPI transfer for Write Enalbe on Config NOR flash. (%d)",
+				ret);
+			continue;
+		}
+
+		/* Set 4-byte address mode */
+		txbuf[0] = SC_SPI_NOR_CMD_4BA;
+		tx_buf[0].buf = txbuf;
+		tx_buf[0].len = 1;
+
+		ret = spi_transceive(nor_dev, &nor_config, &tx_set, NULL);
+		if (ret < 0) {
+			LOG_ERR("Failed to SPI transfer for Set 4-byte address mode. (%d)", ret);
+		}
+	}
 }
