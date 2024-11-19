@@ -8,6 +8,7 @@
 #include "sc_csp.h"
 #include "reply.h"
 #include "syshk.h"
+#include "imu_tlm.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(tlm, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
@@ -17,6 +18,7 @@ LOG_MODULE_REGISTER(tlm, CONFIG_SCSAT1_ADCS_LOG_LEVEL);
 
 /* Command ID */
 #define TLM_SYSHK_CMD (0U)
+#define TLM_IMU_CMD   (1U)
 
 #define UNKOWN_COMMAND_ID (0xFF)
 
@@ -42,6 +44,9 @@ int csp_tlm_handler(csp_packet_t *packet)
 	case TLM_SYSHK_CMD:
 		send_syshk_to_ground();
 		csp_buffer_free(packet);
+		break;
+	case TLM_IMU_CMD:
+		send_imu_tlm(packet, command_id);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
