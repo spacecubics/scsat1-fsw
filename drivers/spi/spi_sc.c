@@ -122,9 +122,9 @@ static int spi_sc_send_tx_data(struct spi_context *ctx, const struct device *dev
 	const struct spi_sc_cfg *cfg = dev->config;
 	int ret;
 
-	*tx_size = ctx->current_tx->len;
+	*tx_size = ctx->tx_len;
 
-	if (ctx->current_tx->len > SC_QSPI_TX_BUFFER_SIZE) {
+	if (ctx->tx_len > SC_QSPI_TX_BUFFER_SIZE) {
 		*tx_size = SC_QSPI_TX_BUFFER_SIZE;
 	}
 
@@ -244,7 +244,7 @@ static int spi_sc_xfer(struct spi_context *ctx, const struct device *dev, uint8_
 
 		if (spi_context_rx_buf_on(ctx)) {
 			discard = false;
-			ret = spi_sc_read_rx_data(ctx, dev, ctx->current_rx->len, dfs, discard);
+			ret = spi_sc_read_rx_data(ctx, dev, ctx->rx_len, dfs, discard);
 			if (ret < 0) {
 				LOG_ERR("Failed to read the RX data. (%d)", ret);
 				goto end;
