@@ -8,6 +8,9 @@
 
 #include <stdint.h>
 
+#define IMU_STD_DATA_SIZE (19U)
+#define IMU_EXT_DATA_SIZE (26U)
+
 struct imu_gyro {
 	uint32_t x;
 	uint32_t y;
@@ -26,6 +29,7 @@ struct imu_data {
 	uint32_t temp;
 	struct imu_gyro gyro;
 	struct imu_acc acc;
+	uint8_t raw[IMU_EXT_DATA_SIZE];
 };
 
 void imu_enable(void);

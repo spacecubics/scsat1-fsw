@@ -12,8 +12,6 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(imu, CONFIG_SC_LIB_IMU_LOG_LEVEL);
 
-#define IMU_STD_DATA_SIZE    (19U)
-#define IMU_EXT_DATA_SIZE    (26U)
 #define IMU_SPI_WRITE        (0U)
 #define IMU_SPI_READ         BIT(7)
 #define IMU_IMU_DATA_EXT_REG (0x60)
@@ -43,6 +41,7 @@ static void imu_decode_imu_data_std(uint8_t *rxbuf, struct imu_data *data)
 	data->acc.x = sys_get_be16(&rxbuf[13]);
 	data->acc.y = sys_get_be16(&rxbuf[15]);
 	data->acc.z = sys_get_be16(&rxbuf[17]);
+	memcpy(data->raw, rxbuf, IMU_STD_DATA_SIZE);
 }
 
 static void imu_decode_imu_data_ext(uint8_t *rxbuf, struct imu_data *data)
@@ -56,6 +55,7 @@ static void imu_decode_imu_data_ext(uint8_t *rxbuf, struct imu_data *data)
 	data->acc.x = sys_get_be24(&rxbuf[17]);
 	data->acc.y = sys_get_be24(&rxbuf[20]);
 	data->acc.z = sys_get_be24(&rxbuf[23]);
+	memcpy(data->raw, rxbuf, IMU_EXT_DATA_SIZE);
 }
 
 void imu_enable(void)
@@ -96,6 +96,7 @@ int get_imu_data_std(struct imu_data *data)
 		LOG_ERR("Invalid ID: 0x%02x", data->id);
 		ret = -1;
 	}
+
 end:
 	return ret;
 }
