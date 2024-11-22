@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <zephyr/sys/byteorder.h>
 #include <csp/csp.h>
 #include "sc_csp.h"
 #include "reply.h"
@@ -14,10 +15,15 @@
 LOG_MODULE_REGISTER(sys_handler, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 
 /* Command size */
-#define SYSTEM_CMD_MIN_SIZE (1U)
+#define SYSTEM_CMD_MIN_SIZE      (1U)
+#define SYSTEM_READ_REG_CMD_SIZE (2U)
 
 /* Command ID */
 #define SYSTEM_CLEAR_BOOT_COUNT_CMD (0U)
+#define SYSTEM_READ_REG_CMD         (1U)
+
+/* Command argument offset */
+#define SYSTEM_REG_ADDR_OFFSET (1U)
 
 static int csp_system_clear_boot_count_cmd(uint8_t command_id, csp_packet_t *packet)
 {
@@ -28,6 +34,37 @@ static int csp_system_clear_boot_count_cmd(uint8_t command_id, csp_packet_t *pac
 	ret = sc_fram_clear_boot_count();
 
 	csp_send_std_reply(packet, command_id, ret);
+
+	return ret;
+}
+
+static int csp_system_read_reg_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret = 0;
+	struct system_reg_telemetry tlm;
+	uint32_t addr;
+	uint32_t value = 0;
+
+	if (packet->length < SYSTEM_READ_REG_CMD_SIZE) {
+		LOG_ERR("Invalide command size: %d", packet->length);
+		ret = -EINVAL;
+		goto reply;
+	}
+
+	addr = sys_be32_to_cpu(*(uint32_t *)&packet->data[SYSTEM_REG_ADDR_OFFSET]);
+	value = sys_read32(addr);
+
+	LOG_INF("Read FPGA register command: (addr: 0x%08x) (value: 0x%08x) ", addr, value);
+
+reply:
+	tlm.telemetry_id = command_id;
+	tlm.error_code = sys_cpu_to_le32(ret);
+	tlm.reg_value = sys_cpu_to_be32(value);
+
+	memcpy(packet->data, &tlm, sizeof(tlm));
+	packet->length = sizeof(tlm);
+
+	csp_sendto_reply(packet, packet, CSP_O_SAME);
 
 	return ret;
 }
@@ -55,6 +92,9 @@ int csp_system_handler(csp_packet_t *packet)
 	switch (command_id) {
 	case SYSTEM_CLEAR_BOOT_COUNT_CMD:
 		csp_system_clear_boot_count_cmd(command_id, packet);
+		break;
+	case SYSTEM_READ_REG_CMD:
+		csp_system_read_reg_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
