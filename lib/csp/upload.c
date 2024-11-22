@@ -133,7 +133,7 @@ static void csp_stack_upload_data_reply(struct session_entry *session, uint8_t c
 	entry = &tlm->entry[session->reply_count];
 
 	tlm->telemetry_id = command_id;
-	tlm->session_id = session->id;
+	tlm->session_id = sys_cpu_to_le16(session->id);
 	entry->error_code = sys_cpu_to_le32(err_code);
 	entry->offset = sys_cpu_to_le32(offset);
 	entry->size = sys_cpu_to_le32(size);
