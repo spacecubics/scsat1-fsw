@@ -14,6 +14,7 @@
 #include "upload.h"
 #include "sc_fpgaconf.h"
 #include "sc_fpgasys.h"
+#include "fram.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(file, CONFIG_SC_LIB_CSP_LOG_LEVEL);
@@ -30,7 +31,7 @@ struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 
 /* Command size */
 #define FILE_CMD_MIN_SIZE         (1U)
-#define FILE_INFO_CMD_SIZE        (2U)  /* without file name length */
+#define FILE_INFO_CMD_SIZE        (3U)  /* without file name length */
 #define FILE_REMOVE_CMD_SIZE      (1U)  /* without file name length */
 #define FILE_COPY_TO_CFG_CMD_SIZE (15U) /* without file name length */
 
@@ -44,7 +45,8 @@ struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 
 /* Command argument offset */
 #define FILE_CRC_OFFSET        (1U)
-#define FILE_FNAME_OFFSET      (2U)
+#define FILE_FRAM_OFFSET       (2U)
+#define FILE_FNAME_OFFSET      (3U)
 #define FILE_RM_FNAME_OFFSET   (1U)
 #define FILE_COPY_FNAME_OFFSET (1U)
 #define FILE_SRC_OFT_OFFSET    FILE_COPY_FNAME_OFFSET + CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN
@@ -244,6 +246,7 @@ static int csp_file_info_cmd(uint8_t command_id, csp_packet_t *packet)
 {
 	int ret = 0;
 	uint8_t crc_opt;
+	uint8_t fram_opt;
 	char fname[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN];
 	struct fs_dirent entry;
 	uint32_t crc32 = 0;
@@ -255,6 +258,7 @@ static int csp_file_info_cmd(uint8_t command_id, csp_packet_t *packet)
 	}
 
 	crc_opt = packet->data[FILE_CRC_OFFSET];
+	fram_opt = packet->data[FILE_FRAM_OFFSET];
 	strncpy(fname, &packet->data[FILE_FNAME_OFFSET], CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN);
 	fname[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN - 1] = '\0';
 
@@ -263,6 +267,9 @@ static int csp_file_info_cmd(uint8_t command_id, csp_packet_t *packet)
 	ret = csp_get_file_info(fname, &entry);
 	if (ret == 0 && crc_opt) {
 		(void)csp_calc_crc32(fname, entry.size, &crc32);
+		if (fram_opt) {
+			(void)sc_fram_update_crc_for_file(fname, crc32);
+		}
 	}
 
 end:
