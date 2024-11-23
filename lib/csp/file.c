@@ -42,6 +42,7 @@ struct file_work file_works[CONFIG_SC_LIB_CSP_MAX_FILE_WORK];
 #define FILE_UPLOAD_DATA_CMD  (3U)
 #define FILE_UPLOAD_CLOSE_CMD (4U)
 #define FILE_COPY_TO_CFG_CMD  (5U)
+#define FILE_GET_LAST_CRC_CMD (6U)
 
 /* Command argument offset */
 #define FILE_CRC_OFFSET        (1U)
@@ -242,6 +243,28 @@ static void csp_send_file_info_reply(struct fs_dirent *entry, uint32_t crc32, cs
 	csp_sendto_reply(packet, packet, CSP_O_SAME);
 }
 
+static void csp_send_last_crc_reply(const char *fname, uint32_t crc32, csp_packet_t *packet,
+				    uint8_t command_id, int err_code)
+{
+	struct file_last_crc_telemetry tlm;
+
+	if (err_code) {
+		memset(&tlm, 0, sizeof(tlm));
+	} else {
+		strncpy(tlm.file_name, fname, CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN);
+		tlm.file_name[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN - 1] = '\0';
+	}
+
+	tlm.telemetry_id = command_id;
+	tlm.error_code = sys_cpu_to_le32(err_code);
+	tlm.crc32 = sys_cpu_to_le32(crc32);
+
+	memcpy(packet->data, &tlm, sizeof(tlm));
+	packet->length = sizeof(tlm);
+
+	csp_sendto_reply(packet, packet, CSP_O_SAME);
+}
+
 static int csp_file_info_cmd(uint8_t command_id, csp_packet_t *packet)
 {
 	int ret = 0;
@@ -335,6 +358,22 @@ end:
 	return ret;
 }
 
+static int csp_file_get_last_crc(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret;
+	char fname[CONFIG_SC_LIB_CSP_FILE_NAME_MAX_LEN];
+	uint32_t crc32;
+
+	ret = sc_fram_get_crc_for_file(fname, &crc32);
+	if (ret < 0) {
+		LOG_ERR("Failed to read the last crc info (%d)", ret);
+	}
+
+	csp_send_last_crc_reply(fname, crc32, packet, command_id, ret);
+
+	return ret;
+}
+
 static void csp_file_work(struct k_work *work)
 {
 	int ret = 0;
@@ -378,6 +417,9 @@ static void csp_file_work(struct k_work *work)
 		break;
 	case FILE_COPY_TO_CFG_CMD:
 		csp_file_copy_to_cfg_cmd(command_id, packet);
+		break;
+	case FILE_GET_LAST_CRC_CMD:
+		csp_file_get_last_crc(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
