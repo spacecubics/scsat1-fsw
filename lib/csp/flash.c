@@ -12,6 +12,7 @@
 #include "reply.h"
 #include "config_nor.h"
 #include "data_nor.h"
+#include "fram.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
@@ -20,7 +21,7 @@ LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 #define FLASH_CMD_MIN_SIZE        (1U)
 #define FLASH_ERASE_CFG_CMD_SIZE  (11U)
 #define FLASH_ERASE_DATA_CMD_SIZE (2U)
-#define FLASH_CALC_CRC_CMD_SIZE   (11U)
+#define FLASH_CALC_CRC_CMD_SIZE   (12U)
 
 /* Command ID */
 #define FLASH_CFG_ERASE_CMD  (0U)
@@ -30,8 +31,9 @@ LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 /* Command argument offset */
 #define FLASH_CFG_BANK_OFFSET (1U)
 #define FLASH_CFG_PID_OFFET   (2U)
-#define FLASH_CFG_OFST_OFFSET (3U)
-#define FLASH_CFG_SIZE_OFFSET (7U)
+#define FLASH_CFG_FRAM_OFFET  (3U)
+#define FLASH_CFG_OFST_OFFSET (4U)
+#define FLASH_CFG_SIZE_OFFSET (8U)
 #define FLASH_DATA_PID_OFFET  (1U)
 
 #define UNKOWN_COMMAND_ID (0xFF)
@@ -117,9 +119,11 @@ static int csp_flash_calc_crc_cmd(uint8_t command_id, csp_packet_t *packet)
 	int ret;
 	uint8_t bank = 0;
 	uint8_t partition_id = 0;
+	uint8_t fram_opt;
 	off_t offset = 0;
 	size_t size = 0;
 	uint32_t crc32 = 0;
+	struct fram_cfgmem_crc crc_info;
 
 	if (packet->length != FLASH_CALC_CRC_CMD_SIZE) {
 		LOG_ERR("Invalide command size: %d", packet->length);
@@ -129,6 +133,7 @@ static int csp_flash_calc_crc_cmd(uint8_t command_id, csp_packet_t *packet)
 
 	bank = packet->data[FLASH_CFG_BANK_OFFSET];
 	partition_id = packet->data[FLASH_CFG_PID_OFFET];
+	fram_opt = packet->data[FLASH_CFG_FRAM_OFFET];
 	offset = sys_le32_to_cpu(*(uint32_t *)&packet->data[FLASH_CFG_OFST_OFFSET]);
 	size = sys_le32_to_cpu(*(uint32_t *)&packet->data[FLASH_CFG_SIZE_OFFSET]);
 
@@ -136,6 +141,15 @@ static int csp_flash_calc_crc_cmd(uint8_t command_id, csp_packet_t *packet)
 		bank, partition_id, offset, size);
 
 	ret = sc_config_nor_calc_crc(bank, partition_id, offset, size, &crc32);
+	if (ret == 0 && fram_opt) {
+		crc_info.bank = bank;
+		crc_info.partition_id = partition_id;
+		crc_info.offset = offset;
+		crc_info.size = size;
+		crc_info.crc32 = crc32;
+		(void)sc_fram_update_crc_for_cfgmem(crc_info);
+		(void)sc_fram_get_crc_for_cfgmem(&crc_info);
+	}
 
 end:
 	csp_send_crc_reply(packet, command_id, ret, bank, partition_id, crc32);
