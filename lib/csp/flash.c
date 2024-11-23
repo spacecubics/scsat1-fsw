@@ -24,9 +24,10 @@ LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 #define FLASH_CALC_CRC_CMD_SIZE   (12U)
 
 /* Command ID */
-#define FLASH_CFG_ERASE_CMD  (0U)
-#define FLASH_DATA_ERASE_CMD (1U)
-#define FLASH_CALC_CRC_CMD   (2U)
+#define FLASH_CFG_ERASE_CMD    (0U)
+#define FLASH_DATA_ERASE_CMD   (1U)
+#define FLASH_CALC_CRC_CMD     (2U)
+#define FLASH_GET_LAST_CRC_CMD (3U)
 
 /* Command argument offset */
 #define FLASH_CFG_BANK_OFFSET (1U)
@@ -58,6 +59,25 @@ static void csp_send_crc_reply(csp_packet_t *packet, uint8_t command_id, int err
 	tlm.offset = sys_cpu_to_le32(offset);
 	tlm.size = sys_cpu_to_le32(size);
 	tlm.crc32 = sys_cpu_to_le32(crc32);
+
+	memcpy(packet->data, &tlm, sizeof(tlm));
+	packet->length = sizeof(tlm);
+
+	csp_sendto_reply(packet, packet, CSP_O_SAME);
+}
+
+static void csp_send_last_crc_reply(struct fram_cfgmem_crc crc_info, csp_packet_t *packet,
+				    uint8_t command_id, int err_code)
+{
+	struct cfg_crc_telemetry tlm;
+
+	tlm.telemetry_id = command_id;
+	tlm.error_code = sys_cpu_to_le32(err_code);
+	tlm.bank = crc_info.bank;
+	tlm.partition_id = crc_info.partition_id;
+	tlm.offset = sys_cpu_to_le32(crc_info.offset);
+	tlm.size = sys_cpu_to_le32(crc_info.size);
+	tlm.crc32 = sys_cpu_to_le32(crc_info.crc32);
 
 	memcpy(packet->data, &tlm, sizeof(tlm));
 	packet->length = sizeof(tlm);
@@ -159,6 +179,21 @@ end:
 	return ret;
 }
 
+static int csp_flash_get_last_crc_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret;
+	struct fram_cfgmem_crc crc_info;
+
+	ret = sc_fram_get_crc_for_cfgmem(&crc_info);
+	if (ret < 0) {
+		LOG_ERR("Failed to read the last crc info (%d)", ret);
+	}
+
+	csp_send_last_crc_reply(crc_info, packet, command_id, ret);
+
+	return ret;
+}
+
 static void csp_flash_work_handler(struct k_work *item)
 {
 	uint8_t command_id;
@@ -176,6 +211,9 @@ static void csp_flash_work_handler(struct k_work *item)
 		break;
 	case FLASH_CALC_CRC_CMD:
 		csp_flash_calc_crc_cmd(command_id, packet);
+		break;
+	case FLASH_GET_LAST_CRC_CMD:
+		csp_flash_get_last_crc_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
