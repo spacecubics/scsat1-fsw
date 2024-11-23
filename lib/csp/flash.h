@@ -13,6 +13,8 @@ struct cfg_crc_telemetry {
 	uint32_t error_code;
 	uint8_t bank;
 	uint8_t partition_id;
+	uint32_t offset;
+	uint32_t size;
 	uint32_t crc32;
 } __attribute__((__packed__));
 

@@ -47,7 +47,7 @@ struct flash_work_msg {
 static struct flash_work_msg flash_work_msg;
 
 static void csp_send_crc_reply(csp_packet_t *packet, uint8_t command_id, int err_code, uint8_t bank,
-			       uint8_t id, uint32_t crc32)
+			       uint8_t id, uint32_t offset, uint32_t size, uint32_t crc32)
 {
 	struct cfg_crc_telemetry tlm;
 
@@ -55,6 +55,8 @@ static void csp_send_crc_reply(csp_packet_t *packet, uint8_t command_id, int err
 	tlm.error_code = sys_cpu_to_le32(err_code);
 	tlm.bank = bank;
 	tlm.partition_id = id;
+	tlm.offset = sys_cpu_to_le32(offset);
+	tlm.size = sys_cpu_to_le32(size);
 	tlm.crc32 = sys_cpu_to_le32(crc32);
 
 	memcpy(packet->data, &tlm, sizeof(tlm));
@@ -152,7 +154,7 @@ static int csp_flash_calc_crc_cmd(uint8_t command_id, csp_packet_t *packet)
 	}
 
 end:
-	csp_send_crc_reply(packet, command_id, ret, bank, partition_id, crc32);
+	csp_send_crc_reply(packet, command_id, ret, bank, partition_id, offset, size, crc32);
 
 	return ret;
 }
