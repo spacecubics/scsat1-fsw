@@ -51,7 +51,9 @@ LOG_MODULE_REGISTER(fram, CONFIG_SC_LIB_FRAM_LOG_LEVEL);
 #define QSPI_SPI_MODE_QUAD               (0x00020000)
 
 #define REG_READ_RETRY(count) (count)
+#define FRAM_CRC_FNAME_MAX    (64U)
 #define FRAM_BOOT_COUNT_ADDR  (0x000000)
+#define FRAM_CRC_FILE_ADDR    (0x000100)
 
 static bool assert32(uint32_t addr, uint32_t exp, uint32_t retry)
 {
@@ -519,5 +521,70 @@ int sc_fram_get_boot_count(uint8_t *boot_count)
 		LOG_ERR("Faild to get the boot count (%d)", ret);
 	}
 
+	return ret;
+}
+
+int sc_fram_update_crc_for_file(const char *fname, uint32_t crc32)
+{
+	int ret;
+	uint32_t fram_addr;
+	off_t offset = 0;
+
+	fram_addr = FRAM_CRC_FILE_ADDR;
+
+	for (int i = 0; i < FRAM_CRC_FNAME_MAX / QSPI_FIFO_MAX_BYTE; i++) {
+		ret = sc_fram_write(SC_FRAM_MEM0, fram_addr, QSPI_FIFO_MAX_BYTE,
+				    (uint8_t *)&fname[offset]);
+		if (ret < 0) {
+			LOG_ERR("Faild to write the CRC file name (fname: %s) (offset: %ld) (%d)",
+				fname, offset, ret);
+			goto end;
+		}
+		fram_addr += QSPI_FIFO_MAX_BYTE;
+		offset += QSPI_FIFO_MAX_BYTE;
+	}
+
+	ret = sc_fram_write(SC_FRAM_MEM0, fram_addr, sizeof(crc32), (uint8_t *)&crc32);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the CRC32 (fname: %s) (crc32: 0x%08x) (%d)", fname, crc32,
+			ret);
+		goto end;
+	}
+
+	LOG_INF("FRAM write CRC result (fname: %s, crc32 0x%08x)", fname, crc32);
+
+end:
+	return ret;
+}
+
+int sc_fram_get_crc_for_file(char *fname, uint32_t *crc32)
+{
+	int ret;
+	uint32_t fram_addr;
+	off_t offset = 0;
+
+	fram_addr = FRAM_CRC_FILE_ADDR;
+
+	for (int i = 0; i < FRAM_CRC_FNAME_MAX / QSPI_FIFO_MAX_BYTE; i++) {
+		ret = sc_fram_read(SC_FRAM_MEM0, fram_addr, QSPI_FIFO_MAX_BYTE,
+				   (uint8_t *)&fname[offset]);
+		if (ret < 0) {
+			LOG_ERR("Faild to read the CRC file name (offset: %ld) (%d)", offset, ret);
+			goto end;
+		}
+		fram_addr += QSPI_FIFO_MAX_BYTE;
+		offset += QSPI_FIFO_MAX_BYTE;
+	}
+
+	ret = sc_fram_read(SC_FRAM_MEM0, fram_addr, sizeof(*crc32), (uint8_t *)crc32);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the CRC32 (fname: %s) (crc32: 0x%08x) (%d)", fname, *crc32,
+			ret);
+		goto end;
+	}
+
+	LOG_INF("FRAM read CRC result (fname: %s, crc32 0x%08x)", fname, *crc32);
+
+end:
 	return ret;
 }
