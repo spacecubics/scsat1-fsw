@@ -54,6 +54,7 @@ LOG_MODULE_REGISTER(fram, CONFIG_SC_LIB_FRAM_LOG_LEVEL);
 #define FRAM_CRC_FNAME_MAX    (64U)
 #define FRAM_BOOT_COUNT_ADDR  (0x000000)
 #define FRAM_CRC_FILE_ADDR    (0x000100)
+#define FRAM_CRC_CFGMEM_ADDR  (0x000200)
 
 static bool assert32(uint32_t addr, uint32_t exp, uint32_t retry)
 {
@@ -584,6 +585,114 @@ int sc_fram_get_crc_for_file(char *fname, uint32_t *crc32)
 	}
 
 	LOG_INF("FRAM read CRC result (fname: %s, crc32 0x%08x)", fname, *crc32);
+
+end:
+	return ret;
+}
+
+int sc_fram_update_crc_for_cfgmem(struct fram_cfgmem_crc crc_info)
+{
+	int ret;
+	uint32_t fram_addr;
+
+	fram_addr = FRAM_CRC_CFGMEM_ADDR;
+
+	ret = sc_fram_write(SC_FRAM_MEM0, fram_addr, sizeof(crc_info.bank), &crc_info.bank);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the Config Memory Bank : %d (%d)", crc_info.bank, ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info.bank);
+
+	ret = sc_fram_write(SC_FRAM_MEM0, fram_addr, sizeof(crc_info.partition_id),
+			    &crc_info.partition_id);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the Config Memory Partition ID : %d (%d)",
+			crc_info.partition_id, ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info.partition_id);
+
+	ret = sc_fram_write(SC_FRAM_MEM0, fram_addr, sizeof(crc_info.offset),
+			    (uint8_t *)&crc_info.offset);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the Config Memory Offset : %d (%d)", crc_info.offset, ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info.offset);
+
+	ret = sc_fram_write(SC_FRAM_MEM0, fram_addr, sizeof(crc_info.size),
+			    (uint8_t *)&crc_info.size);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the Config Memory Size : %d (%d)", crc_info.size, ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info.size);
+
+	ret = sc_fram_write(SC_FRAM_MEM0, fram_addr, sizeof(crc_info.crc32),
+			    (uint8_t *)&crc_info.crc32);
+	if (ret < 0) {
+		LOG_ERR("Faild to write the Config Memory CRC32 : %d (%d)", crc_info.crc32, ret);
+		goto end;
+	}
+
+	LOG_INF("FRAM write CRC result (bank: %u, partion: %u, offset: %u, size: %u, crc32: "
+		"0x%08x)",
+		crc_info.bank, crc_info.partition_id, crc_info.offset, crc_info.size,
+		crc_info.crc32);
+
+end:
+	return ret;
+}
+
+int sc_fram_get_crc_for_cfgmem(struct fram_cfgmem_crc *crc_info)
+{
+	int ret;
+	uint32_t fram_addr;
+
+	fram_addr = FRAM_CRC_CFGMEM_ADDR;
+
+	ret = sc_fram_read(SC_FRAM_MEM0, fram_addr, sizeof(crc_info->bank), &crc_info->bank);
+	if (ret < 0) {
+		LOG_ERR("Faild to read the Config Memory Bank (%d)", ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info->bank);
+
+	ret = sc_fram_read(SC_FRAM_MEM0, fram_addr, sizeof(crc_info->partition_id),
+			   &crc_info->partition_id);
+	if (ret < 0) {
+		LOG_ERR("Faild to read the Config Memory Partition ID %d)", ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info->partition_id);
+
+	ret = sc_fram_read(SC_FRAM_MEM0, fram_addr, sizeof(crc_info->offset),
+			   (uint8_t *)&crc_info->offset);
+	if (ret < 0) {
+		LOG_ERR("Faild to read the Config Memory Offset (%d)", ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info->offset);
+
+	ret = sc_fram_read(SC_FRAM_MEM0, fram_addr, sizeof(crc_info->size),
+			   (uint8_t *)&crc_info->size);
+	if (ret < 0) {
+		LOG_ERR("Faild to read the Config Memory Size (%d)", ret);
+		goto end;
+	}
+	fram_addr += sizeof(crc_info->size);
+
+	ret = sc_fram_read(SC_FRAM_MEM0, fram_addr, sizeof(crc_info->crc32),
+			   (uint8_t *)&crc_info->crc32);
+	if (ret < 0) {
+		LOG_ERR("Faild to read the Config Memory CRC32 (%d)", ret);
+		goto end;
+	}
+
+	LOG_INF("FRAM read CRC result (bank: %u, partion: %u, offset: %u, size: %u, crc32 0x%08x)",
+		crc_info->bank, crc_info->partition_id, crc_info->offset, crc_info->size,
+		crc_info->crc32);
 
 end:
 	return ret;
