@@ -3,7 +3,7 @@ manifest:
   projects:
     - name: zephyr
       url: https://github.com/zephyrproject-rtos/zephyr
-      revision: v3.7-branch
+      revision: 30af4b26968c640d605f6e7853cff4e8daebe4f8
       path: zephyr
       west-commands: scripts/west-commands.yml
       import:
@@ -13,12 +13,12 @@ manifest:
 
     - name: libcsp
       url: https://github.com/libcsp/libcsp.git
-      revision: develop
+      revision: 1653d5b340cdf97ceb97dbf84b2dcbbfe8623e8c
       path: modules/lib/libcsp
 
     - name: littlefs
       url: https://github.com/zephyrproject-rtos/littlefs.git
-      revision: zephyr
+      revision: 009bcff0ed4853a53df8256039fa815bda6854dd
       path: modules/fs/littlefs
       groups:
         - fs
