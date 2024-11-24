@@ -170,7 +170,6 @@ static int csp_flash_calc_crc_cmd(uint8_t command_id, csp_packet_t *packet)
 		crc_info.size = size;
 		crc_info.crc32 = crc32;
 		(void)sc_fram_update_crc_for_cfgmem(crc_info);
-		(void)sc_fram_get_crc_for_cfgmem(&crc_info);
 	}
 
 end:
