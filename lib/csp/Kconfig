@@ -42,7 +42,7 @@ config SC_LIB_CSP_FILE_THREAD_STACK_SIZE
 
 config SC_LIB_CSP_MAX_FILE_WORK
 	int "MAX number of file operation work"
-	default 1000
+	default 300
 	help
 	  MAX number of file operation work.
 
