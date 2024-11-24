@@ -32,9 +32,9 @@ LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 /* Command argument offset */
 #define FLASH_CFG_BANK_OFFSET (1U)
 #define FLASH_CFG_PID_OFFET   (2U)
-#define FLASH_CFG_FRAM_OFFET  (3U)
-#define FLASH_CFG_OFST_OFFSET (4U)
-#define FLASH_CFG_SIZE_OFFSET (8U)
+#define FLASH_CFG_OFST_OFFSET (3U)
+#define FLASH_CFG_SIZE_OFFSET (7U)
+#define FLASH_CFG_FRAM_OFFET  (11U)
 #define FLASH_DATA_PID_OFFET  (1U)
 
 #define UNKOWN_COMMAND_ID (0xFF)
@@ -155,9 +155,9 @@ static int csp_flash_calc_crc_cmd(uint8_t command_id, csp_packet_t *packet)
 
 	bank = packet->data[FLASH_CFG_BANK_OFFSET];
 	partition_id = packet->data[FLASH_CFG_PID_OFFET];
-	fram_opt = packet->data[FLASH_CFG_FRAM_OFFET];
 	offset = sys_le32_to_cpu(*(uint32_t *)&packet->data[FLASH_CFG_OFST_OFFSET]);
 	size = sys_le32_to_cpu(*(uint32_t *)&packet->data[FLASH_CFG_SIZE_OFFSET]);
+	fram_opt = packet->data[FLASH_CFG_FRAM_OFFET];
 
 	LOG_INF("Calculate CRC32 command (bank: %d) (partition_id: %d) (offset: %ld) (size: %d)",
 		bank, partition_id, offset, size);
