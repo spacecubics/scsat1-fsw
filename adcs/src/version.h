@@ -6,4 +6,4 @@
 
 #pragma once
 
-#define ADCS_FSW_VERSION "0.1.0"
+#define ADCS_FSW_VERSION "1.0.0"
