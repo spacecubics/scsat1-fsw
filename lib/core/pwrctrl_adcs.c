@@ -34,7 +34,10 @@ void sc_adcs_power_enable(uint8_t target_bit)
 
 void sc_adcs_power_disable(uint8_t target_bit)
 {
-	sys_clear_bits(SCADCS_ADCS_BASE_ADDR + SCADCS_PCR_OFFSET, SCADCS_PCR_KEYCODE | target_bit);
+	uint32_t val = sys_read32(SCADCS_ADCS_BASE_ADDR + SCADCS_PCR_OFFSET);
+
+	val = SCADCS_PCR_KEYCODE | (val & ~target_bit);
+	sys_write32(val, SCADCS_ADCS_BASE_ADDR + SCADCS_PCR_OFFSET);
 }
 
 void sc_adcs_imu_reset(void)
