@@ -173,9 +173,14 @@
 					#address-cells = <1>;
 					#size-cells = <1>;
 
-					storage_partition: partition@0 {
+					tlm_partition: partition@0 {
+						label = "tlm_partition";
+						reg = <0x00000000 (DT_SIZE_M(8))>;
+					};
+
+					storage_partition: partition@800000 {
 						label = "storage_partition";
-						reg = <0x00000000 DT_SIZE_M(32)>;
+						reg = <0x00800000 (DT_SIZE_M(24))>;
 					};
 				};
 			};
