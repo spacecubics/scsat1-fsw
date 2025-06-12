@@ -131,7 +131,7 @@ int csp_enable(void)
 	ret = csp_can_open_and_add_interface(can2, ifname2, CSP_ID_MAIN, bitrate, filter_addr,
 					     filter_mask, &can_iface2);
 	if (ret != CSP_ERR_NONE) {
-		LOG_ERR("failed to add CAN interface [%s], error: %d\n", ifname1, ret);
+		LOG_ERR("failed to add CAN interface [%s], error: %d\n", ifname2, ret);
 		goto end;
 	}
 
