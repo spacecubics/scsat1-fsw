@@ -114,7 +114,7 @@ int csp_system_handler(csp_packet_t *packet)
 		csp_system_clear_tlm_seq_num_cmd(command_id, packet);
 		break;
 	default:
-		LOG_ERR("Unkown command code: %d", command_id);
+		LOG_ERR("Unknown command code: %d", command_id);
 		ret = -EINVAL;
 		command_id = CSP_UNKNOWN_CMD_CODE;
 		break;

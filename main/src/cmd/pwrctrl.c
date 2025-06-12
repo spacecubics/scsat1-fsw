@@ -97,7 +97,7 @@ int csp_pwrctrl_handler(csp_packet_t *packet)
 		csp_power_cycle_cmd(command_id, packet);
 		break;
 	default:
-		LOG_ERR("Unkown command code: %d", command_id);
+		LOG_ERR("Unknown command code: %d", command_id);
 		command_id = CSP_UNKNOWN_CMD_CODE;
 		ret = -EINVAL;
 		break;

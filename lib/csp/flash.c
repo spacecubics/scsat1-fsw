@@ -37,7 +37,7 @@ LOG_MODULE_REGISTER(sc_flash, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 #define FLASH_CFG_FRAM_OFFET  (11U)
 #define FLASH_DATA_PID_OFFET  (1U)
 
-#define UNKOWN_COMMAND_ID (0xFF)
+#define UNKNOWN_COMMAND_ID (0xFF)
 
 struct flash_work_msg {
 	struct k_work work;
@@ -215,8 +215,8 @@ static void csp_flash_work_handler(struct k_work *item)
 		csp_flash_get_last_crc_cmd(command_id, packet);
 		break;
 	default:
-		LOG_ERR("Unkown command code: %d", command_id);
-		csp_send_std_reply(packet, UNKOWN_COMMAND_ID, -EINVAL);
+		LOG_ERR("Unknown command code: %d", command_id);
+		csp_send_std_reply(packet, UNKNOWN_COMMAND_ID, -EINVAL);
 		break;
 	}
 
@@ -235,7 +235,7 @@ int csp_flash_handler(csp_packet_t *packet)
 
 	if (packet->length < FLASH_CMD_MIN_SIZE) {
 		LOG_ERR("Invalide command size: %d", packet->length);
-		command_id = UNKOWN_COMMAND_ID;
+		command_id = UNKNOWN_COMMAND_ID;
 		ret = -EMSGSIZE;
 		goto reply;
 	}
