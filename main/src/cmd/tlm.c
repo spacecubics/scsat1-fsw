@@ -22,7 +22,7 @@ LOG_MODULE_REGISTER(tlm, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 #define TLM_HISTORY_CMD        (1U)
 #define TLM_CANCEL_HISTORY_CMD (2U)
 
-#define UNKOWN_COMMAND_ID (0xFF)
+#define UNKNOWN_COMMAND_ID (0xFF)
 
 /* Command argument offset */
 #define TLM_HISTORY_START_SEQ_OFFSET (1U)
@@ -117,14 +117,14 @@ int csp_tlm_handler(csp_packet_t *packet)
 		csp_send_std_reply(packet, TLM_CANCEL_HISTORY_CMD, 0);
 		break;
 	default:
-		LOG_ERR("Unkown command code: %d", command_id);
+		LOG_ERR("Unknown command code: %d", command_id);
 		ret = -EINVAL;
 		break;
 	}
 
 free:
 	if (ret < 0) {
-		csp_send_std_reply(packet, UNKOWN_COMMAND_ID, ret);
+		csp_send_std_reply(packet, UNKNOWN_COMMAND_ID, ret);
 		csp_buffer_free(packet);
 	}
 

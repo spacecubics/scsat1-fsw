@@ -422,7 +422,7 @@ static void csp_file_work(struct k_work *work)
 		csp_file_get_last_crc(command_id, packet);
 		break;
 	default:
-		LOG_ERR("Unkown command code: %d", command_id);
+		LOG_ERR("Unknown command code: %d", command_id);
 		ret = -EINVAL;
 		command_id = CSP_UNKNOWN_CMD_CODE;
 		break;
