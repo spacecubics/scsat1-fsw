@@ -19,8 +19,9 @@ LOG_MODULE_REGISTER(sys_handler, CONFIG_SC_LIB_CSP_LOG_LEVEL);
 #define SYSTEM_READ_REG_CMD_SIZE (2U)
 
 /* Command ID */
-#define SYSTEM_CLEAR_BOOT_COUNT_CMD (0U)
-#define SYSTEM_READ_REG_CMD         (1U)
+#define SYSTEM_CLEAR_BOOT_COUNT_CMD  (0U)
+#define SYSTEM_READ_REG_CMD          (1U)
+#define SYSTEM_CLEAR_TLM_SEQ_NUM_CMD (2U)
 
 /* Command argument offset */
 #define SYSTEM_REG_ADDR_OFFSET (1U)
@@ -32,6 +33,19 @@ static int csp_system_clear_boot_count_cmd(uint8_t command_id, csp_packet_t *pac
 	LOG_INF("Clear boot count command");
 
 	ret = sc_fram_clear_boot_count();
+
+	csp_send_std_reply(packet, command_id, ret);
+
+	return ret;
+}
+
+static int csp_system_clear_tlm_seq_num_cmd(uint8_t command_id, csp_packet_t *packet)
+{
+	int ret;
+
+	LOG_INF("Clear telemetry sequence number command");
+
+	ret = sc_fram_clear_tlm_seq_num();
 
 	csp_send_std_reply(packet, command_id, ret);
 
@@ -95,6 +109,9 @@ int csp_system_handler(csp_packet_t *packet)
 		break;
 	case SYSTEM_READ_REG_CMD:
 		csp_system_read_reg_cmd(command_id, packet);
+		break;
+	case SYSTEM_CLEAR_TLM_SEQ_NUM_CMD:
+		csp_system_clear_tlm_seq_num_cmd(command_id, packet);
 		break;
 	default:
 		LOG_ERR("Unkown command code: %d", command_id);
