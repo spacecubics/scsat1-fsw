@@ -5,9 +5,13 @@
 /delete-node/ &uartlite0;
 
 / {
+	chosen {
+		zephyr,sram = &itcm;
+	};
+
 	soc {
-		hrmem: memory@0 {
-			compatible = "sc,hrmem";
+		itcm: memory@0 {
+			compatible = "arm,itcm";
 			reg = <0x00000000 DT_SIZE_K(32)>;
 		};
 
