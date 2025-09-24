@@ -194,7 +194,7 @@ static bool is_qspi_control_done(void)
 	return true;
 }
 
-static bool verify_status_resisger1(uint32_t spi_ss, size_t exp_size, uint32_t *exp_val)
+static bool verify_status_register1(uint32_t spi_ss, size_t exp_size, uint32_t *exp_val)
 {
 	bool ret;
 
@@ -261,12 +261,12 @@ static bool set_write_enable(uint32_t spi_ss, bool enable)
 	}
 
 	if (enable) {
-		if (!verify_status_resisger1(spi_ss, ARRAY_SIZE(exp_write_enable),
+		if (!verify_status_register1(spi_ss, ARRAY_SIZE(exp_write_enable),
 					     exp_write_enable)) {
 			return false;
 		}
 	} else {
-		if (!verify_status_resisger1(spi_ss, ARRAY_SIZE(exp_write_disable),
+		if (!verify_status_register1(spi_ss, ARRAY_SIZE(exp_write_disable),
 					     exp_write_disable)) {
 			return false;
 		}
