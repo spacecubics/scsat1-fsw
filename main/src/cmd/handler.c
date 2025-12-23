@@ -8,11 +8,13 @@
 #include "sc_csp.h"
 #include "handler.h"
 #include "pwrctrl.h"
+#include "mtqctrl.h"
 #include "file.h"
 #include "flash.h"
 #include "tlm.h"
 #include "sys.h"
 
+#define CSP_PORT_MAIN_MTQCTRL (11U)
 #define CSP_PORT_MAIN_PWRCTRL (12U)
 #define CSP_PORT_MAIN_FILE    (13U)
 #define CSP_PORT_MAIN_FLASH   (14U)
@@ -59,6 +61,9 @@ void csp_cmd_handler(void)
 				break;
 			case CSP_PORT_MAIN_SYSTEM:
 				csp_system_handler(packet);
+				break;
+			case CSP_PORT_MAIN_MTQCTRL:
+				csp_mtqctrl_handler(packet);
 				break;
 			default:
 				csp_service_handler(packet);
