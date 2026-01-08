@@ -32,7 +32,7 @@ ZBUS_CHAN_DEFINE(sunsens_chan, struct sunsens_msg, NULL, NULL, ZBUS_OBSERVERS(sy
 		 ZBUS_MSG_INIT(0));
 ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
-#define SYSHK_SYSTEM_BLOCK_SIZE  (27U)
+#define SYSHK_SYSTEM_BLOCK_SIZE  (35U)
 #define SYSHK_TEMP_BLOCK_SIZE    (50U)
 #define SYSHK_CV_BLOCK_SIZE      (105U)
 #define SYSHK_MGNM_BLOCK_SIZE    (24U)
@@ -70,6 +70,10 @@ static void copy_system_to_syshk(struct system_msg *msg)
 	system_block += sizeof(msg->fpga_config_bank);
 	memcpy(system_block, &msg->fpga_fallback_state, sizeof(msg->fpga_fallback_state));
 	system_block += sizeof(msg->fpga_fallback_state);
+	memcpy(system_block, &msg->fpga_clock_state, sizeof(msg->fpga_clock_state));
+	system_block += sizeof(msg->fpga_clock_state);
+	memcpy(system_block, &msg->fpga_sysmon_isr, sizeof(msg->fpga_sysmon_isr));
+	system_block += sizeof(msg->fpga_sysmon_isr);
 	memcpy(system_block, &msg->received_command_count, sizeof(msg->received_command_count));
 	system_block += sizeof(msg->received_command_count);
 	memcpy(system_block, &msg->last_csp_port, sizeof(msg->last_csp_port));
