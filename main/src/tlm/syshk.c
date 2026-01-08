@@ -36,8 +36,8 @@ ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
 #define SYSHK_SYSTEM_BLOCK_SIZE  (35U)
 #define SYSHK_ECC_BLOCK_SIZE     (23U)
-#define SYSHK_TEMP_BLOCK_SIZE    (50U)
-#define SYSHK_CV_BLOCK_SIZE      (105U)
+#define SYSHK_TEMP_BLOCK_SIZE    (40U)
+#define SYSHK_CV_BLOCK_SIZE      (84U)
 #define SYSHK_MGNM_BLOCK_SIZE    (24U)
 #define SYSHK_SUNSENS_BLOCK_SIZE (28U)
 
@@ -146,20 +146,14 @@ static void copy_temp_to_syshk(struct temp_msg *msg)
 	}
 
 	for (pos = 0; pos < OBC_TEMP_POS_NUM; pos++) {
-		memcpy(temp_block, &msg->obc[pos].status, sizeof(msg->obc[pos].status));
-		temp_block += sizeof(msg->obc[pos].status);
 		memcpy(temp_block, &msg->obc[pos].temp, sizeof(msg->obc[pos].temp));
 		temp_block += sizeof(msg->obc[pos].temp);
 	}
 
-	memcpy(temp_block, &msg->xadc.status, sizeof(msg->xadc.status));
-	temp_block += sizeof(msg->xadc.status);
 	memcpy(temp_block, &msg->xadc.temp, sizeof(msg->xadc.temp));
 	temp_block += sizeof(msg->xadc.temp);
 
 	for (pos = 0; pos < IO_TEMP_POS_NUM; pos++) {
-		memcpy(temp_block, &msg->io[pos].status, sizeof(msg->io[pos].status));
-		temp_block += sizeof(msg->io[pos].status);
 		memcpy(temp_block, &msg->io[pos].temp, sizeof(msg->io[pos].temp));
 		temp_block += sizeof(msg->io[pos].temp);
 	}
@@ -180,22 +174,16 @@ static void copy_cv_to_syshk(struct cv_msg *msg)
 	}
 
 	for (pos = 0; pos < OBC_CV_POS_NUM; pos++) {
-		memcpy(cv_block, &msg->obc[pos].status, sizeof(msg->obc[pos].status));
-		cv_block += sizeof(msg->obc[pos].status);
 		memcpy(cv_block, &msg->obc[pos].cv, sizeof(msg->obc[pos].cv));
 		cv_block += sizeof(msg->obc[pos].cv);
 	}
 
 	for (pos = 0; pos < OBC_XADC_CV_POS_NUM; pos++) {
-		memcpy(cv_block, &msg->xadc[pos].status, sizeof(msg->xadc[pos].status));
-		cv_block += sizeof(msg->xadc[pos].status);
 		memcpy(cv_block, &msg->xadc[pos].cv, sizeof(msg->xadc[pos].cv));
 		cv_block += sizeof(msg->xadc[pos].cv);
 	}
 
 	for (pos = 0; pos < IO_CV_POS_NUM; pos++) {
-		memcpy(cv_block, &msg->io[pos].status, sizeof(msg->io[pos].status));
-		cv_block += sizeof(msg->io[pos].status);
 		memcpy(cv_block, &msg->io[pos].cv, sizeof(msg->io[pos].cv));
 		cv_block += sizeof(msg->io[pos].cv);
 	}
