@@ -49,8 +49,6 @@ static void system_monitor(struct k_work *work)
 	msg.received_command_count = csp_stat.received_command_count;
 	msg.last_csp_port = csp_stat.last_csp_port;
 	msg.last_command_id = csp_stat.last_command_id;
-	sc_hrmem_get_ecc_error_count(&msg.ecc_error_count_by_auto, &msg.ecc_error_count_by_bus);
-	sc_sem_get_error_count(&msg.sem_error_count);
 
 	zbus_chan_pub(&system_chan, &msg, K_NO_WAIT);
 }
