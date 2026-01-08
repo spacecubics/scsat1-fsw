@@ -46,3 +46,7 @@ int sc_bhm_get_xadc_temp(float *temp);
 int sc_bhm_get_obc_cv(enum obc_cv_pos pos, int32_t *cv);
 int sc_bhm_get_xadc_cv(enum xadc_cv_pos pos, float *cv);
 int sc_sem_get_error_count(uint16_t *count);
+uint32_t sc_sem_get_controller_state(void);
+uint8_t sc_sem_get_heartbeat_timeout(void);
+uint32_t sc_clock_get_status(void);
+uint32_t sc_sysmon_get_isr(void);
