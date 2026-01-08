@@ -1,5 +1,11 @@
 menu "Monitoring"
 
+config SCSAT1_MAIN_MON_TIMESYNC_INTERVAL_SEC
+	int "Time Sync interval between EPS (sec)"
+	default 3600
+	help
+	  Time Sync interval between EPS (sec).
+
 config SCSAT1_MAIN_MON_SYSTEM_INTERVAL_MSEC
 	int "Monitor interval for System Information (msec)"
 	default 1000

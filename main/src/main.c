@@ -17,6 +17,8 @@
 
 int main(void)
 {
+	uint32_t interval = 0;
+
 	start_kick_wdt_thread();
 
 	datafs_init();
@@ -34,6 +36,10 @@ int main(void)
 	start_send_syshk();
 
 	while (true) {
+		interval++;
+		if (interval % CONFIG_SCSAT1_MAIN_MON_TIMESYNC_INTERVAL_SEC == 0) {
+			csp_time_sync_from_eps();
+		}
 		k_sleep(K_SECONDS(1));
 	}
 
