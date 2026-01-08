@@ -20,14 +20,18 @@ LOG_MODULE_REGISTER(sc_fpgamon, CONFIG_SC_FPGAMON_LOG_LEVEL);
 #define SCOBCA1_GPTMR_BASE  (0x4F050000)
 
 #define SCOBCA1_SYSMON_WDOG_CTRL     (SCOBCA1_SYSMON_BASE + 0x0000)
+#define SCOBCA1_SYSMON_CLOCK_STATE   (SCOBCA1_SYSMON_BASE + 0x0020)
+#define SCOBCA1_SYSMON_ISR           (SCOBCA1_SYSMON_BASE + 0x0030)
+#define SCOBCA1_SYSMON_SEM_STATE     (SCOBCA1_SYSMON_BASE + 0x0040)
 #define SCOBCA1_SYSMON_SEM_ECCOUNT   (SCOBCA1_SYSMON_BASE + 0x0044)
+#define SCOBCA1_SYSMON_SEM_HTIMEOUT  (SCOBCA1_SYSMON_BASE + 0x0048)
 #define SCOBCA1_SYSMON_XADC_TEMP     (SCOBCA1_SYSMON_BASE + 0x1000)
 #define SCOBCA1_SYSMON_XADC_VCCINT   (SCOBCA1_SYSMON_BASE + 0x1010)
 #define SCOBCA1_SYSMON_XADC_VCCAUX   (SCOBCA1_SYSMON_BASE + 0x1020)
 #define SCOBCA1_SYSMON_XADC_VCCBRAM  (SCOBCA1_SYSMON_BASE + 0x1060)
 #define SCOBCA1_SYSMON_INICTLR       (SCOBCA1_SYSMON_BASE + 0x2000)
 #define SCOBCA1_SYSMON_ACCCTLR       (SCOBCA1_SYSMON_BASE + 0x2004)
-#define SCOBCA1_SYSMON_ISR           (SCOBCA1_SYSMON_BASE + 0x2010)
+#define SCOBCA1_SYSMON_BSM_ISR       (SCOBCA1_SYSMON_BASE + 0x2010)
 #define SCOBCA1_SYSMON_1V0_SNTVR     (SCOBCA1_SYSMON_BASE + 0x2020)
 #define SCOBCA1_SYSMON_1V0_BUSVR     (SCOBCA1_SYSMON_BASE + 0x2024)
 #define SCOBCA1_SYSMON_1V8_SNTVR     (SCOBCA1_SYSMON_BASE + 0x2028)
@@ -256,9 +260,9 @@ static int wait_for_bhm_complete(uint32_t target_bit)
 
 	/* Wait for any processing to be complete */
 	for (i = 0; i < SYSMON_RETRY_COUNT; i++) {
-		reg = sys_read32(SCOBCA1_SYSMON_ISR);
+		reg = sys_read32(SCOBCA1_SYSMON_BSM_ISR);
 		if ((reg & target_bit) == target_bit) {
-			sys_write32(target_bit, SCOBCA1_SYSMON_ISR);
+			sys_write32(target_bit, SCOBCA1_SYSMON_BSM_ISR);
 			break;
 		}
 		k_sleep(K_MSEC(1));
@@ -412,6 +416,26 @@ int sc_sem_get_error_count(uint16_t *count)
 	*count = SCOBCA1_SYSMON_SEMCCOUNT(val);
 
 	return 0;
+}
+
+uint32_t sc_sem_get_controller_state(void)
+{
+	return sys_read32(SCOBCA1_SYSMON_SEM_STATE);
+}
+
+uint8_t sc_sem_get_heartbeat_timeout(void)
+{
+	return sys_read32(SCOBCA1_SYSMON_SEM_HTIMEOUT) & 0xFF;
+}
+
+uint32_t sc_clock_get_status(void)
+{
+	return sys_read32(SCOBCA1_SYSMON_CLOCK_STATE);
+}
+
+uint32_t sc_sysmon_get_isr(void)
+{
+	return sys_read32(SCOBCA1_SYSMON_ISR);
 }
 
 static int sc_fpgamon_init(void)
