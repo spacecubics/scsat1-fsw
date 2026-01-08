@@ -41,6 +41,9 @@ ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 #define SYSHK_MGNM_BLOCK_SIZE    (24U)
 #define SYSHK_SUNSENS_BLOCK_SIZE (28U)
 
+#define SYSHK_SEM_TIMEOUT_MS (10U)
+K_SEM_DEFINE(syshk_sem, 1, 1);
+
 struct syshk_tlm {
 	uint8_t telemetry_id;
 	uint32_t seq_num;
@@ -56,7 +59,14 @@ static struct syshk_tlm syshk = {.telemetry_id = CSP_TLM_ID_SYSHK, .seq_num = 0}
 
 static void copy_system_to_syshk(struct system_msg *msg)
 {
+	int ret;
 	uint8_t *system_block = syshk.system_block;
+
+	ret = k_sem_take(&syshk_sem, K_MSEC(SYSHK_SEM_TIMEOUT_MS));
+	if (ret < 0) {
+		LOG_ERR("Failed to take the system HK semaphore");
+		return;
+	}
 
 	memcpy(system_block, &msg->wall_clock, sizeof(msg->wall_clock));
 	system_block += sizeof(msg->wall_clock);
@@ -84,11 +94,20 @@ static void copy_system_to_syshk(struct system_msg *msg)
 	system_block += sizeof(msg->last_csp_port);
 	memcpy(system_block, &msg->last_command_id, sizeof(msg->last_command_id));
 	system_block += sizeof(msg->last_command_id);
+
+	k_sem_give(&syshk_sem);
 }
 
 static void copy_ecc_to_syshk(struct ecc_msg *msg)
 {
+	int ret;
 	uint8_t *ecc_block = syshk.ecc_block;
+
+	ret = k_sem_take(&syshk_sem, K_MSEC(SYSHK_SEM_TIMEOUT_MS));
+	if (ret < 0) {
+		LOG_ERR("Failed to take the system HK semaphore");
+		return;
+	}
 
 	memcpy(ecc_block, &msg->ecc_enable_ecc_collect, sizeof(msg->ecc_enable_ecc_collect));
 	ecc_block += sizeof(msg->ecc_enable_ecc_collect);
@@ -110,12 +129,21 @@ static void copy_ecc_to_syshk(struct ecc_msg *msg)
 	ecc_block += sizeof(msg->sem_contoller_state);
 	memcpy(ecc_block, &msg->sem_error_count, sizeof(msg->sem_error_count));
 	ecc_block += sizeof(msg->sem_error_count);
+
+	k_sem_give(&syshk_sem);
 }
 
 static void copy_temp_to_syshk(struct temp_msg *msg)
 {
+	int ret;
 	int pos;
 	uint8_t *temp_block = syshk.temp_block;
+
+	ret = k_sem_take(&syshk_sem, K_MSEC(SYSHK_SEM_TIMEOUT_MS));
+	if (ret < 0) {
+		LOG_ERR("Failed to take the system HK semaphore");
+		return;
+	}
 
 	for (pos = 0; pos < OBC_TEMP_POS_NUM; pos++) {
 		memcpy(temp_block, &msg->obc[pos].status, sizeof(msg->obc[pos].status));
@@ -135,12 +163,21 @@ static void copy_temp_to_syshk(struct temp_msg *msg)
 		memcpy(temp_block, &msg->io[pos].temp, sizeof(msg->io[pos].temp));
 		temp_block += sizeof(msg->io[pos].temp);
 	}
+
+	k_sem_give(&syshk_sem);
 }
 
 static void copy_cv_to_syshk(struct cv_msg *msg)
 {
+	int ret;
 	int pos;
 	uint8_t *cv_block = syshk.cv_block;
+
+	ret = k_sem_take(&syshk_sem, K_MSEC(SYSHK_SEM_TIMEOUT_MS));
+	if (ret < 0) {
+		LOG_ERR("Failed to take the system HK semaphore");
+		return;
+	}
 
 	for (pos = 0; pos < OBC_CV_POS_NUM; pos++) {
 		memcpy(cv_block, &msg->obc[pos].status, sizeof(msg->obc[pos].status));
@@ -162,12 +199,21 @@ static void copy_cv_to_syshk(struct cv_msg *msg)
 		memcpy(cv_block, &msg->io[pos].cv, sizeof(msg->io[pos].cv));
 		cv_block += sizeof(msg->io[pos].cv);
 	}
+
+	k_sem_give(&syshk_sem);
 }
 
 static void copy_mgnm_to_syshk(struct mgnm_msg *msg)
 {
+	int ret;
 	int pos;
 	uint8_t *mgnm_block = syshk.mgnm_block;
+
+	ret = k_sem_take(&syshk_sem, K_MSEC(SYSHK_SEM_TIMEOUT_MS));
+	if (ret < 0) {
+		LOG_ERR("Failed to take the system HK semaphore");
+		return;
+	}
 
 	for (pos = 0; pos < MGNM_POS_NUM; pos++) {
 		memcpy(mgnm_block, &msg->magnet[pos].status, sizeof(msg->magnet[pos].status));
@@ -182,12 +228,21 @@ static void copy_mgnm_to_syshk(struct mgnm_msg *msg)
 		memcpy(mgnm_block, &msg->temp[pos].data, sizeof(msg->temp[pos].data));
 		mgnm_block += sizeof(msg->temp[pos].data);
 	}
+
+	k_sem_give(&syshk_sem);
 }
 
 static void copy_sunsens_to_syshk(struct sunsens_msg *msg)
 {
+	int ret;
 	int pos;
 	uint8_t *sunsens_block = syshk.sunsens_block;
+
+	ret = k_sem_take(&syshk_sem, K_MSEC(SYSHK_SEM_TIMEOUT_MS));
+	if (ret < 0) {
+		LOG_ERR("Failed to take the system HK semaphore");
+		return;
+	}
 
 	for (pos = 0; pos < SUNSENS_POS_NUM; pos++) {
 		memcpy(sunsens_block, &msg->sun[pos].status, sizeof(msg->sun[pos].status));
@@ -202,6 +257,8 @@ static void copy_sunsens_to_syshk(struct sunsens_msg *msg)
 		memcpy(sunsens_block, &msg->temp[pos].data, sizeof(msg->temp[pos].data));
 		sunsens_block += sizeof(msg->temp[pos].data);
 	}
+
+	k_sem_give(&syshk_sem);
 }
 
 static void syshk_sub_task(void *sub)
