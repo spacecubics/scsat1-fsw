@@ -14,6 +14,7 @@
 #include "cv.h"
 #include "mgnm_mon.h"
 #include "sunsens_mon.h"
+#include "ecc.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(syshk, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -23,6 +24,7 @@ struct k_work_q syshk_workq;
 
 ZBUS_CHAN_DEFINE(system_chan, struct system_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
 		 ZBUS_MSG_INIT(0));
+ZBUS_CHAN_DEFINE(ecc_chan, struct ecc_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub), ZBUS_MSG_INIT(0));
 ZBUS_CHAN_DEFINE(temp_chan, struct temp_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub),
 		 ZBUS_MSG_INIT(0));
 ZBUS_CHAN_DEFINE(cv_chan, struct cv_msg, NULL, NULL, ZBUS_OBSERVERS(syshk_sub), ZBUS_MSG_INIT(0));
@@ -33,6 +35,7 @@ ZBUS_CHAN_DEFINE(sunsens_chan, struct sunsens_msg, NULL, NULL, ZBUS_OBSERVERS(sy
 ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
 #define SYSHK_SYSTEM_BLOCK_SIZE  (35U)
+#define SYSHK_ECC_BLOCK_SIZE     (23U)
 #define SYSHK_TEMP_BLOCK_SIZE    (50U)
 #define SYSHK_CV_BLOCK_SIZE      (105U)
 #define SYSHK_MGNM_BLOCK_SIZE    (24U)
@@ -42,6 +45,7 @@ struct syshk_tlm {
 	uint8_t telemetry_id;
 	uint32_t seq_num;
 	uint8_t system_block[SYSHK_SYSTEM_BLOCK_SIZE];
+	uint8_t ecc_block[SYSHK_ECC_BLOCK_SIZE];
 	uint8_t temp_block[SYSHK_TEMP_BLOCK_SIZE];
 	uint8_t cv_block[SYSHK_CV_BLOCK_SIZE];
 	uint8_t mgnm_block[SYSHK_MGNM_BLOCK_SIZE];
@@ -80,6 +84,32 @@ static void copy_system_to_syshk(struct system_msg *msg)
 	system_block += sizeof(msg->last_csp_port);
 	memcpy(system_block, &msg->last_command_id, sizeof(msg->last_command_id));
 	system_block += sizeof(msg->last_command_id);
+}
+
+static void copy_ecc_to_syshk(struct ecc_msg *msg)
+{
+	uint8_t *ecc_block = syshk.ecc_block;
+
+	memcpy(ecc_block, &msg->ecc_enable_ecc_collect, sizeof(msg->ecc_enable_ecc_collect));
+	ecc_block += sizeof(msg->ecc_enable_ecc_collect);
+	memcpy(ecc_block, &msg->ecc_enable_mem_scrub, sizeof(msg->ecc_enable_mem_scrub));
+	ecc_block += sizeof(msg->ecc_enable_mem_scrub);
+	memcpy(ecc_block, &msg->ecc_enable_mem_scrub_arbit, sizeof(msg->ecc_enable_mem_scrub_arbit));
+	ecc_block += sizeof(msg->ecc_enable_mem_scrub_arbit);
+	memcpy(ecc_block, &msg->ecc_mem_scrub_cycle, sizeof(msg->ecc_mem_scrub_cycle));
+	ecc_block += sizeof(msg->ecc_mem_scrub_cycle);
+	memcpy(ecc_block, &msg->ecc_error_count_by_auto, sizeof(msg->ecc_error_count_by_auto));
+	ecc_block += sizeof(msg->ecc_error_count_by_auto);
+	memcpy(ecc_block, &msg->ecc_error_count_by_bus, sizeof(msg->ecc_error_count_by_bus));
+	ecc_block += sizeof(msg->ecc_error_count_by_bus);
+	memcpy(ecc_block, &msg->ecc_error_discard_count, sizeof(msg->ecc_error_discard_count));
+	ecc_block += sizeof(msg->ecc_error_discard_count);
+	memcpy(ecc_block, &msg->ecc_error_address, sizeof(msg->ecc_error_address));
+	ecc_block += sizeof(msg->ecc_error_address);
+	memcpy(ecc_block, &msg->sem_contoller_state, sizeof(msg->sem_contoller_state));
+	ecc_block += sizeof(msg->sem_contoller_state);
+	memcpy(ecc_block, &msg->sem_error_count, sizeof(msg->sem_error_count));
+	ecc_block += sizeof(msg->sem_error_count);
 }
 
 static void copy_temp_to_syshk(struct temp_msg *msg)
@@ -181,6 +211,7 @@ static void syshk_sub_task(void *sub)
 	const struct zbus_observer *subscriber = sub;
 
 	struct system_msg system_msg;
+	struct ecc_msg ecc_msg;
 	struct temp_msg temp_msg;
 	struct cv_msg cv_msg;
 	struct mgnm_msg mgnm_msg;
@@ -194,6 +225,11 @@ static void syshk_sub_task(void *sub)
 				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
 			LOG_DBG("Subscribe SYSTEM msg %d byte", sizeof(system_msg));
 			copy_system_to_syshk(&system_msg);
+		} else if (&ecc_chan == chan) {
+			zbus_chan_read(chan, &ecc_msg,
+				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));
+			LOG_DBG("Subscribe ECC msg %d byte", sizeof(ecc_msg));
+			copy_ecc_to_syshk(&ecc_msg);
 		} else if (&temp_chan == chan) {
 			zbus_chan_read(chan, &temp_msg,
 				       K_MSEC(CONFIG_SCSAT1_MAIN_ZBUS_READ_TIMEOUT_MSEC));

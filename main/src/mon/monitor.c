@@ -11,6 +11,7 @@
 #include "cv.h"
 #include "mgnm_mon.h"
 #include "sunsens_mon.h"
+#include "ecc.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(monitor, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
@@ -27,6 +28,7 @@ void start_monitor(void)
 
 	sc_bhm_enable();
 	start_system_monitor();
+	start_ecc_monitor();
 	start_temp_monitor();
 	start_cv_monitor();
 	start_mgnm_monitor();

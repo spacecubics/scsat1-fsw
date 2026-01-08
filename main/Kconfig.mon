@@ -30,6 +30,12 @@ config SCSAT1_MAIN_MON_SUNSENS_INTERVAL_MSEC
 	help
 	  Monitor interval for Sun Sensor (sec).
 
+config SCSAT1_MAIN_MON_ECC_INTERVAL_MSEC
+	int "Monitor interval for ECC (msec)"
+	default 100
+	help
+	  Monitor interval for ECC (msec).
+
 config SCSAT1_MAIN_MON_SYSTEM_DELAY_MSEC
 	int "Delay time before starting the monitoring (msec)."
 	default 500
@@ -57,6 +63,12 @@ config SCSAT1_MAIN_MON_MGNM_DELAY_MSEC
 config SCSAT1_MAIN_MON_SUNSENS_DELAY_MSEC
 	int "Delay time before starting the monitoring (msec)."
 	default 4500
+	help
+	  Delay time before starting the initial monitoring (msec).
+
+config SCSAT1_MAIN_MON_ECC_DELAY_MSEC
+	int "Delay time before starting the monitoring (msec)."
+	default 50
 	help
 	  Delay time before starting the initial monitoring (msec).
 
