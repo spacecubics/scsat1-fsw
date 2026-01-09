@@ -22,6 +22,8 @@ LOG_MODULE_REGISTER(system_mon, CONFIG_SCSAT1_MAIN_LOG_LEVEL);
 
 ZBUS_CHAN_DECLARE(system_chan);
 extern struct k_work_q monitor_workq;
+extern int32_t last_time_sync_ret;
+extern uint16_t time_sync_count;
 
 extern struct csp_stat csp_stat;
 
@@ -51,6 +53,8 @@ static void system_monitor(struct k_work *work)
 	msg.received_command_count = csp_stat.received_command_count;
 	msg.last_csp_port = csp_stat.last_csp_port;
 	msg.last_command_id = csp_stat.last_command_id;
+	msg.last_time_sync_ret = last_time_sync_ret;
+	msg.time_sync_count = time_sync_count;
 
 	zbus_chan_pub(&system_chan, &msg, K_NO_WAIT);
 }
