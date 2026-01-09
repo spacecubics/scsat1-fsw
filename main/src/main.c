@@ -15,8 +15,8 @@
 #include "monitor.h"
 #include "eps.h"
 
-int32_t last_time_sync_ret;
-uint16_t time_sync_count;
+int32_t last_time_sync_ret = -1;
+uint16_t time_sync_count = 0;
 
 int main(void)
 {
@@ -30,7 +30,6 @@ int main(void)
 	sc_fram_update_boot_count();
 
 	sc_csp_init();
-	csp_time_sync_from_eps();
 
 	sc_main_power_enable(PDU_O1_PWR);
 
@@ -39,7 +38,6 @@ int main(void)
 	start_send_syshk();
 
 	while (true) {
-		interval++;
 		if (interval % CONFIG_SCSAT1_MAIN_MON_TIMESYNC_INTERVAL_SEC == 0) {
 			last_time_sync_ret = csp_time_sync_from_eps();
 			if (last_time_sync_ret == 0) {
@@ -47,6 +45,7 @@ int main(void)
 			}
 		}
 		k_sleep(K_SECONDS(1));
+		interval++;
 	}
 
 	return 0;
