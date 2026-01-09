@@ -34,7 +34,7 @@ ZBUS_CHAN_DEFINE(sunsens_chan, struct sunsens_msg, NULL, NULL, ZBUS_OBSERVERS(sy
 		 ZBUS_MSG_INIT(0));
 ZBUS_SUBSCRIBER_DEFINE(syshk_sub, CONFIG_SCSAT1_MAIN_SYSHK_SUB_QUEUE_SIZE);
 
-#define SYSHK_SYSTEM_BLOCK_SIZE  (35U)
+#define SYSHK_SYSTEM_BLOCK_SIZE  (41U)
 #define SYSHK_ECC_BLOCK_SIZE     (23U)
 #define SYSHK_TEMP_BLOCK_SIZE    (40U)
 #define SYSHK_CV_BLOCK_SIZE      (84U)
@@ -94,6 +94,10 @@ static void copy_system_to_syshk(struct system_msg *msg)
 	system_block += sizeof(msg->last_csp_port);
 	memcpy(system_block, &msg->last_command_id, sizeof(msg->last_command_id));
 	system_block += sizeof(msg->last_command_id);
+	memcpy(system_block, &msg->last_time_sync_ret, sizeof(msg->last_time_sync_ret));
+	system_block += sizeof(msg->last_time_sync_ret);
+	memcpy(system_block, &msg->time_sync_count, sizeof(msg->time_sync_count));
+	system_block += sizeof(msg->time_sync_count);
 
 	k_sem_give(&syshk_sem);
 }

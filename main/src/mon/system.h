@@ -20,6 +20,8 @@ struct system_msg {
 	uint16_t received_command_count;
 	uint8_t last_csp_port;
 	uint8_t last_command_id;
+	int32_t last_time_sync_ret;
+	uint16_t time_sync_count;
 };
 
 void start_system_monitor(void);
