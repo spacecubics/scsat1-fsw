@@ -55,6 +55,7 @@ LOG_MODULE_REGISTER(fram, CONFIG_SC_LIB_FRAM_LOG_LEVEL);
 #define FRAM_BOOT_COUNT_ADDR  (0x000000)
 #define FRAM_CRC_FILE_ADDR    (0x000100)
 #define FRAM_CRC_CFGMEM_ADDR  (0x000200)
+#define FRAM_TLM_SEQ_NUM_ADDR (0x000300)
 
 static bool assert32(uint32_t addr, uint32_t exp, uint32_t retry)
 {
@@ -695,5 +696,58 @@ int sc_fram_get_crc_for_cfgmem(struct fram_cfgmem_crc *crc_info)
 		crc_info->crc32);
 
 end:
+	return ret;
+}
+
+int sc_fram_clear_tlm_seq_num(void)
+{
+	int ret;
+	uint32_t tlm_seq_num = 0;
+
+	ret = sc_fram_write(SC_FRAM_MEM0, FRAM_TLM_SEQ_NUM_ADDR, sizeof(tlm_seq_num),
+			    (uint8_t *)&tlm_seq_num);
+	if (ret < 0) {
+		LOG_ERR("Failed to clear telemetry sequence number (%d)", ret);
+	}
+
+	return ret;
+}
+
+int sc_fram_update_tlm_seq_num(void)
+{
+	int ret;
+	uint32_t tlm_seq_num;
+
+	ret = sc_fram_read(SC_FRAM_MEM0, FRAM_TLM_SEQ_NUM_ADDR, sizeof(tlm_seq_num),
+			   (uint8_t *)&tlm_seq_num);
+	if (ret < 0) {
+		LOG_ERR("Failed to read telemetry sequence number (%d)", ret);
+		goto end;
+	}
+	tlm_seq_num++;
+
+	ret = sc_fram_write(SC_FRAM_MEM0, FRAM_TLM_SEQ_NUM_ADDR, sizeof(tlm_seq_num),
+			    (uint8_t *)&tlm_seq_num);
+	if (ret < 0) {
+		LOG_ERR("Failed to update telemetry sequence number (%d)", ret);
+		goto end;
+	}
+
+	LOG_INF("Updated telemetry sequence number to %u", tlm_seq_num);
+
+end:
+	return ret;
+}
+
+int sc_fram_get_tlm_seq_num(uint32_t *tlm_seq_num)
+{
+	int ret;
+
+	ret = sc_fram_read(SC_FRAM_MEM0, FRAM_TLM_SEQ_NUM_ADDR, sizeof(*tlm_seq_num),
+			   (uint8_t *)tlm_seq_num);
+	if (ret < 0) {
+		LOG_ERR("Failed to retrieve telemetry sequence number (%d)", ret);
+	}
+
 	return ret;
 }
