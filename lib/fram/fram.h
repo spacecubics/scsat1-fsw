@@ -26,3 +26,6 @@ int sc_fram_update_crc_for_file(const char* fname, uint32_t crc32);
 int sc_fram_get_crc_for_file(char* fname, uint32_t *crc32);
 int sc_fram_update_crc_for_cfgmem(struct fram_cfgmem_crc crc_info);
 int sc_fram_get_crc_for_cfgmem(struct fram_cfgmem_crc *crc_info);
+int sc_fram_clear_tlm_seq_num(void);
+int sc_fram_update_tlm_seq_num(void);
+int sc_fram_get_tlm_seq_num(uint32_t *tlm_seq_num);
