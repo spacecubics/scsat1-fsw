@@ -139,7 +139,6 @@ int csp_pwrctrl_handler(csp_packet_t *packet)
 reply:
 	if (ret < 0) {
 		csp_send_std_reply(packet, command_id, ret);
-		csp_buffer_free(packet);
 	}
 
 end:
