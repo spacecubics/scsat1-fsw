@@ -4,16 +4,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "data_nor.h"
 #include <stdio.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
+#include <zephyr/drivers/flash.h>
 #include <zephyr/fs/fs.h>
 #include <zephyr/fs/littlefs.h>
 #include <zephyr/storage/flash_map.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(data_nor, CONFIG_SC_LIB_FLASH_LOG_LEVEL);
+
+#define FLASH_CHUNK_SIZE (256U)
 
 FS_LITTLEFS_DECLARE_DEFAULT_CONFIG(storage);
 static struct fs_mount_t lfs_storage_mnt = {
@@ -142,4 +146,76 @@ unlock:
 
 end:
 	return ret;
+}
+
+int init_stored_tlm_info(struct syshk_stored_info *info)
+{
+	int ret;
+
+	const struct flash_area *fa;
+
+	ret = flash_area_open(FIXED_PARTITION_ID(tlm_partition), &fa);
+	if (ret < 0) {
+		LOG_ERR("Failed to open the stored telemetry partition (id:%d)",
+			FIXED_PARTITION_ID(tlm_partition));
+		goto end;
+	}
+
+	info->tlm_block_size = 256;
+	info->flash_size = fa->fa_size;
+	info->flash_start_addr = fa->fa_off;
+	info->erase_secotor_size = KB(4);
+	info->max_tlm_num = info->flash_size / info->tlm_block_size;
+	info->available_history_count =
+		info->max_tlm_num - (info->erase_secotor_size / info->tlm_block_size);
+
+	LOG_INF("Stored telemetry information area id=%d, tlm_block_size=%d[byte], "
+		"flash_size=%d[byte], flash_start_addr=0x%x, erase_secotor_size=%d[byte], "
+		"max_tlm_num=%d, available_history_count=%d ",
+		fa->fa_id, info->tlm_block_size, info->flash_size, info->flash_start_addr,
+		info->erase_secotor_size, info->max_tlm_num, info->available_history_count);
+
+	flash_area_close(fa);
+end:
+	return ret;
+}
+
+bool is_flash_erased(const struct device *flash_dev, uint32_t addr, size_t len)
+{
+	int ret;
+	uint32_t chunk_len;
+	uint8_t buf[FLASH_CHUNK_SIZE] __aligned(4);
+
+	while (len > 0) {
+		chunk_len = (len < FLASH_CHUNK_SIZE) ? len : FLASH_CHUNK_SIZE;
+		ret = flash_read(flash_dev, addr, buf, chunk_len);
+		if (ret != 0) {
+			return false;
+		}
+
+		uint32_t *p32 = (uint32_t *)buf;
+		size_t words = chunk_len / 4;
+
+		for (size_t i = 0; i < words; i++) {
+			if (p32[i] != 0xFFFFFFFF) {
+				return false;
+			}
+		}
+
+		for (size_t i = words * 4; i < chunk_len; i++) {
+			if (buf[i] != 0xFF) {
+				return false;
+			}
+		}
+
+		addr += chunk_len;
+		len -= chunk_len;
+	}
+
+	return true;
+}
+
+const struct device *stored_tlm_flash_dev()
+{
+	return DEVICE_DT_GET(DT_NODELABEL(s25fl256l1));
 }
