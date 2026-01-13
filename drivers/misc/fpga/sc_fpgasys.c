@@ -22,6 +22,7 @@ LOG_MODULE_REGISTER(sc_fpgasys, CONFIG_SC_FPGASYS_LOG_LEVEL);
 #define SCOBCA1_SYSREG_SYSCLKCT  (SCOBCA1_SYSREG_BASE + 0x0004)
 #define SCOBCA1_SYSREG_PLLINFO   (SCOBCA1_SYSREG_BASE + 0x0008)
 #define SCOBCA1_SYSREG_CFGMEMCTL (SCOBCA1_SYSREG_BASE + 0x0010)
+#define SCOBCA1_SYSREG_BOOTSTS   (SCOBCA1_SYSREG_BASE + 0x0014)
 #define SCOBCA1_SYSREG_PWRCYCLE  (SCOBCA1_SYSREG_BASE + 0x0020)
 #define SCOBCA1_SYSREG_PWRMANAGE (SCOBCA1_SYSREG_BASE + 0x0030)
 #define SCOBCA1_SYSREG_SPAD1     (SCOBCA1_SYSREG_BASE + 0x00F0)
@@ -41,6 +42,14 @@ LOG_MODULE_REGISTER(sc_fpgasys, CONFIG_SC_FPGASYS_LOG_LEVEL);
 
 #define CFG_MEMSEL_RETRY_COUNT    (100U)
 #define CFG_MEMSEL_RETRY_INTERVAL K_MSEC(1)
+
+#define BOOTSTS_VALID      BIT(0)
+#define BOOTSTS_FALLBACK   BIT(1)
+#define BOOTSTS_IPROG      BIT(2)
+#define BOOTSTS_WTO_ERROR  BIT(3)
+#define BOOTSTS_ID_ERROR   BIT(4)
+#define BOOTSTS_CRC_ERROR  BIT(5)
+#define BOOTSTS_WRAP_ERROR BIT(6)
 
 enum sc_cfgmem sc_get_boot_cfgmem(void)
 {
@@ -96,6 +105,17 @@ uint32_t sc_get_fpga_dna_1(void)
 uint32_t sc_get_fpga_dna_2(void)
 {
 	return sys_read32(SCOBCA1_SYSREG_DNA1);
+}
+
+uint32_t sc_get_bootsts(void)
+{
+	return sys_read32(SCOBCA1_SYSREG_BOOTSTS);
+}
+
+bool sc_is_fallback(void)
+{
+	uint32_t val = sys_read32(SCOBCA1_SYSREG_BOOTSTS);
+	return (val & BOOTSTS_FALLBACK) != 0;
 }
 
 static int sc_fpgasys_init(void)

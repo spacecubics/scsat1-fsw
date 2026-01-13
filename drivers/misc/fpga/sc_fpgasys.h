@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 enum sc_codemem {
 	SC_HRMEM = 0,
@@ -26,3 +27,5 @@ enum sc_cfgmem sc_get_boot_cfgmem(void);
 enum sc_cfgmem sc_get_cfgmem(void);
 int sc_select_cfgmem(enum sc_cfgmem);
 void sc_select_codemem(enum sc_codemem mem);
+uint32_t sc_get_bootsts(void);
+bool sc_is_fallback(void);
