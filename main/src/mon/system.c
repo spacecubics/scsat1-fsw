@@ -47,7 +47,7 @@ static void system_monitor(struct k_work *work)
 	msg.power_status = sc_main_get_power_status();
 	msg.fpga_version = sc_get_fpga_build_hash();
 	msg.fpga_config_bank = sc_get_boot_cfgmem();
-	msg.fpga_fallback_state = sc_fpgaconf_get_bootsts();
+	msg.fpga_fallback_state = sc_get_bootsts();
 	msg.fpga_clock_state = sc_clock_get_status();
 	msg.fpga_sysmon_isr = sc_sysmon_get_isr();
 	msg.received_command_count = csp_stat.received_command_count;

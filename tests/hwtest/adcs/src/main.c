@@ -42,7 +42,7 @@ static void sc_adcs_print_fpga_ids(void)
 {
 	LOG_INF("* FSW Version       : %s", ADCS_HWTEST_VERSION);
 	LOG_INF("* Boot CFG Memory   : %d", sc_get_boot_cfgmem());
-	LOG_INF("* FPGA Boot Status  : 0x%x", sc_fpgaconf_get_bootsts());
+	LOG_INF("* FPGA Boot Status  : 0x%x", sc_get_bootsts());
 	LOG_INF("* IP Version        : %08x", sc_get_fpga_ip_ver());
 	LOG_INF("* Build Information : %08x", sc_get_fpga_build_hash());
 	LOG_INF("* Device DNA 1      : %08x", sc_get_fpga_dna_1());
