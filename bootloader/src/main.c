@@ -9,7 +9,6 @@
 #include <zephyr/storage/flash_map.h>
 #include "version.h"
 #include "sc_fpgasys.h"
-#include "sc_fpgaconf.h"
 
 #define SCOBCA1_FPGA_SYSREG_CFGMEMCTL (0x4F000010)
 #define SCOBCA1_FPGA_HRMEM_ADDR       (0x60000000)
@@ -90,7 +89,7 @@ int main(void)
 	printk("Start SC-Sat1 Boot loader (v%s)\n", BOOT_LOADER_VERSION);
 	printk("FPGA Boot Status : 0x%08x\n", sc_get_bootsts());
 
-	if (sc_fpgaconf_is_fallback()) {
+	if (sc_is_fallback()) {
 		partition_id = FIXED_PARTITION_ID(golden_fsw);
 	}
 

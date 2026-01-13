@@ -12,7 +12,6 @@
 #include "fram.h"
 #include "sys.h"
 #include "pwrctrl_main.h"
-#include "sc_fpgaconf.h"
 #include "sc_fpgahrmem.h"
 #include "sc_fpgamon.h"
 #include "sc_fpgasys.h"

@@ -12,7 +12,6 @@
 #include "sc_csp.h"
 #include "reply.h"
 #include "upload.h"
-#include "sc_fpgaconf.h"
 #include "sc_fpgasys.h"
 #include "fram.h"
 
