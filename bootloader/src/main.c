@@ -88,7 +88,7 @@ int main(void)
 	uint8_t partition_id = FIXED_PARTITION_ID(update_fsw);
 
 	printk("Start SC-Sat1 Boot loader (v%s)\n", BOOT_LOADER_VERSION);
-	printk("FPGA Boot Status : 0x%08x\n", sc_fpgaconf_get_bootsts());
+	printk("FPGA Boot Status : 0x%08x\n", sc_get_bootsts());
 
 	if (sc_fpgaconf_is_fallback()) {
 		partition_id = FIXED_PARTITION_ID(golden_fsw);
