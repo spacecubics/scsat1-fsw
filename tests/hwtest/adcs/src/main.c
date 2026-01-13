@@ -19,7 +19,6 @@
 #include "loop_test.h"
 #include "syshk_test.h"
 #include "data_nor.h"
-#include "sc_fpgaconf.h"
 #include "sc_fpgasys.h"
 #include "sc_fpgamon.h"
 #include "version.h"
